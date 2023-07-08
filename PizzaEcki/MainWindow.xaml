@@ -42,38 +42,33 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="190"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="177.5"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="35*"/>
+                <RowDefinition Height="45*"/>
                 <RowDefinition Height="76*"/>
                 <RowDefinition Height="76*"/>
                 <RowDefinition Height="76*"/>
                 <RowDefinition Height="76*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="76*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Label Content="Kundendaten" VerticalAlignment="Center" Height="33" Background="#474747" Foreground="White" Grid.ColumnSpan="3"/>
-            <Label Grid.Row="1" Content="KundenNR." VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="134" Margin="36,0,0,0" />
-            <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="83,16,83,16" KeyUp="OnEnterKeyPressed"/>
-            <Label Grid.Row="2" Content="Name" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="74" Margin="66,0,0,0"/>
-            <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="83,17,83,16" Grid.ColumnSpan="2"/>
-            <Label Grid.Row="3" Content="Straße" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="80" Margin="62,0,0,0"/>
-            <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="83,11,83,22"/>
-            <Label Grid.Row="4" Content="Ort" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="41" Width="46" Margin="80,0,0,0"/>
-            <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="83,11,83,18"/>
-            <Label Grid.Row="5" Content="Zusatz" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="80" Margin="62,0,0,0"/>
-            <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" Margin="83,11,83,18" Height="58.4458319327731" Grid.ColumnSpan="2"/>
-            <Button x:Name="SaveButton" Grid.Row="6" Grid.Column="1" Content="Speichern" HorizontalAlignment="Right" Width="100" Height="25" Background="Green" Foreground="White" Margin="0,0,0,3" Click="OnSaveButtonClicked"/>
+            <Label Content="Kundendaten" VerticalAlignment="Center" Background="#474747" Foreground="White" Grid.ColumnSpan="3" MinHeight="40" FontWeight="Bold" FontSize="22" Height="34"/>
+            <Label Grid.Row="1" Content="KundenNR." VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="134" Margin="36,0,20,0" />
+            <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"  KeyUp="OnEnterKeyPressed" VerticalAlignment="Center" MinHeight="35" Margin="0,0,20,0" Height="40" FontSize="18" VerticalContentAlignment="Center"/>
+            <Label Grid.Row="2" Content="Name" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="74" Margin="66,0,20,0"/>
+            <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="0,0,20,0" Grid.ColumnSpan="2" VerticalAlignment="Center" MinHeight="25" Height="40" VerticalContentAlignment="Center" FontSize="18"/>
+            <Label Grid.Row="3" Content="Straße" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="80" Margin="62,0,20,0"/>
+            <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,20,0" VerticalAlignment="Center" MinHeight="35" Height="40" FontSize="18" VerticalContentAlignment="Center"/>
+            <Label Grid.Row="4" Content="Ort" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="41" Width="46" Margin="80,0,20,0"/>
+            <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,20,0" VerticalAlignment="Center" MinHeight="35" Height="40" VerticalContentAlignment="Center" FontSize="18"/>
+            <Label Grid.Row="5" Content="Zusatz" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="80" Margin="62,0,20,0"/>
+            <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" Margin="0,0,20,0" Grid.ColumnSpan="2" VerticalAlignment="Center" MinHeight="35" Height="40" FontSize="18" VerticalContentAlignment="Center"/>
+            <Button x:Name="SaveButton" Grid.Row="6" Grid.Column="2" Content="Speichern" HorizontalAlignment="Right" Width="100" Background="Green" Foreground="White" Margin="0,5,20,5" Click="OnSaveButtonClicked" MinHeight="30"/>
         </Grid>
-        <Grid Grid.Column="1" Margin="0,16,0,0" Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="153*"/>
-                <ColumnDefinition Width="134*"/>
-            </Grid.ColumnDefinitions>
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Background="#9e9e9e" Margin="10,264,20,0" Grid.RowSpan="2">
+
+        <Grid Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Background="#9e9e9e" Margin="10,230,20,0" Grid.RowSpan="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="3*"/>
@@ -82,25 +77,25 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*" MinHeight="33"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Label Content="Eingabe" Grid.Row="0" Grid.ColumnSpan="4" VerticalAlignment="Center" Height="33" Background="#474747" Foreground="White"/>
-            <Label Grid.Row="1" Content="Gericht" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="134"/>
-            <ComboBox x:Name="dishComboBox" Grid.Row="1" Grid.Column="1" Margin="10,5,10,5" IsEditable="True" SelectionChanged ="dishComboBox_TextChanged"  PreviewKeyDown="dishComboBox_PreviewKeyDown" />
+            <Label Content="Eingabe" Grid.Row="0" Grid.ColumnSpan="4" VerticalAlignment="Top" Height="34" Background="#474747" Foreground="White" Margin="0,0,-1,0" MinHeight="40" FontWeight="Bold" FontSize="22" VerticalContentAlignment="Center"/>
+            <Label Grid.Row="1" Content="Gericht" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="89" Margin="0,0,20,0"/>
+            <ComboBox x:Name="dishComboBox" Grid.Row="1" Grid.Column="1" Margin="0,5,10,5" IsEditable="True" SelectionChanged ="DishComboBox_TextChanged"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalAlignment="Center" MinHeight="35" VerticalContentAlignment="Center" FontSize="18" />
 
-            <Label Grid.Row="2" Content="Extras" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="134"/>
-            <ComboBox x:Name="extras" Grid.Row="2" Grid.Column="1"  Margin="10,5,10,5"  SelectionChanged="extras_SelectionChanged" />
+            <Label Grid.Row="2" Content="Extras" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="75" Margin="0,0,20,0"/>
+            <ComboBox x:Name="extras" Grid.Row="2" Grid.Column="1"  Margin="0,5,10,5" IsEditable="True" SelectionChanged="Extras_SelectionChanged" VerticalAlignment="Center" MinHeight="35" KeyDown="ExtraCombobox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" />
 
-            <Label Grid.Row="3" Content="Uhrzeit" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="134"/>
-            <xctk:TimePicker Name="TimePicker" Format="Custom" FormatString="HH:mm" Grid.Row="3" Grid.Column="1" Margin="10,5,0,5" HorizontalAlignment="Left" Width="150"  />
+            <Label Grid.Row="3" Content="Uhrzeit" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="89" Margin="0,0,20,0"/>
+            <xctk:TimePicker Name="TimePicker" Format="Custom" FormatString="HH:mm" Grid.Row="3" Grid.Column="1" Margin="0,5,0,5" HorizontalAlignment="Left" Width="150" VerticalAlignment="Center" MinHeight="35" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown"  />
 
 
             <Label Grid.Row="1" Grid.Column="2" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42" Width="150" Margin="36,0,0,0" Grid.ColumnSpan="2"/>
-            <ComboBox x:Name="amountComboBox" Grid.Row="1" Grid.Column="3" Margin="0,0,105,0" KeyUp="amountComboBox_KeyUp" SelectionChanged="amountComboBox_SelectionChanged">
+            <ComboBox x:Name="amountComboBox" Grid.Row="1" Grid.Column="2" Margin="125,0,0,0" SelectionChanged="amountComboBox_SelectionChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="50" FontSize="18" KeyDown="amountComboBox_KeyDown">
                 <ComboBoxItem Content="1" />
                 <ComboBoxItem Content="2" />
                 <ComboBoxItem Content="3" />
@@ -113,7 +108,7 @@
 
             </Grid.RowDefinitions>
             <Label Content="Bestellung" Grid.Row="0" Height="50" Background="#474747" Foreground="White" VerticalAlignment="Top"/>
-            <DataGrid x:Name="myDataGrid" Margin="0,36,0,30" Grid.Row="1" AutoGenerateColumns="False" Background="White" Foreground="Black" GridLinesVisibility="All"  HeadersVisibility="Column" RowBackground="#FFFFFF" AlternatingRowBackground="#F0F0F0" ColumnHeaderHeight="40" Grid.RowSpan="3">
+            <DataGrid x:Name="myDataGrid" Margin="0,36,0,30" Grid.Row="1" AutoGenerateColumns="False" Background="White" Foreground="Black" GridLinesVisibility="All"  HeadersVisibility="Column" RowBackground="#FFFFFF" AlternatingRowBackground="#F0F0F0" ColumnHeaderHeight="40" Grid.RowSpan="3" FontSize="16">
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}" />
                     <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" />
@@ -164,7 +159,6 @@
 
             <Button Height="60" Width="200" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 20 20 0" Background="#21aa00"></Button>
         </Grid>
-        <Button Grid.Column="1" Content="Button" HorizontalAlignment="Left" Margin="72,50,0,0" VerticalAlignment="Top" Click="Button_Click"/>
 
 
 
