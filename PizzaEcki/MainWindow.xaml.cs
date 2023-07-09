@@ -265,8 +265,10 @@ namespace PizzaEcki
                     myDataGrid.ItemsSource = null;
                     myDataGrid.ItemsSource = orderItems;
 
-                    // Setzen Sie tempOrderItem zurück, um bereit für die nächste Eingabe zu sein
-                    tempOrderItem = new OrderItem();
+                CalculateTotal(orderItems);
+
+                // Setzen Sie tempOrderItem zurück, um bereit für die nächste Eingabe zu sein
+                tempOrderItem = new OrderItem();
 
                     // Löschen Sie die Auswahlen und den Text in den ComboBoxen und dem TextBox
                     dishComboBox.SelectedItem = null;
@@ -333,6 +335,11 @@ namespace PizzaEcki
                 myDataGrid.ItemsSource = null;
                 myDataGrid.ItemsSource = orderItems;
 
+                CalculateTotal(orderItems);
+
+
+
+
                 // Setzen Sie tempOrderItem zurück, um bereit für die nächste Eingabe zu sein
                 tempOrderItem = new OrderItem();
 
@@ -342,5 +349,22 @@ namespace PizzaEcki
                 amountComboBox.SelectedItem = null;
             }
         }
+
+        public void CalculateTotal(List<OrderItem> orderItem)
+        {
+            double gesamtPreis = 0;
+            foreach (var item in orderItems)
+            {
+                gesamtPreis += item.Gesamt;
+            }
+            TotalPriceButton.Content = $"{gesamtPreis:F2} €";
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+       
     }
 }

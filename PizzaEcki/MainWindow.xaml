@@ -107,7 +107,7 @@
                 <RowDefinition Height="*"/>
 
             </Grid.RowDefinitions>
-            <Label Content="Bestellung" Grid.Row="0" Height="50" Background="#474747" Foreground="White" VerticalAlignment="Top"/>
+            <Label Content="Bestellung" Grid.Row="0" Height="38" Background="#474747" Foreground="White" VerticalAlignment="Top" VerticalContentAlignment="Center" FontSize="18" FontWeight="Bold"/>
             <DataGrid x:Name="myDataGrid" Margin="0,36,0,30" Grid.Row="1" AutoGenerateColumns="False" Background="White" Foreground="Black" GridLinesVisibility="All"  HeadersVisibility="Column" RowBackground="#FFFFFF" AlternatingRowBackground="#F0F0F0" ColumnHeaderHeight="40" Grid.RowSpan="3" FontSize="16">
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}" />
@@ -157,7 +157,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Button Height="60" Width="200" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 20 20 0" Background="#21aa00"></Button>
+            <Button x:Name="TotalPriceButton" Height="60" Width="200" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 20 20 0" Background="#21aa00" Click="Button_Click" FontSize="30" Foreground="#FFFFFBFB" Content="00.00€"/>
         </Grid>
 
 
