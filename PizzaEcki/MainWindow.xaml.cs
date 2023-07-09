@@ -25,7 +25,8 @@ namespace PizzaEcki
             InitializeComponent();
 
             _databaseManager = new DatabaseManager();
-
+            TimePicker.Value = DateTime.Now;
+            TimePicker.TimeInterval = new TimeSpan(0, 30, 0);
             // Füllen Sie die ComboBox für Gerichte aus der Datenbank
             dishesList = _databaseManager.GetDishes();
             dishComboBox.ItemsSource = dishesList;
