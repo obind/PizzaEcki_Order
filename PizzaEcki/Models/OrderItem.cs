@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PizzaEcki.Models;
+
 
 namespace PizzaEcki.Models
 {
@@ -24,6 +26,7 @@ namespace PizzaEcki.Models
         public double Gesamt { get; set; }
 
         public string Uhrzeit { get; set; }
+        public int LieferungsArt { get; set; }
 
         // ... weitere Eigenschaften und Methoden nach Bedarf
     }
