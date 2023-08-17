@@ -141,6 +141,40 @@ namespace PizzaEcki.Database
             }
         }
 
+        public List<string> GetAllStreets()
+        {
+            List<string> streets = new List<string>();
+            string sql = "SELECT DISTINCT Street FROM Addresses";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        streets.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return streets;
+        }
+
+        public List<string> GetAllCities()
+        {
+            List<string> cities = new List<string>();
+            string sql = "SELECT DISTINCT City FROM Addresses";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        cities.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return cities;
+        }
+
 
         public List<Dish> GetDishes()
         {
