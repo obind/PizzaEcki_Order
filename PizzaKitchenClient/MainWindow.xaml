@@ -1,0 +1,8 @@
+﻿<Window x:Class="PizzaKitchenClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Pizza Kitchen" Height="450" Width="800">
+    <Grid>
+        <ListBox Name="DishList" HorizontalAlignment="Left" Height="400" VerticalAlignment="Top" Width="300"/>
+    </Grid>
+</Window>

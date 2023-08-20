@@ -6,9 +6,9 @@ using System.Windows.Input;
 using PizzaEcki.Database;
 using System.Linq;
 using PizzaEcki.Models;
-using PizzaEcki.Extensions;
 using Microsoft.AspNetCore.SignalR;
-
+using PizzaEcki.Services;
+using SharedLibrary;
 
 namespace PizzaEcki
 {
@@ -18,7 +18,8 @@ namespace PizzaEcki
         private DatabaseManager _databaseManager;
         private List<Dish> dishesList;
         private List<Extra> extrasList;
-        private List<OrderItem> orderItems = new List<OrderItem>();
+        private SignalRService signalRService;
+        private List<SharedLibrary.OrderItem> orderItems = new List<SharedLibrary.OrderItem>();
         private OrderItem tempOrderItem = new OrderItem();     
         
         private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
@@ -31,6 +32,9 @@ namespace PizzaEcki
         public MainWindow()
         {
             InitializeComponent();
+
+            signalRService = new SignalRService();
+            signalRService.StartConnectionAsync();
 
             // Erstellt eine neue Instanz von DatabaseManager, um die Verbindung zur Datenbank zu verwalten
             // und alle erforderlichen Tabellen und Initialdaten zu initialisieren.
@@ -84,7 +88,7 @@ namespace PizzaEcki
                         else // Kunde nicht gefunden
                         {
                             // Aufforderung zur Erstellung eines neuen Kunden
-                            MessageBoxResult result = MessageBox.Show("Es ist noch kein Kunde mit der Nummer bekann.", " Wollen sie einen Anelgen?", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            MessageBoxResult result = MessageBox.Show("Es ist noch kein Kunde mit der Nummer bekann. \n Wollen sie einen Anelgen?", "Frage", MessageBoxButton.YesNo, MessageBoxImage.Question);
                             if (result == MessageBoxResult.Yes)
                             {
                                 SaveButton.Visibility = Visibility.Visible;
@@ -366,5 +370,14 @@ namespace PizzaEcki
             }
         }
 
+        private void SendOrderItems()
+        {
+            signalRService.SendOrderItemsAsync(orderItems);
+        }
+
+        private void EinstellungenBtn_Click(object sender, RoutedEventArgs e)
+        {
+            SendOrderItems();
+        }
     }
 }

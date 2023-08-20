@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PizzaEcki.Models;
 
 
-namespace PizzaEcki.Models
+namespace SharedLibrary
 {
     public class OrderItem
     {
