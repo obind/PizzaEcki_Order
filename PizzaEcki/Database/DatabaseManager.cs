@@ -4,6 +4,7 @@ using SQLitePCL;
 using PizzaEcki.Models;
 using System.Collections.Generic;
 using Microsoft.Win32.SafeHandles;
+using SharedLibrary;
 
 namespace PizzaEcki.Database
 {
@@ -33,7 +34,6 @@ namespace PizzaEcki.Database
         private void CreateTable()
         {
             //Customer Table
-            // Customer Table
             string sql = "CREATE TABLE IF NOT EXISTS Customers (PhoneNumber TEXT PRIMARY KEY, Name TEXT, AddressId INTEGER, AdditionalInfo TEXT, FOREIGN KEY(AddressId) REFERENCES Addresses(Id))";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -57,6 +57,13 @@ namespace PizzaEcki.Database
 
             //Extras Table
             sql = "CREATE TABLE IF NOT EXISTS Extras (Id INTEGER PRIMARY KEY, Name TEXT, Price REAL)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            // Driver Table
+            sql = "CREATE TABLE IF NOT EXISTS Drivers (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, PhoneNumber TEXT)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
@@ -245,7 +252,94 @@ namespace PizzaEcki.Database
             }
 
             return extras;
-        }    
+        }
+
+
+
+        //Driver Methodes
+        public void AddDriver(Driver driver)
+        {
+            string sql = "INSERT INTO Drivers (Name, PhoneNumber) VALUES (@Name, @PhoneNumber)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Name", driver.Name);
+                command.Parameters.AddWithValue("@PhoneNumber", driver.PhoneNumber);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void UpdateDriver(Driver driver)
+        {
+            string sql = "UPDATE Drivers SET Name = @Name, PhoneNumber = @PhoneNumber WHERE Id = @Id";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Id", driver.Id);
+                command.Parameters.AddWithValue("@Name", driver.Name);
+                command.Parameters.AddWithValue("@PhoneNumber", driver.PhoneNumber);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteDriver(int id)
+        {
+            string sql = "DELETE FROM Drivers WHERE Id = @Id";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Id", id);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public List<Driver> GetDrivers()
+        {
+            List<Driver> drivers = new List<Driver>();
+            string sql = "SELECT Id, Name, PhoneNumber FROM Drivers";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            using (SqliteDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    drivers.Add(new Driver
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1),
+                        PhoneNumber = reader.GetString(2),
+                    });
+                }
+            }
+            return drivers;
+        }
+
+        public List<Driver> GetAllDrivers()
+        {
+            List<Driver> drivers = new List<Driver>();
+
+            // SQL-Abfrage, um alle Fahrer abzurufen
+            string sql = "SELECT * FROM Drivers";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Driver driver = new Driver
+                        {
+                            // Stellen Sie sicher, dass Sie die Spalten in der richtigen Reihenfolge abrufen
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            PhoneNumber = reader.GetString(2)
+                        };
+                        drivers.Add(driver);
+                    }
+                }
+            }
+
+            return drivers;
+        }
+
+
+
         public void Dispose()
         {
             _connection?.Close();

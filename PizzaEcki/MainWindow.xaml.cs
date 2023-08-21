@@ -9,12 +9,17 @@ using PizzaEcki.Models;
 using Microsoft.AspNetCore.SignalR;
 using PizzaEcki.Services;
 using SharedLibrary;
+using PizzaEcki.Pages;
+using System.Collections.ObjectModel;
 
 namespace PizzaEcki
 {
 
     public partial class MainWindow : Window
     {
+
+        public ObservableCollection<Driver> Drivers { get; set; }
+
         private DatabaseManager _databaseManager;
         private List<Dish> dishesList;
         private List<Extra> extrasList;
@@ -55,6 +60,11 @@ namespace PizzaEcki
             TimePicker.Value = DateTime.Now;
             TimePicker.Value = DateTime.Now.AddMinutes(15);
             TimePicker.TimeInterval = new TimeSpan(0, 30, 0);
+
+            //Fahrer laden 
+            LoadDrivers();
+            DataContext = this; // Setzen Sie den DataContext auf diese Instanz, damit die Bindung funktioniert
+
         }
 
         private void PhoneNumberTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -85,6 +95,7 @@ namespace PizzaEcki
                         {
                             //Rufe die MEthode auf um die Textfelder Automatisch zu füllen
                             SetCustomerDataToFields(customer);
+                            DishComboBox.Focus();
                             Lieferung++;
                         }
                         else // Kunde nicht gefunden
@@ -393,7 +404,18 @@ namespace PizzaEcki
 
         private void EinstellungenBtn_Click(object sender, RoutedEventArgs e)
         {
-           // SendOrderItems();
+            SettingsWindow settingsWindow = new SettingsWindow();
+            settingsWindow.ShowDialog();
         }
+        private void LoadDrivers()
+        {
+            DatabaseManager dbManager = new DatabaseManager();
+            List<Driver> driversFromDb = dbManager.GetAllDrivers();
+
+            Drivers = new ObservableCollection<Driver>(driversFromDb);
+
+            DriversComboBox.ItemsSource = driversFromDb;
+        }
+
     }
 }

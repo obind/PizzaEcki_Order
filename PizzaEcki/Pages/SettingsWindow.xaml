@@ -1,0 +1,28 @@
+﻿<Window x:Class="PizzaEcki.Pages.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Einstellungen" Height="400" Width="600">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Fahrer">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ListView Name="DriversList" Margin="10">
+                        <!-- Fahrer-Liste -->
+                    </ListView>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                        <Button Content="Hinzufügen" Click="AddDriverButton_Click" Margin="5" />
+                        <Button Content="Bearbeiten" Click="EditDriverButton_Click" Margin="5" />
+                        <!--<Button Content="Löschen" Click="DeleteDriverButton_Click" Margin="5" />-->
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Andere Einstellungen">
+                <!-- Weitere Einstellungen -->
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
