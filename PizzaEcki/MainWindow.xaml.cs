@@ -20,8 +20,10 @@ namespace PizzaEcki
         private List<Extra> extrasList;
         private SignalRService signalRService;
         private List<SharedLibrary.OrderItem> orderItems = new List<SharedLibrary.OrderItem>();
-        private OrderItem tempOrderItem = new OrderItem();     
-        
+        private OrderItem tempOrderItem = new OrderItem();
+   
+
+        private int currentBonNumber = 0;
         private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
         private int Lieferung = 0;
         private int Selbstabholer = 0;
@@ -343,6 +345,20 @@ namespace PizzaEcki
                 //OrderItems = GetCurrentOrderItems(),
             };
 
+            var order = new Order
+            {
+                OrderId = Guid.NewGuid(),
+                BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
+                OrderItems = orderItems
+            };
+            SendOrderItems(order);
+
+            // Leeren Sie die Bestellliste
+            orderItems.Clear();
+
+            // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
+            myDataGrid.Items.Refresh();
+
             //Aktualisiere Lieferungsart
             AuslieferungLabel.Content = Lieferung;
             MitnehmerLabel.Content = Mitnehmer;
@@ -370,14 +386,14 @@ namespace PizzaEcki
             }
         }
 
-        private void SendOrderItems()
+        private void SendOrderItems(Order order)
         {
-            signalRService.SendOrderItemsAsync(orderItems);
+            signalRService.SendOrderItemsAsync(order);
         }
 
         private void EinstellungenBtn_Click(object sender, RoutedEventArgs e)
         {
-            SendOrderItems();
+           // SendOrderItems();
         }
     }
 }

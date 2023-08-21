@@ -2,7 +2,34 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Pizza Kitchen" Height="450" Width="800">
-    <Grid>
-        <ListBox Name="DishList" HorizontalAlignment="Left" Height="400" VerticalAlignment="Top" Width="300"/>
+
+    <Grid Background="WhiteSmoke">
+        <ListView Name="OrdersList" Margin="10">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Bonnummer" Width="100" DisplayMemberBinding="{Binding BonNumber}" />
+                    <GridViewColumn Header="Anzahl der Gerichte" Width="150" DisplayMemberBinding="{Binding OrderItems.Count}" />
+                    <GridViewColumn Header="Gerichte" Width="500">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ItemsControl ItemsSource="{Binding OrderItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Gericht}" Width="200" />
+                                                <TextBlock Text="Menge:" Width="60" />
+                                                <TextBlock Text="{Binding Menge}" Width="40" />
+                                                <TextBlock Text="Extras:" Width="60" />
+                                                <TextBlock Text="{Binding Extras}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </Window>

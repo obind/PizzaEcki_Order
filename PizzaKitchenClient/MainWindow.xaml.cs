@@ -19,26 +19,19 @@ namespace PizzaKitchenClient
 
         private void InitializeHubConnection()
         {
-                   
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7166/pizzaHub") // Update the URL to match your server's address
-            .Build();
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7166/pizzaHub")
+                .Build();
 
-
-            hubConnection.On<List<SharedLibrary.OrderItem>>("ReceiveOrderItems", (orderItems) =>
+            hubConnection.On<Order>("ReceiveOrder", (order) =>
             {
-                // Setzen Sie hier einen Breakpoint
-                // Verarbeiten Sie die Liste der OrderItem-Objekte und aktualisieren Sie die UI
                 Dispatcher.Invoke(() =>
                 {
-                    foreach (var item in orderItems)
-                    {
-                        // Beispiel: Fügen Sie jedes Gericht zu einer Liste in der UI hinzu
-                        DishList.Items.Add(item.Gericht + ", " + item.Extras + ", " + item.Menge);
-                    }
+                    // Hier können Sie die Bestellung im UI anzeigen
+                    // Zum Beispiel:
+                    OrdersList.Items.Add(order);
                 });
             });
-
 
             StartHubConnection();
         }

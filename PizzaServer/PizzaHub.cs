@@ -12,9 +12,9 @@ namespace PizzaServer
             await Clients.All.SendAsync("ReceiveDish", dish);
         }
 
-        public async Task SendOrderItems(List<OrderItem> orderItems)
+        public async Task SendOrderItems(Order order)
         {
-            await Clients.All.SendAsync("ReceiveOrderItems", orderItems);
+            await Clients.All.SendAsync("ReceiveOrder", order);
         }
 
     }

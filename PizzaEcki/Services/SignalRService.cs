@@ -23,9 +23,10 @@ namespace PizzaEcki.Services
             await hubConnection.StartAsync();
         }
 
-        public async Task SendOrderItemsAsync(List<OrderItem> orderItems)
+        public async Task SendOrderItemsAsync(Order order)
         {
-            await hubConnection.InvokeAsync("SendOrderItems", orderItems);
+            await hubConnection.InvokeAsync("SendOrderItems", order);
         }
+
     }
 }
