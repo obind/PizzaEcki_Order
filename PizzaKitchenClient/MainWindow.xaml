@@ -4,6 +4,10 @@
         Title="Pizza Kitchen" Height="450" Width="800">
 
     <Grid Background="WhiteSmoke">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <ListView Name="OrdersList" Margin="10">
             <ListView.View>
                 <GridView>
@@ -31,5 +35,6 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <ComboBox Name="DriversComboBox" Grid.Row="1" Margin="10" Loaded="DriversComboBox_Loaded"/>
     </Grid>
 </Window>

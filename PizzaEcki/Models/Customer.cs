@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PizzaEcki.Models
 {
-    class Customer
+   public class Customer
     {
         public string PhoneNumber { get; set; }
         public string Name { get; set; }

@@ -4,30 +4,31 @@ using SQLitePCL;
 using PizzaEcki.Models;
 using System.Collections.Generic;
 using Microsoft.Win32.SafeHandles;
+using System.IO;
 using SharedLibrary;
 
 namespace PizzaEcki.Database
 {
-    class DatabaseManager : IDisposable
+    public class DatabaseManager : IDisposable
     {
         private SqliteConnection _connection;
-        private readonly string databaseFilePath = "./database.sqlite";
+        private readonly string userDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private readonly string databaseFileName = "database.sqlite";
+        private readonly string fullPathToDatabase;
 
-        //Database Managment
         public DatabaseManager()
         {
             Batteries.Init(); // Initialisierung von SQLitePCLRaw
 
-            _connection = new SqliteConnection($"Data Source={databaseFilePath};");
-            string fullPath = System.IO.Path.GetFullPath(databaseFilePath);
-            Console.WriteLine(fullPath);
+            fullPathToDatabase = Path.Combine(userDocumentsFolder, databaseFileName);
+
+            _connection = new SqliteConnection($"Data Source={fullPathToDatabase};");
+            Console.WriteLine(fullPathToDatabase);
 
             _connection.Open();
 
             CreateTable();
             InitializeDishes();
-
-
         }
 
         //Customers
@@ -123,8 +124,6 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
         }
-
-
 
         //Dishes
         public void AddDishes(List<Dish> dishes)
