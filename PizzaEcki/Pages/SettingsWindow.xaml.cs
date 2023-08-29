@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using PizzaEcki.Database;
+using PizzaEcki.Models;
 using SharedLibrary;
 
 namespace PizzaEcki.Pages
@@ -13,12 +15,21 @@ namespace PizzaEcki.Pages
             InitializeComponent();
             _dbManager = new DatabaseManager();
             LoadDrivers();
+            LoadDishes(); 
         }
 
         private void LoadDrivers()
         {
             DriversList.ItemsSource = _dbManager.GetDrivers();
         }
+
+        private void LoadDishes()
+        {
+            DatabaseManager dbManager = new DatabaseManager();
+            List<Dish> dishesFromDb = dbManager.GetAllDishes();
+            DishListView.ItemsSource = dishesFromDb;
+        }
+
 
         private void AddDriverButton_Click(object sender, RoutedEventArgs e)
         {
@@ -52,6 +63,18 @@ namespace PizzaEcki.Pages
                 }
             }
         }
+
+        private void AddDishButton_Click(object sender, RoutedEventArgs e)
+        {
+            DishDialog dialog = new DishDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                // Update database and reload ListView
+                _dbManager.AddOrUpdateDish(dialog.Dish);
+                LoadDishes();
+            }
+        }
+
 
 
         //private void DeleteDriverButton_Click(object sender, RoutedEventArgs e)

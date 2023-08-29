@@ -20,6 +20,32 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
+            <TabItem Header="Gerichte">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+
+
+                    </Grid.RowDefinitions>
+                    <ListView Name="DishListView">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Id}"/>
+                                <GridViewColumn Header="Name" Width="150" DisplayMemberBinding="{Binding Name}"/>
+                                <GridViewColumn Header="Price" Width="100" DisplayMemberBinding="{Binding Price}"/>
+                                <GridViewColumn Header="Category" Width="100" DisplayMemberBinding="{Binding Category}"/>
+                                <GridViewColumn Header="Size" Width="50" DisplayMemberBinding="{Binding Size}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                        <Button Content="Hinzufügen" Click="AddDishButton_Click" Margin="5"></Button>
+                        <!--<Button Content="Bearbeiten" Click="EditDishButton_Click" Margin="5"></Button>-->
+                    </StackPanel>
+                </Grid>
+            </TabItem>
             <TabItem Header="Andere Einstellungen">
                 <!-- Weitere Einstellungen -->
             </TabItem>

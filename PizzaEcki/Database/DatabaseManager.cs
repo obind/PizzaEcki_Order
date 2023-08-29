@@ -13,14 +13,20 @@ namespace PizzaEcki.Database
     {
         private SqliteConnection _connection;
         private readonly string userDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private readonly string databaseFolderName = "PizzaEckiDb";
         private readonly string databaseFileName = "database.sqlite";
+        private readonly string fullPathToDatabaseFolder;
         private readonly string fullPathToDatabase;
 
         public DatabaseManager()
         {
             Batteries.Init(); // Initialisierung von SQLitePCLRaw
 
-            fullPathToDatabase = Path.Combine(userDocumentsFolder, databaseFileName);
+            fullPathToDatabaseFolder = Path.Combine(userDocumentsFolder, databaseFolderName);
+            fullPathToDatabase = Path.Combine(fullPathToDatabaseFolder, databaseFileName);
+
+            // Erstelle den Ordner, falls er nicht existiert
+            Directory.CreateDirectory(fullPathToDatabaseFolder);
 
             _connection = new SqliteConnection($"Data Source={fullPathToDatabase};");
             Console.WriteLine(fullPathToDatabase);
@@ -30,6 +36,7 @@ namespace PizzaEcki.Database
             CreateTable();
             InitializeDishes();
         }
+
 
         //Customers
         private void CreateTable()
@@ -145,6 +152,30 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@Size", dish.Size); 
                 command.ExecuteNonQuery();
             }
+        }
+        public List<Dish> GetAllDishes()
+        {
+            List<Dish> dishes = new List<Dish>();
+            string sql = "SELECT * FROM Dishes";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Dish dish = new Dish
+                        {
+                            Id = Convert.ToInt32(reader["Id"]),
+                            Name = reader["Name"].ToString(),
+                            Price = Convert.ToDouble(reader["Price"]),
+                            Category = (DishCategory)Convert.ToInt32(reader["Category"]),
+                            Size = reader["Size"].ToString()
+                        };
+                        dishes.Add(dish);
+                    }
+                }
+            }
+            return dishes;
         }
 
         public List<string> GetAllStreets()
