@@ -11,6 +11,8 @@ using PizzaEcki.Services;
 using SharedLibrary;
 using PizzaEcki.Pages;
 using System.Collections.ObjectModel;
+using System.Drawing.Printing;
+using System.Drawing;
 
 namespace PizzaEcki
 {
@@ -26,14 +28,16 @@ namespace PizzaEcki
         private SignalRService signalRService;
         private List<SharedLibrary.OrderItem> orderItems = new List<SharedLibrary.OrderItem>();
         private OrderItem tempOrderItem = new OrderItem();
+
    
 
-        private int currentBonNumber = 0;
+   
         private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
         private int Lieferung = 0;
         private int Selbstabholer = 0;
         private int Mitnehmer = 0;
-      
+        private int currentBonNumber;
+
 
 
         public MainWindow()
@@ -65,6 +69,8 @@ namespace PizzaEcki
             LoadDrivers();
             DataContext = this; // Setzen Sie den DataContext auf diese Instanz, damit die Bindung funktioniert
 
+            //bon Nummer Lden
+            currentBonNumber = _databaseManager.GetCurrentBonNumber();
         }
 
         private void PhoneNumberTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -192,7 +198,6 @@ namespace PizzaEcki
             tempOrderItem.Extras = "";
         }
 
-
         //Das ist gnaz nice aber ich weiß nicht genau ob das so notwendig ist oder ob es eine bessere Lösung gibt
         //Es ist dafür da das wenn die autovervollständigung etwas vorschlägt man es mit Enter bestätigen kann und zur nächten Eingabe springt
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)
@@ -218,57 +223,76 @@ namespace PizzaEcki
         }
 
         //Extras
-        private void Extras_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ExtrasComboBox_Loaded(object sender, RoutedEventArgs e)
         {
-            // Wenn kein Extra ausgewählt ist, tue nichts
-            if (ExtrasComboBox.SelectedItem == null)
+            var textBox = (TextBox)ExtrasComboBox.Template.FindName("PART_EditableTextBox", ExtrasComboBox);
+            if (textBox != null)
+            {
+                textBox.TextChanged += ExtrasTextBox_TextChanged;
+            }
+        }
+
+        private void ExtrasTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox == null)
             {
                 return;
             }
 
-            // Hole das ausgewählte Extra
-            Extra selectedExtra = (Extra)ExtrasComboBox.SelectedItem;
-
-            // Aktualisiere das tempOrderItem mit dem ausgewählten Extra und füge den Preis hinzu
-            tempOrderItem.Extras = selectedExtra.Name.ToString();
-            tempOrderItem.Epreis += selectedExtra.Price;
-        }
-
-        //Hier gilt das gleiche wie oben ;D
-        private void ExtraCombobox_AutocompleteKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
+            // Prüfe, ob die Änderung das Löschen von Text beinhaltet
+            bool isDeleting = e.Changes.Any(change => change.RemovedLength > 0);
+            if (isDeleting)
             {
-                // Prüfe, ob das Dropdown-Menü der ComboBox geöffnet ist
-                if (ExtrasComboBox.IsDropDownOpen)
-                {
-                    // Ändere den Text der ComboBox auf das aktuell hervorgehobene Element
-                    ExtrasComboBox.Text = (ExtrasComboBox.SelectedItem as Extra)?.Name ?? ExtrasComboBox.Text;
-                    ExtrasComboBox.IsDropDownOpen = false; // Schließe das Dropdown-Menü
-                }
+                // Wenn der Benutzer Text löscht, führe die Autovervollständigungslogik nicht aus
+                return;
+            }
 
-                // Verschiebe den Fokus auf das nächste Steuerelement in der Tab-Reihenfolge
-                amountComboBox.Focus();
+            string text = textBox.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
 
-                e.Handled = true; // Markiere das Ereignis als behandelt
+            bool isRemoving = text.StartsWith("-");
+            string lookupText = isRemoving ? text.Substring(1) : text;
+
+            var matchingExtra = extrasList
+                .FirstOrDefault(extra => extra.Name.StartsWith(lookupText, StringComparison.OrdinalIgnoreCase));
+
+            if (matchingExtra != null)
+            {
+                int textStart = textBox.SelectionStart;
+                textBox.Text = (isRemoving ? "-" : "") + matchingExtra.Name;
+                textBox.SelectionStart = textStart;
+                textBox.SelectionLength = textBox.Text.Length - textStart;
             }
         }
+
+
+
 
         //Anzahl in das tempOrderItem Schreiben 
-        private void amountComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBoxItem selectedItem = (ComboBoxItem)amountComboBox.SelectedItem;
-            if (selectedItem != null)
-            {
-                tempOrderItem.Menge = int.Parse(selectedItem.Content.ToString());
-            }
-        }
-
         private void amountComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
+                UpdateTempOrderItemAmount();
                 ProcessOrder();
+            }
+        }
+
+        private void UpdateTempOrderItemAmount()
+        {
+            int amount;
+            if (int.TryParse(amountComboBox.Text, out amount) && amount > 0)
+            {
+                tempOrderItem.Menge = amount;
+            }
+            else
+            {
+                MessageBox.Show("Bitte geben Sie eine gültige Nummer ein.");
+                amountComboBox.Focus();
             }
         }
 
@@ -344,10 +368,10 @@ namespace PizzaEcki
             {
                 gesamtPreis += item.Gesamt;
             }
-            TotalPriceButton.Content = $"{gesamtPreis:F2} €";
+            TotalPriceLabel.Content = $"{gesamtPreis:F2} €";
         }
 
-        private void FinishOrderBtn(object sender, RoutedEventArgs e)
+        private void ConfirmOrderBtn(object sender, RoutedEventArgs e)
         {
             // Erstelle ein neues Receipt Objekt und fülle es mit den OrderItems und der ReceiptNumber
             Receipt receipt = new Receipt
@@ -362,7 +386,10 @@ namespace PizzaEcki
                 BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
                 OrderItems = orderItems
             };
+            _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
             SendOrderItems(order);
+
+            PrintReceipt(order);
 
             // Leeren Sie die Bestellliste
             orderItems.Clear();
@@ -374,6 +401,8 @@ namespace PizzaEcki
             AuslieferungLabel.Content = Lieferung;
             MitnehmerLabel.Content = Mitnehmer;
             SelbstabholerLabel.Content = Selbstabholer;
+
+           
         }
 
         private int GetNextReceiptNumber()
@@ -416,6 +445,85 @@ namespace PizzaEcki
 
             DriversComboBox.ItemsSource = driversFromDb;
         }
+
+        private void SizeComboBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                ExtrasComboBox.Focus();
+            }
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            // Dein Code hier, z.B.
+            _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
+        }
+
+
+        private void PrintReceipt(Order order)
+        {
+            PrintDocument printDoc = new PrintDocument();
+            printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 315, 10000);
+            printDoc.PrintPage += (sender, e) =>
+            {
+                Graphics graphics = e.Graphics;
+                Font font = new Font("Arial", 12);
+                float yOffset = 0;
+
+                // Titel
+                SizeF titleSize = graphics.MeasureString("PIZZA ECKI", font);
+                float titleX = (e.PageBounds.Width - titleSize.Width) / 2;
+                graphics.DrawString("PIZZA ECKI", font, Brushes.Black, titleX, yOffset);
+                yOffset += titleSize.Height + 10;  // 10 pixels Abstand
+
+                // Adresse
+                SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", font);
+                float addressX = (e.PageBounds.Width - addressSize.Width) / 2;
+                graphics.DrawString("Woerdener Str. 4 · 33803 Steinhagen", font, Brushes.Black, addressX, yOffset);
+                yOffset += addressSize.Height + 10;  // 10 pixels Abstand
+
+                // Datum und Uhrzeit
+                string dateStr = DateTime.Now.ToString("dd.MM.yyyy");
+                string timeStr = DateTime.Now.ToString("HH:mm");
+                graphics.DrawString(dateStr, font, Brushes.Black, 0, yOffset);
+                SizeF timeSize = graphics.MeasureString(timeStr, font);
+                graphics.DrawString(timeStr, font, Brushes.Black, e.PageBounds.Width - timeSize.Width, yOffset);
+                yOffset += font.GetHeight() + 20;  // 10 pixels Abstand
+
+                Font boldLargeFont = new Font("Arial", 20, System.Drawing.FontStyle.Bold);  // Verschoben innerhalb des Ereignishandlers
+                string bonNumberStr = $"Bon Nummer: {order.BonNumber}";
+                SizeF bonNumberSize = graphics.MeasureString(bonNumberStr, boldLargeFont);
+                float bonNumberX = (e.PageBounds.Width - bonNumberSize.Width) / 2;
+                graphics.DrawString(bonNumberStr, boldLargeFont, Brushes.Black, bonNumberX, yOffset);
+                yOffset += bonNumberSize.Height + 10;
+
+                // Bestellte Gerichte
+                foreach (var item in order.OrderItems)
+                {
+                    string itemNameStr = $"{item.Menge} x {item.Gericht}";
+                    string itemPriceStr = $"{item.Gesamt:C}";
+                    graphics.DrawString(itemNameStr, font, Brushes.Black, 0, yOffset);
+                    SizeF itemPriceSize = graphics.MeasureString(itemPriceStr, font);
+                    graphics.DrawString(itemPriceStr, font, Brushes.Black, e.PageBounds.Width - itemPriceSize.Width, yOffset);
+                    yOffset += font.GetHeight();
+                }
+                yOffset += 10;  // 10 pixels Abstand
+
+
+                // Bezahlmethode
+                // Du müsstest die Bezahlmethode in deinem Order Objekt speichern, um sie hier zu verwenden.
+                // string paymentMethodStr = "Bezahlmethode: " + order.PaymentMethod;
+                // graphics.DrawString(paymentMethodStr, font, Brushes.Black, 0, yOffset);
+            };
+
+       
+                printDoc.Print();
+            
+        }
+
 
     }
 }

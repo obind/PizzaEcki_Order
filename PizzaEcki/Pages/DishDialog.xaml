@@ -16,7 +16,7 @@
             <Label Content="Größe:" />
             <ComboBox Name="SizeComboBox" Width="200"/>
 
-            <Button Content="Speichern" Width="100" Height="30" Click="SaveButton_Click"/>
+            <Button Content="Speichern" Width="100" Height="30" Click="SaveButton_Click" Margin="0,10,0,0"/>
         </StackPanel>
     </Grid>
 </Window>

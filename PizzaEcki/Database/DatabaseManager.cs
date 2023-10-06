@@ -76,6 +76,24 @@ namespace PizzaEcki.Database
             {
                 command.ExecuteNonQuery();
             }
+
+            //Settings
+
+            sql = "CREATE TABLE IF NOT EXISTS Settings (LastResetDate TEXT, CurrentBonNumber INTEGER)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            // Initialer Eintrag, falls die Tabelle gerade erstellt wurde
+            sql = "INSERT INTO Settings (LastResetDate, CurrentBonNumber) SELECT @date, @number WHERE NOT EXISTS (SELECT 1 FROM Settings)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@date", DateTime.Now.Date);
+                command.Parameters.AddWithValue("@number", 1);
+                command.ExecuteNonQuery();
+            }
+
         }
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
         {
@@ -366,6 +384,38 @@ namespace PizzaEcki.Database
             }
 
             return drivers;
+        }
+
+        //Settings 
+        public int GetCurrentBonNumber()
+        {
+            string sql = "SELECT LastResetDate, CurrentBonNumber FROM Settings";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return int.Parse(reader["CurrentBonNumber"].ToString());
+                    }
+                    else
+                    {
+                        // Fehlerbehandlung, falls kein Eintrag gefunden wurde
+                        throw new Exception("Settings entry not found in the database.");
+                    }
+                }
+            }
+        }
+
+
+        public void UpdateCurrentBonNumber(int newNumber)
+        {
+            string sql = "UPDATE Settings SET CurrentBonNumber = @number";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@number", newNumber);
+                command.ExecuteNonQuery();
+            }
         }
 
 
