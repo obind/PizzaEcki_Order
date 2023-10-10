@@ -13,6 +13,7 @@ using PizzaEcki.Pages;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
 using System.Drawing;
+using Microsoft.AspNetCore.Mvc;
 
 namespace PizzaEcki
 {
@@ -424,7 +425,17 @@ namespace PizzaEcki
                     F1Grid.Visibility = Visibility.Visible;
                 }
             }
+
+            //Zeige die Tagesübersicht
+
+            if(e.Key == Key.F4) {
+                DailyEarnings dailyEarnings = new DailyEarnings();
+                dailyEarnings.ShowDialog();
+                
+            }
         }
+
+       
 
         private void SendOrderItems(Order order)
         {

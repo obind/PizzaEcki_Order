@@ -9,6 +9,7 @@ using SharedLibrary;
 using System.Windows.Documents;
 using PizzaEcki.Database;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PizzaKitchenClient
 {
@@ -71,6 +72,25 @@ namespace PizzaKitchenClient
             List<Driver> driversFromDb = dbManager.GetAllDrivers();
             Drivers = new ObservableCollection<Driver>(driversFromDb);
             DriversComboBox.ItemsSource = driversFromDb;
+        }
+
+        private void OnAssignButtonClicked(object sender, RoutedEventArgs e)
+        {
+            if (OrdersList.SelectedItem is Order selectedOrder && DriversComboBox.SelectedItem is Driver selectedDriver)
+            {
+                // Berechne den Gesamtpreis der Bestellung
+                double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
+
+                // Speichere die Zuordnung
+                dbManager.SaveOrderAssignment(selectedOrder.BonNumber, selectedDriver.Id, orderPrice);
+
+                // Entferne die Bestellung aus der Liste
+                OrdersList.Items.Remove(selectedOrder);
+            }
+            else
+            {
+                MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

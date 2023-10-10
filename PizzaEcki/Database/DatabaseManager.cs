@@ -94,6 +94,22 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
 
+            //Zuordnungstabelle
+            sql = @"
+        CREATE TABLE IF NOT EXISTS OrderAssignments (
+            OrderId INTEGER,
+            DriverId INTEGER,
+            Price REAL,
+            Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
+            FOREIGN KEY(DriverId) REFERENCES Drivers(Id)
+        );
+    ";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+
         }
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
         {
@@ -405,6 +421,98 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+        }
+
+
+        public void SaveOrderAssignment(int orderId, int driverId, double price)
+        {
+            string sql = "INSERT INTO OrderAssignments (OrderId, DriverId, Price, Timestamp) VALUES (@OrderId, @DriverId, @Price, @Timestamp)";  // geändert von AssignmentDate zu Timestamp
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@OrderId", orderId);
+                command.Parameters.AddWithValue("@DriverId", driverId);
+                command.Parameters.AddWithValue("@Price", price);
+                command.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                command.ExecuteNonQuery();
+            }
+        }
+
+
+
+        public List<OrderAssignment> GetOrderAssignments()
+        {
+            List<OrderAssignment> assignments = new List<OrderAssignment>();
+            string sql = "SELECT BonNumber, DriverId, Price, Timestamp FROM OrderAssignments";  // Preis hinzugefügt
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        OrderAssignment assignment = new OrderAssignment
+                        {
+                            BonNumber = reader.GetInt32(0),
+                            DriverId = reader.GetInt32(1),
+                            Price = reader.GetDouble(2),  // Preis hinzugefügt
+                            Timestamp = reader.GetDateTime(3)
+                        };
+                        assignments.Add(assignment);
+                    }
+                }
+            }
+            return assignments;
+        }
+
+
+        public double GetTotalSalesForDate(DateTime date)
+        {
+            string sql = "SELECT SUM(Price) FROM OrderAssignments WHERE AssignmentDate = @Date";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+                object result = command.ExecuteScalar();
+                return result != DBNull.Value ? Convert.ToDouble(result) : 0;
+            }
+        }
+
+        public List<DailySalesInfo> GetDailySales(DateTime date)
+        {
+            List<DailySalesInfo> dailySalesInfoList = new List<DailySalesInfo>();
+
+            // SQL-Query, um die täglichen Umsätze abzurufen
+            string sql = @"
+        SELECT
+            IFNULL(Drivers.Name, 'Theke') as Name,
+            SUM(OrderAssignments.Price) as DailySales
+        FROM
+            OrderAssignments
+        LEFT JOIN
+            Drivers ON OrderAssignments.DriverId = Drivers.Id
+        WHERE
+            date(OrderAssignments.Timestamp) = date(@Date)
+        GROUP BY
+            IFNULL(Drivers.Name, 'Theke');
+    ";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        DailySalesInfo dailySalesInfo = new DailySalesInfo
+                        {
+                            Name = reader.GetString(0),
+                            DailySales = reader.GetDouble(1)
+                        };
+                        dailySalesInfoList.Add(dailySalesInfo);
+                    }
+                }
+            }
+
+            return dailySalesInfoList;
         }
 
 
