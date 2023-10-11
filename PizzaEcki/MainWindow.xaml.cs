@@ -41,6 +41,9 @@ namespace PizzaEcki
         private int Mitnehmer = 0;
         private int currentBonNumber;
 
+        private bool isDelivery = false;
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -87,11 +90,13 @@ namespace PizzaEcki
                     // Behandlung von speziellen Telefonnummern "1" und "2"
                     if (_customerNr == "1")
                     {
+                        isDelivery = false;
                         Selbstabholer++;
                         DishComboBox.Focus();
                     }
                     else if (_customerNr == "2")
                     {
+                        isDelivery = false;
                         Mitnehmer++;
                         DishComboBox.Focus();
                     }
@@ -104,6 +109,7 @@ namespace PizzaEcki
                             SetCustomerDataToFields(customer);
                             DishComboBox.Focus();
                             Lieferung++;
+                            isDelivery = true;
                         }
                         else // Kunde nicht gefunden
                         {
@@ -114,6 +120,7 @@ namespace PizzaEcki
                                 SaveButton.Visibility = Visibility.Visible;
                                 NameTextBox.Focus();
                                 Lieferung++;
+                                isDelivery = true;
                             }
                         }
                     }
@@ -378,46 +385,6 @@ namespace PizzaEcki
             TotalPriceLabel.Content = $"{gesamtPreis:F2} €";
         }
 
-        private void ConfirmOrderBtn(object sender, RoutedEventArgs e)
-        {
-
-            if(PhoneNumberTextBox.Text != "")
-            {
-                // Erstelle ein neues Receipt Objekt und fülle es mit den OrderItems und der ReceiptNumber
-                Receipt receipt = new Receipt
-                {
-                    ReceiptNumber = GetNextReceiptNumber(),
-                    //OrderItems = GetCurrentOrderItems(),
-                };
-
-                var order = new Order
-                {
-                    OrderId = Guid.NewGuid(),
-                    BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
-                    OrderItems = orderItems
-                };
-                _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
-                SendOrderItems(order);
-
-                PrintReceipt(order);
-
-                // Leeren Sie die Bestellliste
-                orderItems.Clear();
-
-                // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
-                myDataGrid.Items.Refresh();
-
-                //Aktualisiere Lieferungsart
-                AuslieferungLabel.Content = Lieferung;
-                MitnehmerLabel.Content = Mitnehmer;
-                SelbstabholerLabel.Content = Selbstabholer;
-            }
-            else
-            {
-                MessageBox.Show("Bitte eine Kundenummer Eingeben");
-            }
-
-        }
 
         private void BarzahlungBtn(object sender, RoutedEventArgs e)
         {
@@ -535,7 +502,7 @@ namespace PizzaEcki
             // Dein Code hier, z.B.
             _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
         }
-        private void PrintReceipt(Order order)
+        private void PrintReceipt(Order order )
         {
             PrintDocument printDoc = new PrintDocument();
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 315, 10000);
@@ -549,7 +516,7 @@ namespace PizzaEcki
                 // Titel
                 SizeF titleSize = graphics.MeasureString("PIZZA ECKI", boldLargeFont);
                 float titleX = (e.PageBounds.Width - titleSize.Width) / 2;
-                graphics.DrawString("PIZZA ECKI", font, Brushes.Black, titleX, yOffset);
+                graphics.DrawString("PIZZA ECKI", boldLargeFont, Brushes.Black, titleX, yOffset);
                 yOffset += titleSize.Height + 10;  // 10 pixels Abstand
 
                 // Adresse
@@ -584,6 +551,14 @@ namespace PizzaEcki
                     yOffset += font.GetHeight();
                 }
                 yOffset += 20;  // 10 pixels Abstand
+
+
+                //if (isDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
+                //{
+                //    string addressStr = "Adresse: " + customer.Street + ", " + customer.City;
+                //    graphics.DrawString(addressStr, font, Brushes.Black, 0, yOffset);
+                //    yOffset += (int)font.GetHeight();  // Aktualisieren der yOffset für den nächsten zu druckenden Text
+                //}
 
 
                 // Bezahlmethode
