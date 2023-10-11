@@ -9,10 +9,16 @@
 
   <ItemGroup>
     <None Remove="Database\database.sqlite" />
+    <None Remove="icons\card.svg" />
+    <None Remove="icons\cash.svg" />
+    <None Remove="icons\paypal.svg" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Database\database.sqlite" />
+    <Content Include="icons\card.svg" />
+    <Content Include="icons\cash.svg" />
+    <Content Include="icons\paypal.svg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +27,7 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="7.0.10" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.5" />
+    <PackageReference Include="SharpVectors" Version="1.8.2" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.5" />
     <PackageReference Include="SQLitePCLRaw.core" Version="2.1.5" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />

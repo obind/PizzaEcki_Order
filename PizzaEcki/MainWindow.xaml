@@ -4,9 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        
         mc:Ignorable="d"
         Title="MainWindow" KeyDown="MainWindowEcki_KeyDown">
+
+
+    <Window.Resources>
+        <ResourceDictionary >
+            <!-- Andere Ressourcen -->
+
+            <DrawingImage x:Key="paypalDrawingImage">
+                <DrawingImage.Drawing>
+                    <DrawingGroup ClipGeometry="M0,0 V512 H384 V0 H0 Z">
+                        <GeometryDrawing Brush="#FF000000" Geometry="F1 M384,512z M0,0z M111.4,295.9C107.9,315.1 94,404.6 89.9,429.9 89.6,431.7 88.9,432.4 86.9,432.4L12.3,432.4C4.7,432.4,-0.799999999999999,425.8,0.200000000000001,418.5L58.8,46.6C60.3,37 68.9,29.7 78.8,29.7 231.1,29.7 243.9,26 282.8,41.1 342.9,64.4 348.4,120.6 326.8,181.4 305.3,244 254.3,270.9 186.7,271.7 143.3,272.4 117.2,264.7 111.4,295.9z M357.1,152C355.3,150.7 354.6,150.2 354.1,153.3 352.1,164.7 349,175.8 345.3,186.9 305.4,300.7 194.8,290.8 140.8,290.8 134.7,290.8 130.7,294.1 129.9,300.2 107.3,440.6 102.8,469.9 102.8,469.9 101.8,477 106.3,482.8 113.4,482.8L176.9,482.8C185.5,482.8 192.6,476.5 194.3,467.9 195,462.5 193.2,474 208.7,376.6 213.3,354.6 223,356.9 238,356.9 309,356.9 364.4,328.1 380.9,244.6 387.4,209.8 385.5,173.2 357.1,152z" />
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
+
+
+            <!-- Andere Ressourcen -->
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid Background="#FF7A7A7A">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -85,7 +102,7 @@
             <ComboBox x:Name="ExtrasComboBox" Grid.Row="2"  Margin="0,5,10,5" IsEditable="True" 
           Loaded="ExtrasComboBox_Loaded" 
              VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
-            VerticalAlignment="Center" Grid.Column="1" Padding="2,0,2,0" TabIndex="7" />
+            VerticalAlignment="Center" Grid.Column="1" Padding="2,0,2,0" TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" />
 
                 <Label Grid.Row="2" Grid.Column="3" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
             <ComboBox x:Name="amountComboBox" Grid.Row="2" Grid.Column="3" 
@@ -177,18 +194,29 @@
            HorizontalAlignment="Right"
            Grid.Column="0" FontWeight="Bold"/>
 
-            <!-- Bestätigungs-Button mit Haken-Icon -->
-            <Button x:Name="ConfirmOrderButton" 
-            Content="✓" 
-            FontSize="30" 
-            Background="#21aa00" 
-            Foreground="#FFFFFBFB" 
-            VerticalAlignment="Top" 
-            HorizontalAlignment="Right" 
-            Click="ConfirmOrderBtn" 
-            Margin="10,5,50,0"
-            Grid.Column="1"/>
+            <!-- Zahlungsarten-Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,50,0">
+                <!-- Barzahlung-Button -->
+                <Button x:Name="btn_cash" Width="50" Height="50" Background="#21aa00" Foreground="#FFFFFBFB" Click="BarzahlungBtn">
+                    <!-- Icon für Barzahlung (Beispiel) -->
+                    <TextBlock Text="💵" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+
+                <!-- Kartenzahlung-Button -->
+                <Button x:Name="btn_card" Width="50" Height="50" Background="#21aa00" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" Margin="0,10,0,0">
+                    <!-- Icon für Kartenzahlung (Beispiel) -->
+                    <TextBlock Text="💳" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+
+                <!-- PayPal-Button -->
+                <Button x:Name="btn_paypal" Width="50" Height="50" Background="#21aa00" Foreground="#FFFFFBFB" Click="PaypalBtn" Margin="0,10,0,0">
+                    <!-- Icon für PayPal (Beispiel) -->
+                    <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+            </StackPanel>
         </Grid>
+
+
 
     </Grid>
 </Window>

@@ -21,6 +21,8 @@ namespace PizzaEcki
     public partial class MainWindow : Window
     {
 
+
+
         public ObservableCollection<Driver> Drivers { get; set; }
 
         private DatabaseManager _databaseManager;
@@ -30,16 +32,14 @@ namespace PizzaEcki
         private List<SharedLibrary.OrderItem> orderItems = new List<SharedLibrary.OrderItem>();
         private OrderItem tempOrderItem = new OrderItem();
 
-   
 
-   
+        public string SelectedPaymentMethod { get; private set; }
+
         private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
         private int Lieferung = 0;
         private int Selbstabholer = 0;
         private int Mitnehmer = 0;
         private int currentBonNumber;
-
-
 
         public MainWindow()
         {
@@ -113,6 +113,7 @@ namespace PizzaEcki
                             {
                                 SaveButton.Visibility = Visibility.Visible;
                                 NameTextBox.Focus();
+                                Lieferung++;
                             }
                         }
                     }
@@ -270,8 +271,13 @@ namespace PizzaEcki
             }
         }
 
-
-
+        private void ExtrasComboBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                amountComboBox.Focus();
+            }
+        }
 
         //Anzahl in das tempOrderItem Schreiben 
         private void amountComboBox_KeyDown(object sender, KeyEventArgs e)
@@ -374,36 +380,99 @@ namespace PizzaEcki
 
         private void ConfirmOrderBtn(object sender, RoutedEventArgs e)
         {
-            // Erstelle ein neues Receipt Objekt und fülle es mit den OrderItems und der ReceiptNumber
-            Receipt receipt = new Receipt
+
+            if(PhoneNumberTextBox.Text != "")
             {
-                ReceiptNumber = GetNextReceiptNumber(),
-                //OrderItems = GetCurrentOrderItems(),
-            };
+                // Erstelle ein neues Receipt Objekt und fülle es mit den OrderItems und der ReceiptNumber
+                Receipt receipt = new Receipt
+                {
+                    ReceiptNumber = GetNextReceiptNumber(),
+                    //OrderItems = GetCurrentOrderItems(),
+                };
 
-            var order = new Order
+                var order = new Order
+                {
+                    OrderId = Guid.NewGuid(),
+                    BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
+                    OrderItems = orderItems
+                };
+                _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
+                SendOrderItems(order);
+
+                PrintReceipt(order);
+
+                // Leeren Sie die Bestellliste
+                orderItems.Clear();
+
+                // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
+                myDataGrid.Items.Refresh();
+
+                //Aktualisiere Lieferungsart
+                AuslieferungLabel.Content = Lieferung;
+                MitnehmerLabel.Content = Mitnehmer;
+                SelbstabholerLabel.Content = Selbstabholer;
+            }
+            else
             {
-                OrderId = Guid.NewGuid(),
-                BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
-                OrderItems = orderItems
-            };
-            _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
-            SendOrderItems(order);
+                MessageBox.Show("Bitte eine Kundenummer Eingeben");
+            }
 
-            PrintReceipt(order);
+        }
 
-            // Leeren Sie die Bestellliste
-            orderItems.Clear();
+        private void BarzahlungBtn(object sender, RoutedEventArgs e)
+        {
+            CompleteOrder("Barzahlung");
+        }
 
-            // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
-            myDataGrid.Items.Refresh();
+        private void KartenzahlungBtn(object sender, RoutedEventArgs e)
+        {
+            CompleteOrder("Kartenzahlung");
+        }
 
-            //Aktualisiere Lieferungsart
-            AuslieferungLabel.Content = Lieferung;
-            MitnehmerLabel.Content = Mitnehmer;
-            SelbstabholerLabel.Content = Selbstabholer;
+        private void PaypalBtn(object sender, RoutedEventArgs e)
+        {
+            CompleteOrder("PayPal");
+        }
 
-           
+
+        private void CompleteOrder(string paymentMethod)
+        {
+            if (PhoneNumberTextBox.Text != "")
+            {
+                // Erstelle ein neues Receipt Objekt und fülle es mit den OrderItems und der ReceiptNumber
+                Receipt receipt = new Receipt
+                {
+                    ReceiptNumber = GetNextReceiptNumber(),
+                    //OrderItems = GetCurrentOrderItems(),
+                };
+
+                var order = new Order
+                {
+                    OrderId = Guid.NewGuid(),
+                    BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
+                    OrderItems = orderItems,
+                    PaymentMethod = paymentMethod // Zuweisen der Zahlungsmethode
+                };
+                _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
+                SendOrderItems(order);
+
+                PrintReceipt(order);
+
+                // Leeren Sie die Bestellliste
+                orderItems.Clear();
+
+                // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
+                myDataGrid.Items.Refresh();
+
+                //Aktualisiere Lieferungsart
+                AuslieferungLabel.Content = Lieferung;
+                MitnehmerLabel.Content = Mitnehmer;
+                SelbstabholerLabel.Content = Selbstabholer;
+            }
+            else
+            {
+                MessageBox.Show("Bitte eine Kundenummer Eingeben");
+            }
         }
 
         private int GetNextReceiptNumber()
@@ -434,14 +503,10 @@ namespace PizzaEcki
                 
             }
         }
-
-       
-
         private void SendOrderItems(Order order)
         {
             signalRService.SendOrderItemsAsync(order);
         }
-
         private void EinstellungenBtn_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow settingsWindow = new SettingsWindow();
@@ -456,7 +521,6 @@ namespace PizzaEcki
 
             DriversComboBox.ItemsSource = driversFromDb;
         }
-
         private void SizeComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -464,7 +528,6 @@ namespace PizzaEcki
                 ExtrasComboBox.Focus();
             }
         }
-
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
@@ -472,8 +535,6 @@ namespace PizzaEcki
             // Dein Code hier, z.B.
             _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
         }
-
-
         private void PrintReceipt(Order order)
         {
             PrintDocument printDoc = new PrintDocument();
@@ -482,10 +543,11 @@ namespace PizzaEcki
             {
                 Graphics graphics = e.Graphics;
                 Font font = new Font("Arial", 12);
+                Font boldLargeFont = new Font("Arial", 20, System.Drawing.FontStyle.Bold);
                 float yOffset = 0;
 
                 // Titel
-                SizeF titleSize = graphics.MeasureString("PIZZA ECKI", font);
+                SizeF titleSize = graphics.MeasureString("PIZZA ECKI", boldLargeFont);
                 float titleX = (e.PageBounds.Width - titleSize.Width) / 2;
                 graphics.DrawString("PIZZA ECKI", font, Brushes.Black, titleX, yOffset);
                 yOffset += titleSize.Height + 10;  // 10 pixels Abstand
@@ -504,7 +566,7 @@ namespace PizzaEcki
                 graphics.DrawString(timeStr, font, Brushes.Black, e.PageBounds.Width - timeSize.Width, yOffset);
                 yOffset += font.GetHeight() + 20;  // 10 pixels Abstand
 
-                Font boldLargeFont = new Font("Arial", 20, System.Drawing.FontStyle.Bold);  // Verschoben innerhalb des Ereignishandlers
+                // Verschoben innerhalb des Ereignishandlers
                 string bonNumberStr = $"Bon Nummer: {order.BonNumber}";
                 SizeF bonNumberSize = graphics.MeasureString(bonNumberStr, boldLargeFont);
                 float bonNumberX = (e.PageBounds.Width - bonNumberSize.Width) / 2;
@@ -521,13 +583,13 @@ namespace PizzaEcki
                     graphics.DrawString(itemPriceStr, font, Brushes.Black, e.PageBounds.Width - itemPriceSize.Width, yOffset);
                     yOffset += font.GetHeight();
                 }
-                yOffset += 10;  // 10 pixels Abstand
+                yOffset += 20;  // 10 pixels Abstand
 
 
                 // Bezahlmethode
-                // Du müsstest die Bezahlmethode in deinem Order Objekt speichern, um sie hier zu verwenden.
-                // string paymentMethodStr = "Bezahlmethode: " + order.PaymentMethod;
-                // graphics.DrawString(paymentMethodStr, font, Brushes.Black, 0, yOffset);
+                string paymentMethodStr = "Bezahlmethode: " + order.PaymentMethod;
+                graphics.DrawString(paymentMethodStr, boldLargeFont, Brushes.Black, 0, yOffset);
+                yOffset += (int)font.GetHeight();
             };
 
        
@@ -535,6 +597,6 @@ namespace PizzaEcki
             
         }
 
-
+      
     }
 }
