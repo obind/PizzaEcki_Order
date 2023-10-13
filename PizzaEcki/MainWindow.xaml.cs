@@ -35,6 +35,8 @@ namespace PizzaEcki
 
         public string SelectedPaymentMethod { get; private set; }
 
+        public string _customerNr;
+
         private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
         private int Lieferung = 0;
         private int Selbstabholer = 0;
@@ -82,7 +84,7 @@ namespace PizzaEcki
             // Überprüfung, ob die Enter-Taste gedrückt wurde
             if (e.Key == Key.Return)
             {
-                string _customerNr = PhoneNumberTextBox.Text;
+                _customerNr = PhoneNumberTextBox.Text;
 
                 // Überprüfung, ob die Telefonnummer eingegeben wurde
                 if (_customerNr != null && _customerNr != "")
@@ -249,11 +251,9 @@ namespace PizzaEcki
                 return;
             }
 
-            // Prüfe, ob die Änderung das Löschen von Text beinhaltet
             bool isDeleting = e.Changes.Any(change => change.RemovedLength > 0);
             if (isDeleting)
             {
-                // Wenn der Benutzer Text löscht, führe die Autovervollständigungslogik nicht aus
                 return;
             }
 
@@ -263,8 +263,12 @@ namespace PizzaEcki
                 return;
             }
 
-            bool isRemoving = text.StartsWith("-");
-            string lookupText = isRemoving ? text.Substring(1) : text;
+            // Split the text by commas and get the last segment for auto-completion
+            var segments = text.Split(',');
+            var lastSegment = segments.Last().Trim();
+
+            bool isRemoving = lastSegment.StartsWith("-");
+            string lookupText = isRemoving ? lastSegment.Substring(1) : lastSegment;
 
             var matchingExtra = extrasList
                 .FirstOrDefault(extra => extra.Name.StartsWith(lookupText, StringComparison.OrdinalIgnoreCase));
@@ -272,10 +276,14 @@ namespace PizzaEcki
             if (matchingExtra != null)
             {
                 int textStart = textBox.SelectionStart;
-                textBox.Text = (isRemoving ? "-" : "") + matchingExtra.Name;
+                // Replace the last segment with the auto-completed text
+                segments[segments.Length - 1] = (isRemoving ? "-" : "") + matchingExtra.Name;
+                textBox.Text = string.Join(", ", segments);
                 textBox.SelectionStart = textStart;
                 textBox.SelectionLength = textBox.Text.Length - textStart;
             }
+
+            tempOrderItem.Extras = textBox.Text;
         }
 
         private void ExtrasComboBox_KeyDown(object sender, KeyEventArgs e)
@@ -348,12 +356,17 @@ namespace PizzaEcki
             }
             if (tempOrderItem.Extras != null)
             {
-                Extra selectedExtra = extrasList.FirstOrDefault(x => x.Name == tempOrderItem.Extras);
-                if (selectedExtra != null)
+                var extras = tempOrderItem.Extras.Split(',').Select(extra => extra.Trim());  // Konvertieren Sie den Extras-String in ein Array
+                foreach (var extra in extras)
                 {
-                    tempOrderItem.Epreis += selectedExtra.Price;
+                    Extra selectedExtra = extrasList.FirstOrDefault(x => x.Name == extra);
+                    if (selectedExtra != null)
+                    {
+                        tempOrderItem.Epreis += selectedExtra.Price;
+                    }
                 }
             }
+
 
             // Berechnen Sie den Gesamtpreis eines Gerichtes mit Berücksichtigung der Anzahl
             tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
@@ -421,9 +434,14 @@ namespace PizzaEcki
                     PaymentMethod = paymentMethod // Zuweisen der Zahlungsmethode
                 };
                 _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
+
+                _databaseManager.SaveOrder(order);
                 SendOrderItems(order);
 
-                PrintReceipt(order);
+                Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
+                PrintReceipt(order, customer);
+
+        
 
                 // Leeren Sie die Bestellliste
                 orderItems.Clear();
@@ -498,11 +516,9 @@ namespace PizzaEcki
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
-
-            // Dein Code hier, z.B.
             _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
         }
-        private void PrintReceipt(Order order )
+        private void PrintReceipt(Order order, Customer customer )
         {
             PrintDocument printDoc = new PrintDocument();
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 315, 10000);

@@ -26,6 +26,7 @@ namespace PizzaKitchenClient
             InitializeComponent();
             InitializeHubConnection();
             LoadDrivers();
+            LoadUnassignedOrders();
         }
 
         private void LoadDrivers()
@@ -82,7 +83,7 @@ namespace PizzaKitchenClient
                 double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
 
                 // Speichere die Zuordnung
-                dbManager.SaveOrderAssignment(selectedOrder.BonNumber, selectedDriver.Id, orderPrice);
+                dbManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
 
                 // Entferne die Bestellung aus der Liste
                 OrdersList.Items.Remove(selectedOrder);
@@ -90,6 +91,15 @@ namespace PizzaKitchenClient
             else
             {
                 MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+        }
+        private void LoadUnassignedOrders()
+        {
+            List<Order> unassignedOrders = dbManager.GetUnassignedOrders();  // Rufe die Methode GetUnassignedOrders auf
+            foreach (Order order in unassignedOrders)
+            {
+                OrdersList.Items.Add(order);  // Füge jede nicht zugewiesene Bestellung zur OrdersList hinzu
             }
         }
     }

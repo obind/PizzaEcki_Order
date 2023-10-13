@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Microsoft.Win32.SafeHandles;
 using System.IO;
 using SharedLibrary;
+using System.Data;
+using System.Linq;
 
 namespace PizzaEcki.Database
 {
@@ -77,6 +79,7 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
 
+         
             //Settings
 
             sql = "CREATE TABLE IF NOT EXISTS Settings (LastResetDate TEXT, CurrentBonNumber INTEGER)";
@@ -96,19 +99,52 @@ namespace PizzaEcki.Database
 
             //Zuordnungstabelle
             sql = @"
-        CREATE TABLE IF NOT EXISTS OrderAssignments (
-            OrderId INTEGER,
-            DriverId INTEGER,
-            Price REAL,
-            Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
-            FOREIGN KEY(DriverId) REFERENCES Drivers(Id)
-        );
-    ";
+    CREATE TABLE IF NOT EXISTS OrderAssignments (
+        OrderId TEXT,
+        DriverId INTEGER,
+        Price REAL,
+        Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
+        FOREIGN KEY(OrderId) REFERENCES Orders(OrderId),
+        FOREIGN KEY(DriverId) REFERENCES Drivers(Id)
+    );
+";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
             }
 
+
+            sql = @"
+            CREATE TABLE IF NOT EXISTS Orders (
+                OrderId TEXT PRIMARY KEY,
+                BonNumber INTEGER,
+                IsDelivery BOOLEAN,
+                PaymentMethod TEXT,
+                CustomerPhoneNumber TEXT,
+                Timestamp DATETIME
+            )";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+         
+            sql = @"
+            CREATE TABLE IF NOT EXISTS OrderItems (
+                OrderItemId INTEGER PRIMARY KEY AUTOINCREMENT,
+                OrderId TEXT,
+                Gericht TEXT,
+                Extras TEXT,
+                Menge INTEGER,
+                Epreis REAL,
+                Gesamt REAL,
+                Uhrzeit TEXT,
+                LieferungsArt INTEGER,
+                FOREIGN KEY(OrderId) REFERENCES Orders(OrderId)
+            )";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
 
         }
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
@@ -423,20 +459,195 @@ namespace PizzaEcki.Database
             }
         }
 
-
-        public void SaveOrderAssignment(int orderId, int driverId, double price)
+        public void SaveOrderAssignment(string orderId, int driverId, double price)
         {
-            string sql = "INSERT INTO OrderAssignments (OrderId, DriverId, Price, Timestamp) VALUES (@OrderId, @DriverId, @Price, @Timestamp)";  // geändert von AssignmentDate zu Timestamp
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            string checkSql = "SELECT COUNT(*) FROM OrderAssignments WHERE OrderId = @OrderId";
+            using (SqliteCommand checkCommand = new SqliteCommand(checkSql, _connection))
             {
-                command.Parameters.AddWithValue("@OrderId", orderId);
-                command.Parameters.AddWithValue("@DriverId", driverId);
-                command.Parameters.AddWithValue("@Price", price);
-                command.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
-                command.ExecuteNonQuery();
+                checkCommand.Parameters.AddWithValue("@OrderId", orderId);
+                int count = Convert.ToInt32(checkCommand.ExecuteScalar());
+                if (count > 0)
+                {
+                    // Ein Eintrag für die angegebene OrderId existiert bereits, aktualisieren Sie ihn
+                    string updateSql = "UPDATE OrderAssignments SET DriverId = @DriverId, Price = @Price, Timestamp = @Timestamp WHERE OrderId = @OrderId";
+                    using (SqliteCommand updateCommand = new SqliteCommand(updateSql, _connection))
+                    {
+                        updateCommand.Parameters.AddWithValue("@OrderId", orderId);
+                        updateCommand.Parameters.AddWithValue("@DriverId", driverId);
+                        updateCommand.Parameters.AddWithValue("@Price", price);
+                        updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                        updateCommand.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    // Kein Eintrag für die angegebene OrderId, erstellen Sie einen neuen Eintrag
+                    string insertSql = "INSERT INTO OrderAssignments (OrderId, DriverId, Price, Timestamp) VALUES (@OrderId, @DriverId, @Price, @Timestamp)";
+                    using (SqliteCommand insertCommand = new SqliteCommand(insertSql, _connection))
+                    {
+                        insertCommand.Parameters.AddWithValue("@OrderId", orderId);
+                        insertCommand.Parameters.AddWithValue("@DriverId", driverId);
+                        insertCommand.Parameters.AddWithValue("@Price", price);
+                        insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                        insertCommand.ExecuteNonQuery();
+                    }
+                }
             }
         }
 
+        public void SaveOrder(Order order)
+        {
+            // Speichern der Bestellung in der Orders Tabelle
+            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber, PaymentMethod) VALUES (@OrderId, @BonNumber, @PaymentMethod)";
+            using (SqliteCommand commandOrder = new SqliteCommand(sqlOrder, _connection))
+            {
+                commandOrder.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                commandOrder.Parameters.AddWithValue("@BonNumber", order.BonNumber);
+                commandOrder.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
+                commandOrder.ExecuteNonQuery();
+            }
+
+            // Speichern der OrderItems in der OrderItems Tabelle
+            foreach (var item in order.OrderItems)
+            {
+                string sqlItem = @"
+        INSERT INTO OrderItems 
+        (
+            OrderId, 
+            Gericht, 
+            Extras, 
+            Menge, 
+            Epreis, 
+            Gesamt, 
+            Uhrzeit, 
+            LieferungsArt
+        ) 
+        VALUES 
+        (
+            @OrderId, 
+            @Gericht, 
+            @Extras, 
+            @Menge, 
+            @Epreis, 
+            @Gesamt, 
+            @Uhrzeit, 
+            @LieferungsArt
+        )
+    ";
+                using (SqliteCommand commandItem = new SqliteCommand(sqlItem, _connection))
+                {
+                    commandItem.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                    commandItem.Parameters.Add("@Gericht", SqliteType.Text).Value = (object)item.Gericht ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Extras", SqliteType.Text).Value = (object)item.Extras ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Menge", SqliteType.Integer).Value = (object)item.Menge ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Epreis", SqliteType.Real).Value = (object)item.Epreis ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Gesamt", SqliteType.Real).Value = (object)item.Gesamt ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Uhrzeit", SqliteType.Text).Value = (object)item.Uhrzeit ?? DBNull.Value;
+                    commandItem.Parameters.Add("@LieferungsArt", SqliteType.Integer).Value = (object)item.LieferungsArt ?? DBNull.Value;
+
+                    commandItem.ExecuteNonQuery();
+                }
+            }
+
+            // Erstellen eines Eintrags in der OrderAssignments Tabelle mit einer NULL DriverId
+            // Erstellen eines Eintrags in der OrderAssignments Tabelle mit einer NULL DriverId
+            string sqlAssignment = "INSERT INTO OrderAssignments (OrderId, DriverId) VALUES (@OrderId, NULL)";
+            using (SqliteCommand commandAssignment = new SqliteCommand(sqlAssignment, _connection))
+            {
+                commandAssignment.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                commandAssignment.ExecuteNonQuery();
+            }
+
+        }
+
+
+        public List<Order> GetUnassignedOrders()
+        {
+            List<Order> unassignedOrders = new List<Order>();
+            string sql = @"
+        SELECT 
+            Orders.*,
+            OrderItems.*
+        FROM 
+            Orders
+        LEFT JOIN 
+            OrderItems ON Orders.OrderId = OrderItems.OrderId
+        LEFT JOIN 
+            OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
+        WHERE 
+            OrderAssignments.DriverId IS NULL
+    ";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Guid currentOrderId = Guid.Parse(reader["OrderId"].ToString());
+                        Order order;
+                        if (unassignedOrders.Any(o => o.OrderId == currentOrderId))
+                        {
+                            order = unassignedOrders.First(o => o.OrderId == currentOrderId);
+                        }
+                        else
+                        {
+                            order = new Order
+                            {
+                                OrderId = currentOrderId,
+                                BonNumber = Convert.ToInt32(reader["BonNumber"]),
+                                // ...
+                            };
+                            unassignedOrders.Add(order);
+                        }
+
+                        OrderItem orderItem = new OrderItem
+                        {
+                            Nr = reader.IsDBNull(reader.GetOrdinal("OrderItemId")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+                            Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+                            Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                            Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+                            Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+                            Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                            Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                            LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                        };
+
+                        order.OrderItems.Add(orderItem);
+                    }
+                }
+            }
+            return unassignedOrders;
+        }
+
+
+        public List<OrderItem> GetOrderItems(Guid orderId)
+        {
+            List<OrderItem> orderItems = new List<OrderItem>();
+            string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@OrderId", orderId);
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        OrderItem orderItem = new OrderItem
+                        {
+                            Nr = reader.GetInt32(reader.GetOrdinal("Nr")),
+                            Gericht = reader.GetString(reader.GetOrdinal("Gericht")),
+                            Extras = reader.GetString(reader.GetOrdinal("Extras")),
+                            Menge = reader.GetInt32(reader.GetOrdinal("Menge")),
+                            Epreis = reader.GetDouble(reader.GetOrdinal("Epreis")),
+                            Gesamt = reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                            Uhrzeit = reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                            LieferungsArt = reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                        };
+                        orderItems.Add(orderItem);
+                    }
+                }
+            }
+            return orderItems;
+        }
 
 
         public List<OrderAssignment> GetOrderAssignments()
