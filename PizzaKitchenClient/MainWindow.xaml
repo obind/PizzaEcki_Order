@@ -39,8 +39,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <ComboBox Name="DriversComboBox" Grid.Row="1" Margin="10" Loaded="DriversComboBox_Loaded"/>
-        <Button Name="AssignButton" Grid.Column="1" Content="Zuordnen" Margin="10,0,0,0" Click="OnAssignButtonClicked" Height="42" Grid.RowSpan="2" VerticalAlignment="Bottom"/>
+        <ComboBox Name="DriversComboBox" Grid.Row="1" Margin="10,0,0,5" Loaded="DriversComboBox_Loaded" VerticalAlignment="Center"/>
+        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,5" Click="OnAssignButtonClicked" Grid.RowSpan="2" VerticalAlignment="Center"/>
 
     </Grid>
 </Window>
