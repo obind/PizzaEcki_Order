@@ -447,6 +447,8 @@ namespace PizzaEcki
                 // Leeren Sie die Bestellliste
                 orderItems.Clear();
 
+                TotalPriceLabel.Content = $"0.00 €";
+
                 // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
                 myDataGrid.Items.Refresh();
 
