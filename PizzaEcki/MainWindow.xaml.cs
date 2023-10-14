@@ -518,42 +518,52 @@ namespace PizzaEcki
             base.OnClosing(e);
             _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
         }
-        private void PrintReceipt(Order order, Customer customer )
+        private void PrintReceipt(Order order, Customer customer)
         {
             PrintDocument printDoc = new PrintDocument();
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 315, 10000);
             printDoc.PrintPage += (sender, e) =>
             {
                 Graphics graphics = e.Graphics;
-                Font font = new Font("Arial", 12);
-                Font boldLargeFont = new Font("Arial", 20, System.Drawing.FontStyle.Bold);
-                float yOffset = 0;
 
-                // Titel
-                SizeF titleSize = graphics.MeasureString("PIZZA ECKI", boldLargeFont);
-                float titleX = (e.PageBounds.Width - titleSize.Width) / 2;
-                graphics.DrawString("PIZZA ECKI", boldLargeFont, Brushes.Black, titleX, yOffset);
-                yOffset += titleSize.Height + 10;  // 10 pixels Abstand
+                // Fonts
+                Font regularFont = new Font("Segoe UI", 12);
+                Font boldFont = new Font("Segoe UI", 16, System.Drawing.FontStyle.Bold);
+                Font titleFont = new Font("Segoe UI", 24, System.Drawing.FontStyle.Bold);
+
+                float yOffset = 10;  // Initial offset
+
+                // Title
+                string title = "PIZZA ECKI";
+                float titleWidth = graphics.MeasureString(title, titleFont).Width;
+                graphics.DrawString(title, titleFont, Brushes.Black, (e.PageBounds.Width - titleWidth) / 2, yOffset);
+                yOffset += titleFont.GetHeight() + 20;
+
+                //// Titel
+                //SizeF titleSize = graphics.MeasureString("PIZZA ECKI", titleFont);
+                //float titleX = (e.PageBounds.Width - titleSize.Width) / 2;
+                //graphics.DrawString("PIZZA ECKI", titleFont, Brushes.Black, titleX, yOffset);
+                //yOffset += titleSize.Height + 10;  // 10 pixels Abstand
 
                 // Adresse
-                SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", font);
+                SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", regularFont);
                 float addressX = (e.PageBounds.Width - addressSize.Width) / 2;
-                graphics.DrawString("Woerdener Str. 4 · 33803 Steinhagen", font, Brushes.Black, addressX, yOffset);
+                graphics.DrawString("Woerdener Str. 4 · 33803 Steinhagen", regularFont, Brushes.Black, addressX, yOffset);
                 yOffset += addressSize.Height + 10;  // 10 pixels Abstand
 
                 // Datum und Uhrzeit
                 string dateStr = DateTime.Now.ToString("dd.MM.yyyy");
                 string timeStr = DateTime.Now.ToString("HH:mm");
-                graphics.DrawString(dateStr, font, Brushes.Black, 0, yOffset);
-                SizeF timeSize = graphics.MeasureString(timeStr, font);
-                graphics.DrawString(timeStr, font, Brushes.Black, e.PageBounds.Width - timeSize.Width, yOffset);
-                yOffset += font.GetHeight() + 20;  // 10 pixels Abstand
+                graphics.DrawString(dateStr, regularFont, Brushes.Black, 0, yOffset);
+                SizeF timeSize = graphics.MeasureString(timeStr, regularFont);
+                graphics.DrawString(timeStr, regularFont, Brushes.Black, e.PageBounds.Width - timeSize.Width, yOffset);
+                yOffset += regularFont.GetHeight() + 20;  // 10 pixels Abstand
 
                 // Verschoben innerhalb des Ereignishandlers
                 string bonNumberStr = $"Bon Nummer: {order.BonNumber}";
-                SizeF bonNumberSize = graphics.MeasureString(bonNumberStr, boldLargeFont);
+                SizeF bonNumberSize = graphics.MeasureString(bonNumberStr, boldFont);
                 float bonNumberX = (e.PageBounds.Width - bonNumberSize.Width) / 2;
-                graphics.DrawString(bonNumberStr, boldLargeFont, Brushes.Black, bonNumberX, yOffset);
+                graphics.DrawString(bonNumberStr, boldFont, Brushes.Black, bonNumberX, yOffset);
                 yOffset += bonNumberSize.Height + 10;
 
                 // Bestellte Gerichte
@@ -561,26 +571,26 @@ namespace PizzaEcki
                 {
                     string itemNameStr = $"{item.Menge} x {item.Gericht}";
                     string itemPriceStr = $"{item.Gesamt:C}";
-                    graphics.DrawString(itemNameStr, font, Brushes.Black, 0, yOffset);
-                    SizeF itemPriceSize = graphics.MeasureString(itemPriceStr, font);
-                    graphics.DrawString(itemPriceStr, font, Brushes.Black, e.PageBounds.Width - itemPriceSize.Width, yOffset);
-                    yOffset += font.GetHeight();
+                    graphics.DrawString(itemNameStr, regularFont, Brushes.Black, 0, yOffset);
+                    SizeF itemPriceSize = graphics.MeasureString(itemPriceStr, regularFont);
+                    graphics.DrawString(itemPriceStr, regularFont, Brushes.Black, e.PageBounds.Width - itemPriceSize.Width, yOffset);
+                    yOffset += regularFont.GetHeight();
                 }
                 yOffset += 20;  // 10 pixels Abstand
 
 
-                //if (isDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
-                //{
-                //    string addressStr = "Adresse: " + customer.Street + ", " + customer.City;
-                //    graphics.DrawString(addressStr, font, Brushes.Black, 0, yOffset);
-                //    yOffset += (int)font.GetHeight();  // Aktualisieren der yOffset für den nächsten zu druckenden Text
-                //}
+                if (isDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
+                {
+                    string addressStr = "Adresse: " + customer.Street + ", " + customer.City;
+                    graphics.DrawString(addressStr, boldFont, Brushes.Black, 0, yOffset);
+                    yOffset += (int)boldFont.GetHeight();  // Aktualisieren der yOffset für den nächsten zu druckenden Text
+                }
 
 
                 // Bezahlmethode
                 string paymentMethodStr = "Bezahlmethode: " + order.PaymentMethod;
-                graphics.DrawString(paymentMethodStr, boldLargeFont, Brushes.Black, 0, yOffset);
-                yOffset += (int)font.GetHeight();
+                graphics.DrawString(paymentMethodStr, boldFont, Brushes.Black, 0, yOffset);
+                yOffset += (int)boldFont.GetHeight();
             };
 
        
