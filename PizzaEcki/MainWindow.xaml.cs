@@ -20,9 +20,6 @@ namespace PizzaEcki
 
     public partial class MainWindow : Window
     {
-
-
-
         public ObservableCollection<Driver> Drivers { get; set; }
 
         private DatabaseManager _databaseManager;
@@ -31,7 +28,6 @@ namespace PizzaEcki
         private SignalRService signalRService;
         private List<SharedLibrary.OrderItem> orderItems = new List<SharedLibrary.OrderItem>();
         private OrderItem tempOrderItem = new OrderItem();
-
 
         public string SelectedPaymentMethod { get; private set; }
 
@@ -64,8 +60,7 @@ namespace PizzaEcki
             // Füllen die ComboBox für Extras aus der Datenbank
             extrasList = _databaseManager.GetExtras();
             ExtrasComboBox.ItemsSource = extrasList;
-                  
-         
+                           
             //Den Time Picker Vorbereiten zum Programm start 
             TimePicker.Value = DateTime.Now;
             TimePicker.Value = DateTime.Now.AddMinutes(15);
@@ -417,6 +412,12 @@ namespace PizzaEcki
 
         private void CompleteOrder(string paymentMethod)
         {
+            if (!orderItems.Any())
+            {
+                MessageBox.Show("Es wurden keine Order-Items hinzugefügt. Bitte füge mindestens ein Order-Item hinzu, bevor du die Bestellung abschließt.");
+                return; // Verlasse die Methode frühzeitig
+            }
+
             if (PhoneNumberTextBox.Text != "")
             {
                 // Erstelle ein neues Receipt Objekt und fülle es mit den OrderItems und der ReceiptNumber
@@ -487,6 +488,11 @@ namespace PizzaEcki
                 dailyEarnings.ShowDialog();
                 
             }
+
+            if (e.Key == Key.F12)
+            {
+                BarzahlungBtn(null, null); // Du kannst null für sender und RoutedEventArgs übergeben, da sie in deiner Methode nicht verwendet werden
+            }
         }
         private void SendOrderItems(Order order)
         {
@@ -538,12 +544,6 @@ namespace PizzaEcki
                 float titleWidth = graphics.MeasureString(title, titleFont).Width;
                 graphics.DrawString(title, titleFont, Brushes.Black, (e.PageBounds.Width - titleWidth) / 2, yOffset);
                 yOffset += titleFont.GetHeight() + 20;
-
-                //// Titel
-                //SizeF titleSize = graphics.MeasureString("PIZZA ECKI", titleFont);
-                //float titleX = (e.PageBounds.Width - titleSize.Width) / 2;
-                //graphics.DrawString("PIZZA ECKI", titleFont, Brushes.Black, titleX, yOffset);
-                //yOffset += titleSize.Height + 10;  // 10 pixels Abstand
 
                 // Adresse
                 SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", regularFont);
