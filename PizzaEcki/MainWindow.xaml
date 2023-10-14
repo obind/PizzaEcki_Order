@@ -31,9 +31,9 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.2*" />
-            <RowDefinition Height="1.5*"/>
-            <RowDefinition Height="1.*" />
-            <RowDefinition Height="1.5*" />
+            <RowDefinition Height="1.2*"/>
+            <RowDefinition Height="1.3*" />
+            <RowDefinition Height="1.3*" />
 
         </Grid.RowDefinitions>
 
@@ -141,19 +141,19 @@
             </DataGrid>
         </Grid>
 
-        <Grid Grid.Row="4" Background="#9e9e9e" Margin="50,8,0,20" MinWidth="40">
+        <Grid Grid.Row="4" Background="#9e9e9e" Margin="50,5,0,5" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="0.5*" />
+                <ColumnDefinition Width="0.2*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="0.5*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <!-- Für die Überschrift -->
-                <RowDefinition Height="1*" MinHeight="30" />
-                <RowDefinition Height="1*" MinHeight="30" />
-                <RowDefinition Height="1*" MinHeight="30" />
+                <!-- Überschrift -->
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Label Content="Offene Bestellung" Grid.Row="0" Background="#474747" Foreground="White" Grid.ColumnSpan="4" FontSize="18" FontWeight="Bold" Padding="2,2,2,2" Height="42" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
@@ -176,7 +176,7 @@
             <ComboBox x:Name="DriversComboBox" Grid.Column="3" Grid.Row="2" Margin="0,2,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" FontSize="18" DisplayMemberPath="Name" />
 
         </Grid>
-        <Grid Grid.Row="4" Grid.Column="1" Margin="97,14,0,0">
+        <Grid Grid.Row="4" Grid.Column="1" Margin="97,10,0,0" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
