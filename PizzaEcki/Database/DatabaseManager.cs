@@ -99,15 +99,15 @@ namespace PizzaEcki.Database
 
             //Zuordnungstabelle
             sql = @"
-    CREATE TABLE IF NOT EXISTS OrderAssignments (
-        OrderId TEXT,
-        DriverId INTEGER,
-        Price REAL,
-        Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
-        FOREIGN KEY(OrderId) REFERENCES Orders(OrderId),
-        FOREIGN KEY(DriverId) REFERENCES Drivers(Id)
-    );
-";
+                CREATE TABLE IF NOT EXISTS OrderAssignments (
+                    OrderId TEXT,
+                    DriverId INTEGER,
+                    Price REAL,
+                    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
+                    FOREIGN KEY(OrderId) REFERENCES Orders(OrderId),
+                    FOREIGN KEY(DriverId) REFERENCES Drivers(Id)
+                );
+            ";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
@@ -147,6 +147,44 @@ namespace PizzaEcki.Database
             }
 
         }
+
+        //Tabellen
+        public List<string> GetTableNames()
+        {
+            List<string> tableNames = new List<string>();
+            string sql = "SELECT name FROM sqlite_master WHERE type='table';";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tableNames.Add(reader.GetString(0));
+                    }
+                }
+            }
+
+            return tableNames;
+        }
+
+        public DataTable GetTableData(string tableName)
+        {
+            DataTable tableData = new DataTable();
+            string sql = $"SELECT * FROM {tableName};";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    tableData.Load(reader);
+                }
+            }
+
+            return tableData;
+        }
+
+
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
         {
             string sql = @"SELECT c.PhoneNumber, c.Name, a.Street, a.City, c.AdditionalInfo 
@@ -583,7 +621,15 @@ namespace PizzaEcki.Database
                 {
                     while (reader.Read())
                     {
-                        Guid currentOrderId = Guid.Parse(reader["OrderId"].ToString());
+                        var orderIdValue = reader["OrderId"].ToString();
+                        if (string.IsNullOrEmpty(orderIdValue))
+                        {
+                            var bonNumber = reader["BonNumber"].ToString();
+                            Console.WriteLine($"Fehler: OrderId ist null oder leer für BonNumber: {bonNumber}");
+                            continue;  // Überspringe diesen Datensatz
+                        }
+                        Guid currentOrderId = Guid.Parse(orderIdValue);
+
                         Order order;
                         if (unassignedOrders.Any(o => o.OrderId == currentOrderId))
                         {

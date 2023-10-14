@@ -598,5 +598,10 @@ namespace PizzaEcki
             
         }
 
+        private void btn_tables_Click(object sender, RoutedEventArgs e)
+        {
+            TableView tableView = new TableView();
+            tableView.ShowDialog();
+        }
     }
 }
