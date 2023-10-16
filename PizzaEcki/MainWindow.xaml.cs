@@ -14,12 +14,14 @@ using System.Collections.ObjectModel;
 using System.Drawing.Printing;
 using System.Drawing;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace PizzaEcki
 {
 
     public partial class MainWindow : Window
     {
+        private StringBuilder extrasStringBuilder = new StringBuilder();
         public ObservableCollection<Driver> Drivers { get; set; }
 
         private DatabaseManager _databaseManager;
@@ -229,15 +231,6 @@ namespace PizzaEcki
         }
 
         //Extras
-        private void ExtrasComboBox_Loaded(object sender, RoutedEventArgs e)
-        {
-            var textBox = (TextBox)ExtrasComboBox.Template.FindName("PART_EditableTextBox", ExtrasComboBox);
-            if (textBox != null)
-            {
-                textBox.TextChanged += ExtrasTextBox_TextChanged;
-            }
-        }
-
         private void ExtrasTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -249,43 +242,101 @@ namespace PizzaEcki
             bool isDeleting = e.Changes.Any(change => change.RemovedLength > 0);
             if (isDeleting)
             {
-                return;
+                return;  // Wenn der Benutzer löscht, tun wir nichts
             }
 
             string text = textBox.Text;
             if (string.IsNullOrEmpty(text))
             {
-                return;
+                return;  // Wenn der Text leer ist, tun wir nichts
             }
 
-            // Split the text by commas and get the last segment for auto-completion
             var segments = text.Split(',');
             var lastSegment = segments.Last().Trim();
 
             bool isRemoving = lastSegment.StartsWith("-");
             string lookupText = isRemoving ? lastSegment.Substring(1) : lastSegment;
 
+            // Stellen Sie sicher, dass lookupText mindestens einen Buchstaben hat,
+            // bevor die Autovervollständigung ausgeführt wird
+            if (lookupText.Length < 1)
+            {
+                return;
+            }
+
             var matchingExtra = extrasList
                 .FirstOrDefault(extra => extra.Name.StartsWith(lookupText, StringComparison.OrdinalIgnoreCase));
 
             if (matchingExtra != null)
             {
+                // Ermittle den Index des letzten Segments im Text
+                int lastSegmentIndex = text.LastIndexOf(lastSegment);
+                // Ersetze den letzten Segmenttext durch den Autovervollständigungstext
+                string newText = text.Substring(0, lastSegmentIndex) + (isRemoving ? "-" : "") + matchingExtra.Name;
                 int textStart = textBox.SelectionStart;
-                // Replace the last segment with the auto-completed text
-                segments[segments.Length - 1] = (isRemoving ? "-" : "") + matchingExtra.Name;
-                textBox.Text = string.Join(", ", segments);
+                textBox.Text = newText;
                 textBox.SelectionStart = textStart;
                 textBox.SelectionLength = textBox.Text.Length - textStart;
             }
+        }
 
-            tempOrderItem.Extras = textBox.Text;
+        private void ExtrasComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            var textBox = (TextBox)ExtrasComboBox.Template.FindName("PART_EditableTextBox", ExtrasComboBox);
+            if (textBox != null)
+            {
+                textBox.TextChanged += ExtrasTextBox_TextChanged;
+                textBox.PreviewKeyDown += ExtrasComboBox_PreviewKeyDown;
+            }
+        }
+
+        private void ExtrasComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox == null)
+            {
+                return;
+            }
+
+            if (e.Key == Key.Space)
+            {
+                string text = textBox.Text;
+                if (!text.EndsWith(", "))
+                {
+                    textBox.Text += ", ";  // Füge ein Komma und ein Leerzeichen hinzu, wenn die Leertaste gedrückt wird
+                    textBox.SelectionStart = textBox.Text.Length;  // Setze den Cursor ans Ende des Texts
+                }
+                e.Handled = true;  // Verhindere, dass die Leertaste ein Leerzeichen einfügt
+            }
+            else if (e.Key == Key.Enter)
+            {
+                tempOrderItem.Extras = textBox.Text;
+                amountComboBox.Focus();  // Verschiebe den Fokus zur amountComboBox
+            }
         }
 
         private void ExtrasComboBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Enter)
+            var textBox = sender as TextBox;
+            if (textBox == null)
             {
-                amountComboBox.Focus();
+                return;
+            }
+
+            if (e.Key == Key.Space)
+            {
+                string text = textBox.Text;
+                if (!text.EndsWith(", "))
+                {
+                    textBox.Text += ", ";  // Füge ein Komma und ein Leerzeichen hinzu, wenn die Leertaste gedrückt wird
+                    textBox.SelectionStart = textBox.Text.Length;  // Setze den Cursor ans Ende des Texts
+                }
+                e.Handled = true;  // Verhindere, dass die Leertaste ein Leerzeichen einfügt
+            }
+            else if (e.Key == Key.Enter)
+            {
+                tempOrderItem.Extras = textBox.Text;
+                amountComboBox.Focus();  // Verschiebe den Fokus zur amountComboBox
             }
         }
 
@@ -380,7 +431,10 @@ namespace PizzaEcki
             // Löschen Sie die Auswahlen und den Text in den ComboBoxen und dem TextBox
             DishComboBox.SelectedItem = null;
             ExtrasComboBox.SelectedItem = null;
-            amountComboBox.SelectedItem = null;
+            ExtrasComboBox.Text = "";
+            amountComboBox.Text ="1";
+
+            DishComboBox.Focus();
         }
 
         public void CalculateTotal(List<OrderItem> orderItem)
@@ -605,5 +659,7 @@ namespace PizzaEcki
             TableView tableView = new TableView();
             tableView.ShowDialog();
         }
+
+
     }
 }
