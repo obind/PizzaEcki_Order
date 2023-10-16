@@ -60,5 +60,7 @@ namespace PizzaEcki.Pages
         {
             CategoryComboBox.ItemsSource = Enum.GetValues(typeof(DishCategory)).Cast<DishCategory>();
         }
+
+
     }
 }

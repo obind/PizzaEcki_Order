@@ -2,7 +2,6 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Pizza Kitchen" Height="450" Width="800">
-
     <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -12,11 +11,11 @@
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <ListView Name="OrdersList" Margin="10" Grid.ColumnSpan="12">
+        <ListView Name="OrdersList" Margin="10" Grid.ColumnSpan="12" FontSize="16">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Bonnummer" Width="100" DisplayMemberBinding="{Binding BonNumber}" />
-                    <GridViewColumn Header="Anzahl der Gerichte" Width="150" DisplayMemberBinding="{Binding OrderItems.Count}" />
+                    <GridViewColumn Header="Bonnummer" Width="120" DisplayMemberBinding="{Binding BonNumber}" />
+                    <GridViewColumn Header="Anzahl der Gerichte" Width="170" DisplayMemberBinding="{Binding OrderItems.Count}" />
                     <GridViewColumn Header="Gerichte" Width="500">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -24,11 +23,11 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Gericht}" Width="200" />
-                                                <TextBlock Text="Menge:" Width="60" />
-                                                <TextBlock Text="{Binding Menge}" Width="40" />
-                                                <TextBlock Text="Extras:" Width="60" />
-                                                <TextBlock Text="{Binding Extras}" />
+                                                <TextBlock Text="{Binding Gericht}" Width="220" FontWeight="Bold" />
+                                                <TextBlock Text="Menge:" Width="70" />
+                                                <TextBlock Text="{Binding Menge}" Width="50" FontWeight="Bold" />
+                                                <TextBlock Text="Extras:" Width="70" />
+                                                <TextBlock Text="{Binding Extras}" FontWeight="Bold" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -40,7 +39,7 @@
             </ListView.View>
         </ListView>
         <ComboBox Name="DriversComboBox" Grid.Row="1" Margin="10,0,0,5" Loaded="DriversComboBox_Loaded" VerticalAlignment="Center"/>
-        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,5" Click="OnAssignButtonClicked" Grid.RowSpan="2" VerticalAlignment="Center"/>
+        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,5" Click="OnAssignButtonClicked" Grid.RowSpan="2" VerticalAlignment="Center" FontWeight="Bold" Background="#21aa00" Padding="1,5,1,5"/>
 
     </Grid>
 </Window>

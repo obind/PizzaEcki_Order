@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Input;
 using PizzaEcki.Database;
 using PizzaEcki.Models;
 using SharedLibrary;
@@ -76,6 +77,18 @@ namespace PizzaEcki.Pages
         }
 
 
+        private void DishListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DishListView.SelectedItem is Dish selectedDish)
+            {
+                DishDialog dialog = new DishDialog(selectedDish);
+                if (dialog.ShowDialog() == true)
+                {
+                    _dbManager.AddOrUpdateDish(dialog.Dish);
+                    LoadDishes();
+                }
+            }
+        }
 
         //private void DeleteDriverButton_Click(object sender, RoutedEventArgs e)
         //{

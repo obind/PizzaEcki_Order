@@ -3,20 +3,35 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Dish Dialog" Height="300" Width="400">
     <Grid>
-        <StackPanel>
-            <Label Content="Name des Gerichts:" />
-            <TextBox Name="NameTextBox" Width="200"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <Label Content="Preis:" />
-            <TextBox Name="PriceTextBox" Width="200"/>
+        <!-- Name des Gerichts -->
+        <Label Content="Name des Gerichts:" Grid.Row="0" Grid.Column="0" Margin="10"/>
+        <TextBox Name="NameTextBox" Grid.Row="0" Grid.Column="1" Margin="10" Width="200"/>
 
-            <Label Content="Kategorie:" />
-            <ComboBox Name="CategoryComboBox" Width="200" Loaded="CategoryComboBox_Loaded" SelectionChanged="CategoryComboBox_SelectionChanged"/>
+        <!-- Preis -->
+        <Label Content="Preis:" Grid.Row="1" Grid.Column="0" Margin="10"/>
+        <TextBox Name="PriceTextBox" Grid.Row="1" Grid.Column="1" Margin="10" Width="200"/>
 
-            <Label Content="Größe:" />
-            <ComboBox Name="SizeComboBox" Width="200"/>
+        <!-- Kategorie -->
+        <Label Content="Kategorie:" Grid.Row="2" Grid.Column="0" Margin="10"/>
+        <ComboBox Name="CategoryComboBox" Grid.Row="2" Grid.Column="1" Margin="10" Width="200" Loaded="CategoryComboBox_Loaded" SelectionChanged="CategoryComboBox_SelectionChanged"/>
 
-            <Button Content="Speichern" Width="100" Height="30" Click="SaveButton_Click" Margin="0,10,0,0"/>
-        </StackPanel>
+        <!-- Größe -->
+        <Label Content="Größe:" Grid.Row="3" Grid.Column="0" Margin="10"/>
+        <ComboBox Name="SizeComboBox" Grid.Row="3" Grid.Column="1" Margin="10" Width="200"/>
+
+        <!-- Speichern Button -->
+        <Button Content="Speichern" Grid.Row="4" Grid.ColumnSpan="2" Width="100" Height="30" Click="SaveButton_Click" Margin="10" HorizontalAlignment="Center"/>
     </Grid>
 </Window>

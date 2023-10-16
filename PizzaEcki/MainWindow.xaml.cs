@@ -109,6 +109,8 @@ namespace PizzaEcki
                             DishComboBox.Focus();
                             Lieferung++;
                             isDelivery = true;
+
+                            
                         }
                         else // Kunde nicht gefunden
                         {

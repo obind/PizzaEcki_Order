@@ -738,18 +738,18 @@ namespace PizzaEcki.Database
 
             // SQL-Query, um die täglichen Umsätze abzurufen
             string sql = @"
-        SELECT
-            IFNULL(Drivers.Name, 'Theke') as Name,
-            SUM(OrderAssignments.Price) as DailySales
-        FROM
-            OrderAssignments
-        LEFT JOIN
-            Drivers ON OrderAssignments.DriverId = Drivers.Id
-        WHERE
-            date(OrderAssignments.Timestamp) = date(@Date)
-        GROUP BY
-            IFNULL(Drivers.Name, 'Theke');
-    ";
+            SELECT
+                IFNULL(Drivers.Name, 'Theke') as Name,
+                SUM(OrderAssignments.Price) as DailySales
+            FROM
+                OrderAssignments
+            LEFT JOIN
+                Drivers ON OrderAssignments.DriverId = Drivers.Id
+            WHERE
+                date(OrderAssignments.Timestamp) = date(@Date)
+            GROUP BY
+                IFNULL(Drivers.Name, 'Theke');
+            ";
 
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -762,7 +762,7 @@ namespace PizzaEcki.Database
                         DailySalesInfo dailySalesInfo = new DailySalesInfo
                         {
                             Name = reader.GetString(0),
-                            DailySales = reader.GetDouble(1)
+                            DailySales = reader.IsDBNull(1) ? 0 : reader.GetDouble(1)  // Überprüfung auf NULL
                         };
                         dailySalesInfoList.Add(dailySalesInfo);
                     }
@@ -771,6 +771,7 @@ namespace PizzaEcki.Database
 
             return dailySalesInfoList;
         }
+
 
 
         public void UpdateCurrentBonNumber(int newNumber)

@@ -28,7 +28,7 @@
 
 
                     </Grid.RowDefinitions>
-                    <ListView Name="DishListView">
+                    <ListView Name="DishListView" MouseDoubleClick="DishListView_MouseDoubleClick">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Id}"/>

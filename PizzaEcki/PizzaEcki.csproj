@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.5.1" />
+    <PackageReference Include="GoogleApi" Version="5.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="7.0.12" />
