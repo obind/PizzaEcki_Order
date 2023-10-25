@@ -56,7 +56,7 @@ namespace PizzaEcki
             _databaseManager = new DatabaseManager();
 
             // Füllen die ComboBox für Gerichte aus der Datenbank
-            dishesList = _databaseManager.GetDishes();
+            dishesList = _databaseManager.GetAllDishes();
             DishComboBox.ItemsSource = dishesList;
 
             // Füllen die ComboBox für Extras aus der Datenbank
@@ -189,10 +189,10 @@ namespace PizzaEcki
             // Aktualisiere das temporäre OrderItem mit den Details des ausgewählten Gerichts
             tempOrderItem.Gericht = selectedDish.Name.ToString();
             tempOrderItem.Nr = selectedDish.Id;
-            tempOrderItem.Epreis = selectedDish.Price;
+            tempOrderItem.Epreis = selectedDish.Preis;
 
             // Ermittle die verfügbaren Größen für die Kategorie des ausgewählten Gerichts
-            var sizes = DishSizeManager.CategorySizes[selectedDish.Category];
+            var sizes = DishSizeManager.CategorySizes[selectedDish.Kategorie];
 
             // Fülle die SizeComboBox mit den verfügbaren Größen für das ausgewählte Gericht
             SizeComboBox.ItemsSource = sizes;
@@ -399,7 +399,7 @@ namespace PizzaEcki
                 Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
                 if (selectedDish != null)
                 {
-                    tempOrderItem.Epreis += selectedDish.Price;
+                    tempOrderItem.Epreis += selectedDish.Preis;
                 }
             }
             if (tempOrderItem.Extras != null)

@@ -59,11 +59,13 @@ namespace PizzaEcki.Database
 
 
             //Dishes Table
-            sql = "CREATE TABLE IF NOT EXISTS Dishes (Id INTEGER PRIMARY KEY, Name TEXT, Price REAL, Category INTEGER, Size TEXT)";
+            sql = "CREATE TABLE IF NOT EXISTS Gerichte (Id INTEGER PRIMARY KEY, Name TEXT, Preis REAL, Kategorie INTEGER, Größe TEXT, HappyHour TEXT, Steuersatz REAL, GratisBeilage INTEGER)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
             }
+
+
 
             //Extras Table
             sql = "CREATE TABLE IF NOT EXISTS Extras (Id INTEGER PRIMARY KEY, Name TEXT, Price REAL)";
@@ -250,21 +252,26 @@ namespace PizzaEcki.Database
         }
         public void AddOrUpdateDish(Dish dish)
         {
-            string sql = "INSERT OR REPLACE INTO Dishes (Id, Name, Price, Category, Size) VALUES (@Id, @Name, @Price, @Category, @Size)";
+            string sql = "INSERT OR REPLACE INTO Gerichte (Id, Name, Preis, Kategorie, Größe, HappyHour, Steuersatz, GratisBeilage) VALUES (@Id, @Name, @Preis, @Kategorie, @Größe, @HappyHour, @Steuersatz, @GratisBeilage)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.Parameters.AddWithValue("@Id", dish.Id);
                 command.Parameters.AddWithValue("@Name", dish.Name);
-                command.Parameters.AddWithValue("@Price", dish.Price);
-                command.Parameters.AddWithValue("@Category", (int)dish.Category);
-                command.Parameters.AddWithValue("@Size", dish.Size); 
+                command.Parameters.AddWithValue("@Preis", dish.Preis);
+                command.Parameters.AddWithValue("@Kategorie", (int)dish.Kategorie);
+                command.Parameters.AddWithValue("@Größe", dish.Größe);
+                command.Parameters.AddWithValue("@HappyHour", dish.HappyHour);
+                command.Parameters.AddWithValue("@Steuersatz", dish.Steuersatz);
+                command.Parameters.AddWithValue("@GratisBeilage", dish.GratisBeilage);
                 command.ExecuteNonQuery();
             }
         }
+
+
         public List<Dish> GetAllDishes()
         {
             List<Dish> dishes = new List<Dish>();
-            string sql = "SELECT * FROM Dishes";
+            string sql = "SELECT * FROM Gerichte";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 using (SqliteDataReader reader = command.ExecuteReader())
@@ -275,9 +282,12 @@ namespace PizzaEcki.Database
                         {
                             Id = Convert.ToInt32(reader["Id"]),
                             Name = reader["Name"].ToString(),
-                            Price = Convert.ToDouble(reader["Price"]),
-                            Category = (DishCategory)Convert.ToInt32(reader["Category"]),
-                            Size = reader["Size"].ToString()
+                            Preis = Convert.ToDouble(reader["Preis"]),
+                            Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
+                            Größe = reader["Größe"].ToString(),
+                            HappyHour = reader["HappyHour"].ToString(),
+                            Steuersatz = Convert.ToDouble(reader["Steuersatz"]),
+                            GratisBeilage = Convert.ToInt32(reader["GratisBeilage"])
                         };
                         dishes.Add(dish);
                     }
@@ -285,6 +295,8 @@ namespace PizzaEcki.Database
             }
             return dishes;
         }
+
+
 
         public List<string> GetAllStreets()
         {
@@ -324,7 +336,7 @@ namespace PizzaEcki.Database
         public List<Dish> GetDishes()
         {
             List<Dish> dishes = new List<Dish>();
-            string sql = "SELECT * FROM Dishes";
+            string sql = "SELECT * FROM Gerichte";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 using (SqliteDataReader reader = command.ExecuteReader())
@@ -335,9 +347,9 @@ namespace PizzaEcki.Database
                         {
                             Id = Convert.ToInt32(reader["Id"]),
                             Name = reader["Name"].ToString(),
-                            Price = Convert.ToDouble(reader["Price"]),
-                            Category = (DishCategory)Convert.ToInt32(reader["Category"]),
-                            Size = reader["Size"].ToString()
+                            Preis = Convert.ToDouble(reader["Preis"]),
+                            Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
+                            Größe = reader["Größe"].ToString()
                         };
 
                         dishes.Add(dish);
@@ -796,82 +808,82 @@ namespace PizzaEcki.Database
         {
             List<Dish> dishes = new List<Dish>
             {
-            //Salate
-                new Dish { Id = 10, Name = "Bauernsalat", Price = 8.20 , Category = DishCategory.Salad },
-                new Dish { Id = 11, Name = "Gemischter Salat", Price = 7.90 , Category = DishCategory.Salad },
-                new Dish { Id = 12, Name = "Cetrioli Salat", Price = 8.20 , Category = DishCategory.Salad},
-                new Dish { Id = 13, Name = "Tomaten Salat", Price = 7.90 , Category = DishCategory.Salad},
-                new Dish { Id = 14, Name = "Mozzarella Salat", Price = 8.20 , Category = DishCategory.Salad},
-                new Dish { Id = 15, Name = "Thunfisch Salat", Price = 8.90 , Category = DishCategory.Salad},
-                new Dish { Id = 16, Name = "Italia Salat", Price = 9.20 , Category = DishCategory.Salad},
-                new Dish { Id = 17, Name = "Fisch Salat", Price = 9.20 , Category = DishCategory.Salad},
-                new Dish { Id = 18, Name = "Chef Salat", Price = 10.20 , Category = DishCategory.Salad},
-                new Dish { Id = 19, Name = "Chicken-Salat", Price = 9.90 , Category = DishCategory.Salad},
-                new Dish { Id = 600, Name = "Lachs-Salat", Price = 9.80 , Category = DishCategory.Salad},
-                new Dish { Id = 601, Name = "Rucola-Salat", Price = 9.80 , Category = DishCategory.Salad},
-                new Dish { Id = 602, Name = "Döner-Salat", Price = 9.80 , Category = DishCategory.Salad},
+            ////Salate
+            //    new Dish { Id = 10, Name = "Bauernsalat", Price = 8.20 , Category = DishCategory.Salad },
+            //    new Dish { Id = 11, Name = "Gemischter Salat", Price = 7.90 , Category = DishCategory.Salad },
+            //    new Dish { Id = 12, Name = "Cetrioli Salat", Price = 8.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 13, Name = "Tomaten Salat", Price = 7.90 , Category = DishCategory.Salad},
+            //    new Dish { Id = 14, Name = "Mozzarella Salat", Price = 8.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 15, Name = "Thunfisch Salat", Price = 8.90 , Category = DishCategory.Salad},
+            //    new Dish { Id = 16, Name = "Italia Salat", Price = 9.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 17, Name = "Fisch Salat", Price = 9.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 18, Name = "Chef Salat", Price = 10.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 19, Name = "Chicken-Salat", Price = 9.90 , Category = DishCategory.Salad},
+            //    new Dish { Id = 600, Name = "Lachs-Salat", Price = 9.80 , Category = DishCategory.Salad},
+            //    new Dish { Id = 601, Name = "Rucola-Salat", Price = 9.80 , Category = DishCategory.Salad},
+            //    new Dish { Id = 602, Name = "Döner-Salat", Price = 9.80 , Category = DishCategory.Salad},
 
-            //Baugette
-                new Dish { Id = 100, Name = "Käse", Price = 7.30 , Category = DishCategory.Other},
-                new Dish { Id = 101, Name = "Mozzarella", Price = 8.60 , Category = DishCategory.Other},
-                new Dish { Id = 102, Name = "Salami", Price = 7.80 , Category = DishCategory.Other},
-                new Dish { Id = 103, Name = "Schinken", Price = 7.80 , Category = DishCategory.Other},
-                new Dish { Id = 104, Name = "Thunfisch", Price = 8.80 , Category = DishCategory.Other},
-                new Dish { Id = 105, Name = "Weißkäse", Price = 9.30 , Category = DishCategory.Other},
-                new Dish { Id = 106, Name = "Vegetaria", Price = 9.30 , Category = DishCategory.Other},
-                new Dish { Id = 107, Name = "Chicken", Price = 10.30 , Category = DishCategory.Other},
-                new Dish { Id = 108, Name = "Ei", Price = 7.80 , Category = DishCategory.Other},
-                new Dish { Id = 109, Name = "Lachs", Price = 10.30 , Category = DishCategory.Other},
-                new Dish { Id = 110, Name = "Hawaii", Price = 8.80 , Category = DishCategory.Other},
-                new Dish { Id = 111, Name = "Dönero", Price = 9.30 , Category = DishCategory.Other},
-                new Dish { Id = 112, Name = "Knoblauchwurst", Price = 9.30 , Category = DishCategory.Other},
+            ////Baugette
+            //    new Dish { Id = 100, Name = "Käse", Price = 7.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 101, Name = "Mozzarella", Price = 8.60 , Category = DishCategory.Other},
+            //    new Dish { Id = 102, Name = "Salami", Price = 7.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 103, Name = "Schinken", Price = 7.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 104, Name = "Thunfisch", Price = 8.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 105, Name = "Weißkäse", Price = 9.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 106, Name = "Vegetaria", Price = 9.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 107, Name = "Chicken", Price = 10.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 108, Name = "Ei", Price = 7.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 109, Name = "Lachs", Price = 10.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 110, Name = "Hawaii", Price = 8.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 111, Name = "Dönero", Price = 9.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 112, Name = "Knoblauchwurst", Price = 9.30 , Category = DishCategory.Other},
            
-            // Pizzen
-                new Dish { Id = 20, Name = "Margherita", Price = 6.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 21, Name = "Champignons", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 22, Name = "Spinat", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 23, Name = "Sardellen", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 24, Name = "Cipolla", Price = 6.20 , Category = DishCategory.Pizza},
-                new Dish { Id = 25, Name = "Adrinta", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 26, Name = "Salami", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 27, Name = "Schinken", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 28, Name = "Bolognese", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 29, Name = "Vesuvio", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 30, Name = "Funghi", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 31, Name = "Romana", Price = 7.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 32, Name = "Hawaii", Price = 7.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 33, Name = "Tonno", Price = 7.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 34, Name = "Billa", Price = 7.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 35, Name = "Quattro Stagione", Price = 8.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 36, Name = "Apollo", Price = 7.70 , Category = DishCategory.Pizza},
-                new Dish { Id = 37, Name = "Cosa Nostra", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 38, Name = "Primavera", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 39, Name = "Mista", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 40, Name = "Vegetaria", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 41, Name = "Bacio", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 42, Name = "Calzone", Price = 9.60 , Category = DishCategory.Pizza},
-                new Dish { Id = 43, Name = "Weißkäse", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 44, Name = "Gorgonzola", Price = 7.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 45, Name = "Riesengarnele", Price = 8.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 46, Name = "Laguna", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 47, Name = "Polio", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 48, Name = "Pollana", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 49, Name = "Spezial", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 500, Name = "Capri", Price = 7.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 501, Name = "Spaghetti", Price = 8.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 502, Name = "Mexicana", Price = 8.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 503, Name = "Sicilia", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 504, Name = "Picante", Price = 8.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 505, Name = "Calzone", Price = 9.60 , Category = DishCategory.Pizza},
-                new Dish { Id = 506, Name = "Spargel", Price = 8.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 507, Name = "Döner", Price = 8.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 508, Name = "Döner", Price = 9.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 509, Name = "Calzone", Price = 10.30 , Category = DishCategory.Pizza},
-                new Dish { Id = 510, Name = "Spinat", Price = 7.40 , Category = DishCategory.Pizza},
-                new Dish { Id = 511, Name = "Polio", Price = 9.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 512, Name = "Parmenzola", Price = 8.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 513, Name = "Jalapeno", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 514, Name = "Melanzana", Price = 9.80 , Category = DishCategory.Pizza},
+            //// Pizzen
+            //    new Dish { Id = 20, Name = "Margherita", Price = 6.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 21, Name = "Champignons", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 22, Name = "Spinat", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 23, Name = "Sardellen", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 24, Name = "Cipolla", Price = 6.20 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 25, Name = "Adrinta", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 26, Name = "Salami", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 27, Name = "Schinken", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 28, Name = "Bolognese", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 29, Name = "Vesuvio", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 30, Name = "Funghi", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 31, Name = "Romana", Price = 7.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 32, Name = "Hawaii", Price = 7.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 33, Name = "Tonno", Price = 7.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 34, Name = "Billa", Price = 7.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 35, Name = "Quattro Stagione", Price = 8.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 36, Name = "Apollo", Price = 7.70 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 37, Name = "Cosa Nostra", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 38, Name = "Primavera", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 39, Name = "Mista", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 40, Name = "Vegetaria", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 41, Name = "Bacio", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 42, Name = "Calzone", Price = 9.60 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 43, Name = "Weißkäse", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 44, Name = "Gorgonzola", Price = 7.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 45, Name = "Riesengarnele", Price = 8.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 46, Name = "Laguna", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 47, Name = "Polio", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 48, Name = "Pollana", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 49, Name = "Spezial", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 500, Name = "Capri", Price = 7.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 501, Name = "Spaghetti", Price = 8.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 502, Name = "Mexicana", Price = 8.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 503, Name = "Sicilia", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 504, Name = "Picante", Price = 8.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 505, Name = "Calzone", Price = 9.60 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 506, Name = "Spargel", Price = 8.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 507, Name = "Döner", Price = 8.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 508, Name = "Döner", Price = 9.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 509, Name = "Calzone", Price = 10.30 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 510, Name = "Spinat", Price = 7.40 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 511, Name = "Polio", Price = 9.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 512, Name = "Parmenzola", Price = 8.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 513, Name = "Jalapeno", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 514, Name = "Melanzana", Price = 9.80 , Category = DishCategory.Pizza},
             };
 
             AddDishes(dishes);
