@@ -59,13 +59,11 @@ namespace PizzaEcki.Database
 
 
             //Dishes Table
-            sql = "CREATE TABLE IF NOT EXISTS Gerichte (Id INTEGER PRIMARY KEY, Name TEXT, Preis REAL, Kategorie INTEGER, Größe TEXT, HappyHour TEXT, Steuersatz REAL, GratisBeilage INTEGER)";
+            sql = "CREATE TABLE IF NOT EXISTS Gerichte (Id INTEGER PRIMARY KEY, Name TEXT, Preis_S REAL, Preis_L REAL, Preis_XL REAL, Kategorie INTEGER, HappyHour TEXT, Steuersatz REAL, GratisBeilage INTEGER)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
             }
-
-
 
             //Extras Table
             sql = "CREATE TABLE IF NOT EXISTS Extras (Id INTEGER PRIMARY KEY, Name TEXT, Price REAL)";
@@ -252,14 +250,15 @@ namespace PizzaEcki.Database
         }
         public void AddOrUpdateDish(Dish dish)
         {
-            string sql = "INSERT OR REPLACE INTO Gerichte (Id, Name, Preis, Kategorie, Größe, HappyHour, Steuersatz, GratisBeilage) VALUES (@Id, @Name, @Preis, @Kategorie, @Größe, @HappyHour, @Steuersatz, @GratisBeilage)";
+            string sql = "INSERT OR REPLACE INTO Gerichte (Id, Name, Preis_S, Preis_L, Preis_XL, Kategorie, Größe, HappyHour, Steuersatz, GratisBeilage) VALUES (@Id, @Name, @Preis_S, @Preis_M, @Preis_L, @Preis_XL, @Kategorie, @Größe, @HappyHour, @Steuersatz, @GratisBeilage)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.Parameters.AddWithValue("@Id", dish.Id);
                 command.Parameters.AddWithValue("@Name", dish.Name);
-                command.Parameters.AddWithValue("@Preis", dish.Preis);
+                command.Parameters.AddWithValue("@Preis_S", dish.Preis_S);
+                command.Parameters.AddWithValue("@Preis_L", dish.Preis_L);
+                command.Parameters.AddWithValue("@Preis_XL", dish.Preis_XL);
                 command.Parameters.AddWithValue("@Kategorie", (int)dish.Kategorie);
-                command.Parameters.AddWithValue("@Größe", dish.Größe);
                 command.Parameters.AddWithValue("@HappyHour", dish.HappyHour);
                 command.Parameters.AddWithValue("@Steuersatz", dish.Steuersatz);
                 command.Parameters.AddWithValue("@GratisBeilage", dish.GratisBeilage);
@@ -278,23 +277,55 @@ namespace PizzaEcki.Database
                 {
                     while (reader.Read())
                     {
-                        Dish dish = new Dish
+                        Dish dish = new Dish();
+
+                        if (int.TryParse(reader["Id"].ToString(), out int Id))
                         {
-                            Id = Convert.ToInt32(reader["Id"]),
-                            Name = reader["Name"].ToString(),
-                            Preis = Convert.ToDouble(reader["Preis"]),
-                            Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
-                            Größe = reader["Größe"].ToString(),
-                            HappyHour = reader["HappyHour"].ToString(),
-                            Steuersatz = Convert.ToDouble(reader["Steuersatz"]),
-                            GratisBeilage = Convert.ToInt32(reader["GratisBeilage"])
-                        };
+                            dish.Id = Id;
+                        }
+
+                        dish.Name = reader["Name"].ToString();
+
+                        if (double.TryParse(reader["Preis_S"].ToString(), out double preis_s))
+                        {
+                            dish.Preis_S = preis_s;
+                        }
+
+                        if (double.TryParse(reader["Preis_L"].ToString(), out double preis_l))
+                        {
+                            dish.Preis_L = preis_l;
+                        }
+
+                        if (double.TryParse(reader["Preis_XL"].ToString(), out double preis_xl))
+                        {
+                            dish.Preis_XL = preis_xl;
+                        }
+
+                        if (int.TryParse(reader["Kategorie"].ToString(), out int kategorie))
+                        {
+                            dish.Kategorie = (DishCategory)kategorie;
+                        }
+
+                        dish.HappyHour = reader["HappyHour"].ToString();
+
+                        if (double.TryParse(reader["Steuersatz"].ToString(), out double steuersatz))
+                        {
+                            dish.Steuersatz = steuersatz;
+                        }
+
+                        if (int.TryParse(reader["GratisBeilage"].ToString(), out int gratisBeilage))
+                        {
+                            dish.GratisBeilage = gratisBeilage;
+                        }
+
                         dishes.Add(dish);
                     }
                 }
             }
             return dishes;
         }
+
+
 
 
 
@@ -333,31 +364,31 @@ namespace PizzaEcki.Database
         }
 
 
-        public List<Dish> GetDishes()
-        {
-            List<Dish> dishes = new List<Dish>();
-            string sql = "SELECT * FROM Gerichte";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        Dish dish = new Dish
-                        {
-                            Id = Convert.ToInt32(reader["Id"]),
-                            Name = reader["Name"].ToString(),
-                            Preis = Convert.ToDouble(reader["Preis"]),
-                            Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
-                            Größe = reader["Größe"].ToString()
-                        };
+        //public List<Dish> GetDishes()
+        //{
+        //    List<Dish> dishes = new List<Dish>();
+        //    string sql = "SELECT * FROM Gerichte";
+        //    using (SqliteCommand command = new SqliteCommand(sql, _connection))
+        //    {
+        //        using (SqliteDataReader reader = command.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                Dish dish = new Dish
+        //                {
+        //                    Id = Convert.ToInt32(reader["Id"]),
+        //                    Name = reader["Name"].ToString(),
+        //                    Preis = Convert.ToDouble(reader["Preis"]),
+        //                    Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
+        //                    Größe = reader["Größe"].ToString()
+        //                };
 
-                        dishes.Add(dish);
-                    }
-                }
-            }
-            return dishes;
-        }
+        //                dishes.Add(dish);
+        //            }
+        //        }
+        //    }
+        //    return dishes;
+        //}
 
 
         //Extras

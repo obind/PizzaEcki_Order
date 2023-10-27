@@ -189,7 +189,7 @@ namespace PizzaEcki
             // Aktualisiere das temporäre OrderItem mit den Details des ausgewählten Gerichts
             tempOrderItem.Gericht = selectedDish.Name.ToString();
             tempOrderItem.Nr = selectedDish.Id;
-            tempOrderItem.Epreis = selectedDish.Preis;
+           // tempOrderItem.Epreis = selectedDish.Preis;
 
             // Ermittle die verfügbaren Größen für die Kategorie des ausgewählten Gerichts
             var sizes = DishSizeManager.CategorySizes[selectedDish.Kategorie];
@@ -399,7 +399,7 @@ namespace PizzaEcki
                 Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
                 if (selectedDish != null)
                 {
-                    tempOrderItem.Epreis += selectedDish.Preis;
+                   // tempOrderItem.Epreis += selectedDish.Preis;
                 }
             }
             if (tempOrderItem.Extras != null)

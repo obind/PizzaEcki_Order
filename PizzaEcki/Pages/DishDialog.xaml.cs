@@ -32,7 +32,7 @@ namespace PizzaEcki.Pages
         private void PopulateFields()
         {
             NameTextBox.Text = Dish.Name;
-            PriceTextBox.Text = Dish.Preis.ToString();
+          //  PriceTextBox.Text = Dish.Preis.ToString();
             CategoryComboBox.ItemsSource = Enum.GetValues(typeof(DishCategory)).Cast<DishCategory>();
             CategoryComboBox.SelectedItem = Dish.Kategorie;
             SizeComboBox.ItemsSource = DishSizeManager.CategorySizes[Dish.Kategorie];
@@ -42,7 +42,7 @@ namespace PizzaEcki.Pages
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             Dish.Name = NameTextBox.Text;
-            Dish.Preis = double.Parse(PriceTextBox.Text);
+          //  Dish.Preis = double.Parse(PriceTextBox.Text);
             Dish.Kategorie = (DishCategory)CategoryComboBox.SelectedItem;
             Dish.Größe = SizeComboBox.SelectedItem.ToString();
             DialogResult = true;
