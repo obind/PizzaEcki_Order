@@ -1,9 +1,14 @@
 ﻿<Window x:Class="PizzaEcki.Pages.DishDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Dish Dialog" Height="300" Width="400">
+        Title="Dish Dialog" Height="500" Width="400">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -14,24 +19,44 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
+        <Label Content="ID des Gerichts:" Grid.Row="0" Grid.Column="0" Margin="10"/>
+        <TextBox Name="IdTextBox" Grid.Row="0" Grid.Column="1" Margin="10" Width="200"/>
         <!-- Name des Gerichts -->
-        <Label Content="Name des Gerichts:" Grid.Row="0" Grid.Column="0" Margin="10"/>
-        <TextBox Name="NameTextBox" Grid.Row="0" Grid.Column="1" Margin="10" Width="200"/>
+        <Label Content="Name des Gerichts:" Grid.Row="1" Grid.Column="0" Margin="10"/>
+        <TextBox Name="NameTextBox" Grid.Row="1" Grid.Column="1" Margin="10" Width="200"/>
 
         <!-- Preis -->
-        <Label Content="Preis:" Grid.Row="1" Grid.Column="0" Margin="10"/>
-        <TextBox Name="PriceTextBox" Grid.Row="1" Grid.Column="1" Margin="10" Width="200"/>
+        <!-- Preis S -->
+        <Label Content="Preis S:" Grid.Row="2" Grid.Column="0" Margin="10"/>
+        <TextBox Name="PriceSTextBox" Grid.Row="2" Grid.Column="1" Margin="10" Width="200"/>
+
+        <!-- Preis L -->
+        <Label Content="Preis L:" Grid.Row="3" Grid.Column="0" Margin="10"/>
+        <TextBox Name="PriceLTextBox" Grid.Row="3" Grid.Column="1" Margin="10" Width="200"/>
+
+        <!-- Preis XL -->
+        <Label Content="Preis XL:" Grid.Row="4" Grid.Column="0" Margin="10"/>
+        <TextBox Name="PriceXLTextBox" Grid.Row="4" Grid.Column="1" Margin="10" Width="200"/>
 
         <!-- Kategorie -->
-        <Label Content="Kategorie:" Grid.Row="2" Grid.Column="0" Margin="10"/>
-        <ComboBox Name="CategoryComboBox" Grid.Row="2" Grid.Column="1" Margin="10" Width="200" Loaded="CategoryComboBox_Loaded" SelectionChanged="CategoryComboBox_SelectionChanged"/>
+        <Label Content="Kategorie:" Grid.Row="5" Grid.Column="0" Margin="10"/>
+        <ComboBox Name="CategoryComboBox" Grid.Row="5" Grid.Column="1" Margin="10" Width="200" Loaded="CategoryComboBox_Loaded"/>
 
-        <!-- Größe -->
-        <Label Content="Größe:" Grid.Row="3" Grid.Column="0" Margin="10"/>
-        <ComboBox Name="SizeComboBox" Grid.Row="3" Grid.Column="1" Margin="10" Width="200"/>
+        <!-- HappyHour -->
+        <Label Content="HappyHour:" Grid.Row="6" Grid.Column="0" Margin="10"/>
+        <CheckBox Name="HappyHourCheckBox" Grid.Row="6" Grid.Column="1" Margin="10"/>
+
+        <!-- Steuersatz -->
+        <Label Content="Steuersatz:" Grid.Row="7" Grid.Column="0" Margin="10"/>
+        <TextBox Name="TaxRateTextBox" Grid.Row="7" Grid.Column="1" Margin="10" Width="200"/>
+
+
+        <!-- Gratis Beilage -->
+        <Label Content="Gratis Beilage:" Grid.Row="8" Grid.Column="0" Margin="10"/>
+        <CheckBox Name="FreeSideCheckBox" Grid.Row="8" Grid.Column="1" Margin="10"/>
+
 
         <!-- Speichern Button -->
-        <Button Content="Speichern" Grid.Row="4" Grid.ColumnSpan="2" Width="100" Height="30" Click="SaveButton_Click" Margin="10" HorizontalAlignment="Center"/>
+        <Button Content="Speichern" Grid.Row="9" Grid.ColumnSpan="2" Width="100" Height="30" Click="SaveButton_Click" Margin="10" HorizontalAlignment="Center"/>
     </Grid>
 </Window>

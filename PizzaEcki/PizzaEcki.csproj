@@ -5,6 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>pizzzzzzaaaa.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,7 @@
     <Content Include="icons\card.svg" />
     <Content Include="icons\cash.svg" />
     <Content Include="icons\paypal.svg" />
+    <Content Include="pizzzzzzaaaa.ico" />
   </ItemGroup>
 
   <ItemGroup>

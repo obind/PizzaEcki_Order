@@ -493,6 +493,24 @@ namespace PizzaEcki
             CompleteOrder("PayPal");
         }
 
+        private void OnDataGridKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Back || e.Key == Key.Delete)
+            {
+                // Ausgewählte Zeile holen
+                var selectedRow = myDataGrid.SelectedItem as OrderItem;
+                if (selectedRow != null)
+                {
+                    // Zeile aus dem DataGrid und der Datenquelle entfernen
+                    orderItems.Remove(selectedRow);
+                    myDataGrid.ItemsSource = null;
+                    myDataGrid.ItemsSource = orderItems;
+
+                    // Gesamtpreis neu berechnen
+                    CalculateTotal(orderItems);
+                }
+            }
+        }
 
         private void CompleteOrder(string paymentMethod)
         {

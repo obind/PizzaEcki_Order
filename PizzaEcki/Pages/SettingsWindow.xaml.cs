@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using PizzaEcki.Database;
@@ -10,6 +11,8 @@ namespace PizzaEcki.Pages
     public partial class SettingsWindow : Window
     {
         private DatabaseManager _dbManager;
+        public ObservableCollection<Dish> Dishes { get; set; }
+
 
         public SettingsWindow()
         {
@@ -26,10 +29,10 @@ namespace PizzaEcki.Pages
 
         private void LoadDishes()
         {
-            DatabaseManager dbManager = new DatabaseManager();
-            List<Dish> dishesFromDb = dbManager.GetAllDishes();
-            DishListView.ItemsSource = dishesFromDb;
+            Dishes = new ObservableCollection<Dish>(_dbManager.GetAllDishes());
+            DishListView.ItemsSource = Dishes;
         }
+
 
 
         private void AddDriverButton_Click(object sender, RoutedEventArgs e)
@@ -70,9 +73,8 @@ namespace PizzaEcki.Pages
             DishDialog dialog = new DishDialog();
             if (dialog.ShowDialog() == true)
             {
-                // Update database and reload ListView
                 _dbManager.AddOrUpdateDish(dialog.Dish);
-                LoadDishes();
+                Dishes.Add(dialog.Dish);  // Fügt das neue Gericht zur ObservableCollection hinzu
             }
         }
 
@@ -90,14 +92,29 @@ namespace PizzaEcki.Pages
             }
         }
 
-        //private void DeleteDriverButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    Driver selectedDriver = DriversList.SelectedItem as Driver;
-        //    if (selectedDriver != null)
-        //    {
-        //        _dbManager.DeleteDriver(selectedDriver);
-        //        LoadDrivers();
-        //    }
-        //}
+
+
+        private void DeleteDishButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DishListView.SelectedItem is Dish selectedDish)
+            {
+                // Bestätigungsfenster, um sicherzustellen, dass der Benutzer das Gericht wirklich löschen möchte
+                MessageBoxResult result = MessageBox.Show("Sind Sie sicher, dass Sie dieses Gericht löschen möchten?", "Bestätigung", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    // Lösche das Gericht aus der Datenbank
+                    _dbManager.DeleteDish(selectedDish.Id);
+
+                    // Entferne das Gericht aus der ObservableCollection
+                    Dishes.Remove(selectedDish);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Bitte wählen Sie ein Gericht aus, das Sie löschen möchten.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
     }
 }

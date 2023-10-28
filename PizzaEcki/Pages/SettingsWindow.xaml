@@ -33,17 +33,42 @@
                             <GridView>
                                 <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Id}"/>
                                 <GridViewColumn Header="Name" Width="150" DisplayMemberBinding="{Binding Name}"/>
-                                <GridViewColumn Header="Price" Width="100" DisplayMemberBinding="{Binding Price}"/>
-                                <GridViewColumn Header="Category" Width="100" DisplayMemberBinding="{Binding Category}"/>
-                                <GridViewColumn Header="Size" Width="50" DisplayMemberBinding="{Binding Size}"/>
+                                <GridViewColumn Header="Preis S" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Preis_S, StringFormat={}{0:0.00 €}}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Preis L" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Preis_L, StringFormat={}{0:0.00 €}}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Preis XL" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Preis_XL, StringFormat={}{0:0.00 €}}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Kategorie" Width="100" DisplayMemberBinding="{Binding Kategorie}"/>
+                                <GridViewColumn Header="Happy Hour" Width="100" DisplayMemberBinding="{Binding HappyHour}"/>
+                                <GridViewColumn Header="Steuersatz" Width="100" DisplayMemberBinding="{Binding Steuersatz}"/>
+                                <GridViewColumn Header="Gratis Beilage" Width="100" DisplayMemberBinding="{Binding GratisBeilage}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
 
+
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
                         <Button Content="Hinzufügen" Click="AddDishButton_Click" Margin="5"></Button>
-                        <!--<Button Content="Bearbeiten" Click="EditDishButton_Click" Margin="5"></Button>-->
+                        <Button Content="Löschen" Click="DeleteDishButton_Click" Margin="5"></Button>
+                        <!-- Neuer Button zum Löschen -->
                     </StackPanel>
+
                 </Grid>
             </TabItem>
             <TabItem Header="Andere Einstellungen">

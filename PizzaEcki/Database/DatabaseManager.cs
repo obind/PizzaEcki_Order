@@ -97,6 +97,7 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
 
+
             //Zuordnungstabelle
             sql = @"
                 CREATE TABLE IF NOT EXISTS OrderAssignments (
@@ -133,6 +134,7 @@ namespace PizzaEcki.Database
                 OrderItemId INTEGER PRIMARY KEY AUTOINCREMENT,
                 OrderId TEXT,
                 Gericht TEXT,
+                Größe TEXT,
                 Extras TEXT,
                 Menge INTEGER,
                 Epreis REAL,
@@ -250,7 +252,7 @@ namespace PizzaEcki.Database
         }
         public void AddOrUpdateDish(Dish dish)
         {
-            string sql = "INSERT OR REPLACE INTO Gerichte (Id, Name, Preis_S, Preis_L, Preis_XL, Kategorie, Größe, HappyHour, Steuersatz, GratisBeilage) VALUES (@Id, @Name, @Preis_S, @Preis_M, @Preis_L, @Preis_XL, @Kategorie, @Größe, @HappyHour, @Steuersatz, @GratisBeilage)";
+            string sql = "INSERT OR REPLACE INTO Gerichte (Id, Name, Preis_S, Preis_L, Preis_XL, Kategorie, HappyHour, Steuersatz, GratisBeilage) VALUES (@Id, @Name, @Preis_S, @Preis_L, @Preis_XL, @Kategorie, @HappyHour, @Steuersatz, @GratisBeilage)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.Parameters.AddWithValue("@Id", dish.Id);
@@ -323,6 +325,28 @@ namespace PizzaEcki.Database
             }
             return dishes;
         }
+        public bool IsIdExists(int id)
+        {
+            string sql = "SELECT COUNT(*) FROM Gerichte WHERE Id = @Id";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Id", id);
+                var result = command.ExecuteScalar();
+                return Convert.ToInt32(result) > 0;
+            }
+        }
+
+        public void DeleteDish(int id)
+        {
+            string sql = "DELETE FROM Gerichte WHERE Id = @Id";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Id", id);
+                command.ExecuteNonQuery();
+            }
+        }
+
+
 
         public List<string> GetAllStreets()
         {
@@ -587,33 +611,36 @@ namespace PizzaEcki.Database
             foreach (var item in order.OrderItems)
             {
                 string sqlItem = @"
-        INSERT INTO OrderItems 
-        (
-            OrderId, 
-            Gericht, 
-            Extras, 
-            Menge, 
-            Epreis, 
-            Gesamt, 
-            Uhrzeit, 
-            LieferungsArt
-        ) 
-        VALUES 
-        (
-            @OrderId, 
-            @Gericht, 
-            @Extras, 
-            @Menge, 
-            @Epreis, 
-            @Gesamt, 
-            @Uhrzeit, 
-            @LieferungsArt
-        )
-    ";
+                    INSERT INTO OrderItems 
+                    (
+                        OrderId, 
+                        Gericht, 
+                        Größe,
+                        Extras, 
+                        Menge, 
+                        Epreis, 
+                        Gesamt, 
+                        Uhrzeit, 
+                        LieferungsArt
+                    ) 
+                    VALUES 
+                    (
+                        @OrderId, 
+                        @Gericht, 
+                        @Größe,
+                        @Extras, 
+                        @Menge, 
+                        @Epreis, 
+                        @Gesamt, 
+                        @Uhrzeit, 
+                        @LieferungsArt
+                    )
+                ";
                 using (SqliteCommand commandItem = new SqliteCommand(sqlItem, _connection))
                 {
                     commandItem.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
                     commandItem.Parameters.Add("@Gericht", SqliteType.Text).Value = (object)item.Gericht ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Größe", SqliteType.Text).Value = (object)item.Größe ?? DBNull.Value;
                     commandItem.Parameters.Add("@Extras", SqliteType.Text).Value = (object)item.Extras ?? DBNull.Value;
                     commandItem.Parameters.Add("@Menge", SqliteType.Integer).Value = (object)item.Menge ?? DBNull.Value;
                     commandItem.Parameters.Add("@Epreis", SqliteType.Real).Value = (object)item.Epreis ?? DBNull.Value;
@@ -679,7 +706,6 @@ namespace PizzaEcki.Database
                             {
                                 OrderId = currentOrderId,
                                 BonNumber = Convert.ToInt32(reader["BonNumber"]),
-                                // ...
                             };
                             unassignedOrders.Add(order);
                         }
@@ -689,6 +715,7 @@ namespace PizzaEcki.Database
                             Nr = reader.IsDBNull(reader.GetOrdinal("OrderItemId")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderItemId")),
                             Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
                             Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                            Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
                             Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
                             Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
                             Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
@@ -719,6 +746,7 @@ namespace PizzaEcki.Database
                         {
                             Nr = reader.GetInt32(reader.GetOrdinal("Nr")),
                             Gericht = reader.GetString(reader.GetOrdinal("Gericht")),
+                            Größe = reader.GetString(reader.GetOrdinal("Größe")),
                             Extras = reader.GetString(reader.GetOrdinal("Extras")),
                             Menge = reader.GetInt32(reader.GetOrdinal("Menge")),
                             Epreis = reader.GetDouble(reader.GetOrdinal("Epreis")),

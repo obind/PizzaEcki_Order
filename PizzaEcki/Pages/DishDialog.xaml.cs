@@ -1,4 +1,5 @@
-﻿using PizzaEcki.Models;
+﻿using PizzaEcki.Database;
+using PizzaEcki.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace PizzaEcki.Pages
     /// </summary>
     public partial class DishDialog : Window
     {
+        DatabaseManager _dbManager = new DatabaseManager();
         public Dish Dish { get; private set; }
 
         public DishDialog(Dish dish = null)
@@ -31,36 +33,79 @@ namespace PizzaEcki.Pages
 
         private void PopulateFields()
         {
+            IdTextBox.Text = Dish.Id.ToString();
             NameTextBox.Text = Dish.Name;
-          //  PriceTextBox.Text = Dish.Preis.ToString();
+            PriceSTextBox.Text = Dish.Preis_S.ToString();
+            PriceLTextBox.Text = Dish.Preis_L.ToString();
+            PriceXLTextBox.Text = Dish.Preis_XL.ToString();
             CategoryComboBox.ItemsSource = Enum.GetValues(typeof(DishCategory)).Cast<DishCategory>();
             CategoryComboBox.SelectedItem = Dish.Kategorie;
-            SizeComboBox.ItemsSource = DishSizeManager.CategorySizes[Dish.Kategorie];
-            SizeComboBox.SelectedItem = Dish.Größe;
+          
         }
+
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+
+            if (int.TryParse(IdTextBox.Text, out int id))
+            {
+                // Überprüfe, ob die ID bereits existiert
+                if (_dbManager.IsIdExists(id))
+                {
+                    MessageBox.Show("Diese ID existiert bereits. Bitte wähle eine andere.");
+                    return;
+                }
+                Dish.Id = id;
+            }
+            else
+            {
+                MessageBox.Show("Bitte gib eine gültige ID ein.");
+                return;
+            }
+
+
             Dish.Name = NameTextBox.Text;
-          //  Dish.Preis = double.Parse(PriceTextBox.Text);
+
+            if (double.TryParse(PriceSTextBox.Text, out double preisS))
+            {
+                Dish.Preis_S = preisS;
+            }
+
+            if (double.TryParse(PriceLTextBox.Text, out double preisL))
+            {
+                Dish.Preis_L = preisL;
+            }
+
+            if (double.TryParse(PriceXLTextBox.Text, out double preisXL))
+            {
+                Dish.Preis_XL = preisXL;
+            }
+
             Dish.Kategorie = (DishCategory)CategoryComboBox.SelectedItem;
-            Dish.Größe = SizeComboBox.SelectedItem.ToString();
+
+            // HappyHour
+
+                // HappyHour
+                Dish.HappyHour = (HappyHourCheckBox.IsChecked == true ? 1 : 0).ToString();
+
+            // Gratis Beilage
+            Dish.GratisBeilage = FreeSideCheckBox.IsChecked == true ? 1 : 0;
+
+           
+
+            // Steuersatz
+            if (double.TryParse(TaxRateTextBox.Text, out double steuersatz))
+            {
+                Dish.Steuersatz = steuersatz;
+            }
+
             DialogResult = true;
         }
 
-        private void CategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (CategoryComboBox.SelectedItem is DishCategory selectedCategory)
-            {
-                SizeComboBox.ItemsSource = DishSizeManager.CategorySizes[selectedCategory];
-            }
-        }
 
         private void CategoryComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             CategoryComboBox.ItemsSource = Enum.GetValues(typeof(DishCategory)).Cast<DishCategory>();
         }
-
-
     }
 }
