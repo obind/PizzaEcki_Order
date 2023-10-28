@@ -180,7 +180,7 @@ namespace PizzaEcki
             if (DishComboBox.SelectedItem == null)
             {
                 SizeComboBox.ItemsSource = null; // Leere die SizeComboBox, wenn kein Gericht ausgewählt ist
-                return;               
+                return;
             }
 
             // Umwandeln des ausgewählten Items in ein Dish-Objekt, um auf dessen Eigenschaften zugreifen zu können
@@ -189,9 +189,11 @@ namespace PizzaEcki
             // Aktualisiere das temporäre OrderItem mit den Details des ausgewählten Gerichts
             tempOrderItem.Gericht = selectedDish.Name.ToString();
             tempOrderItem.Nr = selectedDish.Id;
-           // tempOrderItem.Epreis = selectedDish.Preis;
+
+            //tempOrderItem.Epreis = selectedDish.Preis;
 
             // Ermittle die verfügbaren Größen für die Kategorie des ausgewählten Gerichts
+            
             var sizes = DishSizeManager.CategorySizes[selectedDish.Kategorie];
 
             // Fülle die SizeComboBox mit den verfügbaren Größen für das ausgewählte Gericht
@@ -204,6 +206,8 @@ namespace PizzaEcki
                 SizeComboBox.SelectedIndex = 0;
             }
 
+            string selectedSize = SizeComboBox.SelectedItem.ToString();
+            tempOrderItem.Epreis = GetPriceForSelectedSize(selectedDish, selectedSize);
             // Leere die ausgewählten Extras, da sich das ausgewählte Gericht geändert hat
             tempOrderItem.Extras = "";
         }
@@ -231,7 +235,6 @@ namespace PizzaEcki
                 e.Handled = true;
             }
         }
-
         //Extras
         private void ExtrasTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -373,35 +376,45 @@ namespace PizzaEcki
                 ProcessOrder();
             }
         }
+        private double GetPriceForSelectedSize(Dish selectedDish, string selectedSize)
+        {
+            switch (selectedSize)
+            {
+                case "S":
+                    return selectedDish.Preis_S;
+                case "L":
+                    return selectedDish.Preis_L;
+                case "XL":
+                    return selectedDish.Preis_XL;
+                default:
+                    return 0;
+            }
+        }
 
         private void ProcessOrder()
         {
-            // Überprüfen Sie, ob alle erforderlichen Felder ausgefüllt sind
             if (string.IsNullOrEmpty(tempOrderItem.Gericht) || tempOrderItem.Menge == 0)
             {
                 MessageBox.Show("Bitte füllen Sie alle erforderlichen Felder aus.");
                 return;
             }
 
-            // Überprüfen Sie, ob die eingegebene Uhrzeit in der Zukunft liegt
             if (TimePicker.Value == null || TimePicker.Value.Value <= DateTime.Now)
             {
                 MessageBox.Show("Die eingegebene Uhrzeit muss in der Zukunft liegen.");
                 return;
             }
 
-            // Setzen Sie den Epreis zurück
+            // Setze den Epreis zurück
             tempOrderItem.Epreis = 0;
 
-            // Berechnen Sie den Epreis basierend auf dem Preis des Gerichts und der Extras
-            if (tempOrderItem.Gericht != null)
+            Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
+            if (selectedDish != null)
             {
-                Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
-                if (selectedDish != null)
-                {
-                   // tempOrderItem.Epreis += selectedDish.Preis;
-                }
+                string selectedSize = SizeComboBox.SelectedItem.ToString();
+                tempOrderItem.Epreis += GetPriceForSelectedSize(selectedDish, selectedSize);
             }
+
             if (tempOrderItem.Extras != null)
             {
                 var extras = tempOrderItem.Extras.Split(',').Select(extra => extra.Trim());  // Konvertieren Sie den Extras-String in ein Array

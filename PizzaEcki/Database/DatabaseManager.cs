@@ -59,7 +59,7 @@ namespace PizzaEcki.Database
 
 
             //Dishes Table
-            sql = "CREATE TABLE IF NOT EXISTS Gerichte (Id INTEGER PRIMARY KEY, Name TEXT, Preis_S REAL, Preis_L REAL, Preis_XL REAL, Kategorie INTEGER, HappyHour TEXT, Steuersatz REAL, GratisBeilage INTEGER)";
+            sql = "CREATE TABLE IF NOT EXISTS Gerichte (Id INTEGER PRIMARY KEY, Name TEXT, Preis_S REAL, Preis_L REAL, Preis_XL REAL, Kategorie TEXT, HappyHour TEXT, Steuersatz REAL, GratisBeilage INTEGER)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
@@ -258,7 +258,7 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@Preis_S", dish.Preis_S);
                 command.Parameters.AddWithValue("@Preis_L", dish.Preis_L);
                 command.Parameters.AddWithValue("@Preis_XL", dish.Preis_XL);
-                command.Parameters.AddWithValue("@Kategorie", (int)dish.Kategorie);
+                command.Parameters.AddWithValue("@Kategorie", dish.Kategorie.ToString());
                 command.Parameters.AddWithValue("@HappyHour", dish.HappyHour);
                 command.Parameters.AddWithValue("@Steuersatz", dish.Steuersatz);
                 command.Parameters.AddWithValue("@GratisBeilage", dish.GratisBeilage);
@@ -301,10 +301,9 @@ namespace PizzaEcki.Database
                             dish.Preis_XL = preis_xl;
                         }
 
-                        if (int.TryParse(reader["Kategorie"].ToString(), out int kategorie))
-                        {
-                            dish.Kategorie = (DishCategory)kategorie;
-                        }
+
+                         dish.Kategorie = Enum.Parse<DishCategory>(reader["Kategorie"].ToString());
+                       
 
                         dish.HappyHour = reader["HappyHour"].ToString();
 
@@ -324,10 +323,6 @@ namespace PizzaEcki.Database
             }
             return dishes;
         }
-
-
-
-
 
         public List<string> GetAllStreets()
         {
@@ -646,18 +641,18 @@ namespace PizzaEcki.Database
         {
             List<Order> unassignedOrders = new List<Order>();
             string sql = @"
-        SELECT 
-            Orders.*,
-            OrderItems.*
-        FROM 
-            Orders
-        LEFT JOIN 
-            OrderItems ON Orders.OrderId = OrderItems.OrderId
-        LEFT JOIN 
-            OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
-        WHERE 
-            OrderAssignments.DriverId IS NULL
-    ";
+                SELECT 
+                    Orders.*,
+                    OrderItems.*
+                FROM 
+                    Orders
+                LEFT JOIN 
+                    OrderItems ON Orders.OrderId = OrderItems.OrderId
+                LEFT JOIN 
+                    OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
+                WHERE 
+                    OrderAssignments.DriverId IS NULL
+            ";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 using (SqliteDataReader reader = command.ExecuteReader())

@@ -14,7 +14,7 @@ namespace PizzaEcki.Models
     public enum DishCategory
     {
         Pizza,
-        Salat,
+        Salate,
         Baguette,
         Pasta,
         Nudeln,
@@ -35,7 +35,6 @@ namespace PizzaEcki.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public double Preis_S { get; set; }
-        public double Preis_M { get; set; }
         public double Preis_L { get; set; }
         public double Preis_XL { get; set; }
         public DishCategory Kategorie { get; set; }
