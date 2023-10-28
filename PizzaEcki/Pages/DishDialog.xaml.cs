@@ -23,13 +23,17 @@ namespace PizzaEcki.Pages
     {
         DatabaseManager _dbManager = new DatabaseManager();
         public Dish Dish { get; private set; }
+        public bool IsNewDish { get; set; }
+
 
         public DishDialog(Dish dish = null)
         {
             InitializeComponent();
             Dish = dish ?? new Dish();
+            IsNewDish = dish == null;
             PopulateFields();
         }
+
 
         private void PopulateFields()
         {
@@ -47,23 +51,22 @@ namespace PizzaEcki.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-
             if (int.TryParse(IdTextBox.Text, out int id))
             {
-                // Überprüfe, ob die ID bereits existiert
-                if (_dbManager.IsIdExists(id))
+                Dish.Id = id;
+
+                // Für neue Gerichte, prüfe ob die ID bereits existiert
+                if (IsNewDish && _dbManager.IsIdExists(id))
                 {
                     MessageBox.Show("Diese ID existiert bereits. Bitte wähle eine andere.");
                     return;
                 }
-                Dish.Id = id;
             }
             else
             {
                 MessageBox.Show("Bitte gib eine gültige ID ein.");
                 return;
             }
-
 
             Dish.Name = NameTextBox.Text;
 

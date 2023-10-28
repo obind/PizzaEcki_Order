@@ -70,13 +70,13 @@
             <Label Content="KundenNR." VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Row="1" MinHeight="20" Padding="5,0,5,0" Margin="0,0,0,2" />
             <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,2,10,2" FontSize="16" VerticalContentAlignment="Center" KeyDown="PhoneNumberTextBox_KeyDown" TabIndex="0"/>
             <Label Content="Name" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Grid.Row="2" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-            <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="16" TabIndex="1"/>
+            <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="16" TabIndex="1" TextChanged="OnTextChanged"/>
             <Label Grid.Row="3" Content="Straße" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-            <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="2"/>
+            <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="2" TextChanged="OnTextChanged"/>
             <Label Grid.Row="4" Content="Ort" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-            <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3"/>
+            <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3" TextChanged="OnTextChanged"/>
             <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-            <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="4"/>
+            <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="4" TextChanged="OnTextChanged"/>
             <Button x:Name="SaveButton" Grid.Row="6" Grid.Column="1" Content="Speichern" HorizontalAlignment="Right" Background="#FF21AA00" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Margin="0,0,10,0" Height="30" Width="58" Visibility="Collapsed"        />
         </Grid>
 
@@ -93,7 +93,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Label Content="Eingabe" Background="#474747" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center" Grid.ColumnSpan="3" Padding="5,0,5,2" VerticalAlignment="Top" Margin="0,-2,0,0"/>
+            <Label Content="Eingabe" Background="#474747" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center" Grid.ColumnSpan="3" Padding="5,0,5,2" VerticalAlignment="Top" Margin="0,0,0,0"/>
 
             <Label Grid.Row="1" Content="Gericht" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" FontStretch="ExtraCondensed" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinHeight="20" Margin="0,0,0,2" Padding="5,0,5,0"/>
             <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,1,10,0" IsEditable="True" SelectionChanged ="DishComboBox_TextChanged"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" VerticalAlignment="Bottom" Grid.Column="1" Padding="2,0,2,0" Grid.IsSharedSizeScope="True" TabIndex="5" />
@@ -127,7 +127,7 @@
                 <RowDefinition Height="*" MinHeight="25"/>
             </Grid.RowDefinitions>
             <Label Content="Bestellung" Grid.Row="0" Background="#474747" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2" VerticalAlignment="Top"/>
-            <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#FFE9E9E9" Foreground="Black" GridLinesVisibility="All" FontSize="15" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" VerticalAlignment="Top" IsReadOnly="True" KeyDown="OnDataGridKeyDown">
+            <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#FFE9E9E9" Foreground="Black" GridLinesVisibility="All" FontSize="15" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" VerticalAlignment="Top" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown">
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}" />
                     <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" />

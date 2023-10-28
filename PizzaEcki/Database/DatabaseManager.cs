@@ -336,6 +336,8 @@ namespace PizzaEcki.Database
             }
         }
 
+
+
         public void DeleteDish(int id)
         {
             string sql = "DELETE FROM Gerichte WHERE Id = @Id";

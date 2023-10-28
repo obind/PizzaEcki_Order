@@ -42,6 +42,8 @@ namespace PizzaEcki
         private int currentBonNumber;
 
         private bool isDelivery = false;
+        private bool isProgrammaticChange = false;
+
 
 
         public MainWindow()
@@ -62,17 +64,15 @@ namespace PizzaEcki
             // Füllen die ComboBox für Extras aus der Datenbank
             extrasList = _databaseManager.GetExtras();
             ExtrasComboBox.ItemsSource = extrasList;
-                           
+
             //Den Time Picker Vorbereiten zum Programm start 
             TimePicker.Value = DateTime.Now;
             TimePicker.Value = DateTime.Now.AddMinutes(15);
             TimePicker.TimeInterval = new TimeSpan(0, 30, 0);
-            
-            //Fahrer laden 
-            LoadDrivers();
-            DataContext = this; // Setzen Sie den DataContext auf diese Instanz, damit die Bindung funktioniert
 
-            //bon Nummer Lden
+            LoadDrivers();
+            DataContext = this;
+
             currentBonNumber = _databaseManager.GetCurrentBonNumber();
         }
 
@@ -110,7 +110,7 @@ namespace PizzaEcki
                             Lieferung++;
                             isDelivery = true;
 
-                            
+
                         }
                         else // Kunde nicht gefunden
                         {
@@ -144,6 +144,13 @@ namespace PizzaEcki
             }
         }
 
+        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!isProgrammaticChange) // prüft, ob die Änderung durch den Benutzer und nicht durch den Code gemacht wurde
+            {
+                SaveButton.Visibility = Visibility.Visible; // Zeigt den "Speichern"-Button an
+            }
+        }
 
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
         {
@@ -167,11 +174,21 @@ namespace PizzaEcki
         //Methode um die Textfelder automatisch zu füllen
         private void SetCustomerDataToFields(Customer customer)
         {
+            isProgrammaticChange = true;
             NameTextBox.Text = customer.Name;
             StreetTextBox.Text = customer.Street;
             CityTextBox.Text = customer.City;
             AdditionalInfoTextBox.Text = customer.AdditionalInfo;
+            isProgrammaticChange = false;
         }
+        private void OnCustomerDataChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!isProgrammaticChange)
+            {
+                SaveButton.Visibility = Visibility.Visible;
+            }
+        }
+
 
         //Gerichte
         private void DishComboBox_TextChanged(object sender, SelectionChangedEventArgs e)
@@ -197,7 +214,7 @@ namespace PizzaEcki
             //tempOrderItem.Epreis = selectedDish.Preis;
 
             // Ermittle die verfügbaren Größen für die Kategorie des ausgewählten Gerichts
-            
+
             var sizes = DishSizeManager.CategorySizes[selectedDish.Kategorie];
 
             // Fülle die SizeComboBox mit den verfügbaren Größen für das ausgewählte Gericht
@@ -462,7 +479,7 @@ namespace PizzaEcki
             DishComboBox.SelectedItem = null;
             ExtrasComboBox.SelectedItem = null;
             ExtrasComboBox.Text = "";
-            amountComboBox.Text ="1";
+            amountComboBox.Text = "1";
 
             DishComboBox.Focus();
         }
@@ -492,9 +509,9 @@ namespace PizzaEcki
         {
             CompleteOrder("PayPal");
         }
-
-        private void OnDataGridKeyDown(object sender, KeyEventArgs e)
+        private void myDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            MessageBox.Show(e.Key.ToString());
             if (e.Key == Key.Back || e.Key == Key.Delete)
             {
                 // Ausgewählte Zeile holen
@@ -544,7 +561,7 @@ namespace PizzaEcki
                 Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
                 PrintReceipt(order, customer);
 
-        
+
 
                 // Leeren Sie die Bestellliste
                 orderItems.Clear();
@@ -587,10 +604,11 @@ namespace PizzaEcki
 
             //Zeige die Tagesübersicht
 
-            if(e.Key == Key.F4) {
+            if (e.Key == Key.F4)
+            {
                 DailyEarnings dailyEarnings = new DailyEarnings();
                 dailyEarnings.ShowDialog();
-                
+
             }
 
             if (e.Key == Key.F12)
@@ -697,9 +715,9 @@ namespace PizzaEcki
                 yOffset += (int)boldFont.GetHeight();
             };
 
-       
-                printDoc.Print();
-            
+
+            printDoc.Print();
+
         }
 
         private void btn_tables_Click(object sender, RoutedEventArgs e)
@@ -707,7 +725,6 @@ namespace PizzaEcki
             TableView tableView = new TableView();
             tableView.ShowDialog();
         }
-
 
     }
 }
