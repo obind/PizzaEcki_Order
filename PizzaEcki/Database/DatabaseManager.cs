@@ -78,8 +78,9 @@ namespace PizzaEcki.Database
             {
                 command.ExecuteNonQuery();
             }
+            InitializeStaticDrivers();
 
-         
+
             //Settings
 
             sql = "CREATE TABLE IF NOT EXISTS Settings (LastResetDate TEXT, CurrentBonNumber INTEGER)";
@@ -481,7 +482,14 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
         }
-
+        public void InitializeStaticDrivers()
+        {
+            string sql = "INSERT OR IGNORE INTO Drivers (Id, Name, PhoneNumber) VALUES (-1, 'Theke', ''), (-2, 'Kasse1', '')";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
         public void DeleteDriver(int id)
         {
             string sql = "DELETE FROM Drivers WHERE Id = @Id";

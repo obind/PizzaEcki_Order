@@ -32,9 +32,13 @@ namespace PizzaKitchenClient
         private void LoadDrivers()
         {
             List<Driver> driversFromDb = dbManager.GetAllDrivers();
-            Drivers = new ObservableCollection<Driver>(driversFromDb);
-            DriversComboBox.ItemsSource = Drivers;
+
+            // Filtere 'Theke' und 'Kasse1' heraus
+            var driversForKitchen = driversFromDb.Where(d => d.Name != "Theke" && d.Name != "Kasse1").ToList();
+
+            DriversComboBox.ItemsSource = driversForKitchen;
         }
+
 
 
         private void InitializeHubConnection()
@@ -70,9 +74,9 @@ namespace PizzaKitchenClient
         private void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {
 
-            List<Driver> driversFromDb = dbManager.GetAllDrivers();
-            Drivers = new ObservableCollection<Driver>(driversFromDb);
-            DriversComboBox.ItemsSource = driversFromDb;
+            //List<Driver> driversFromDb = dbManager.GetAllDrivers();
+            //Drivers = new ObservableCollection<Driver>(driversFromDb);
+            //DriversComboBox.ItemsSource = driversFromDb;
         }
 
         private void OnAssignButtonClicked(object sender, RoutedEventArgs e)
@@ -87,6 +91,8 @@ namespace PizzaKitchenClient
 
                 // Entferne die Bestellung aus der Liste
                 OrdersList.Items.Remove(selectedOrder);
+
+                DriversComboBox.SelectedItem = null;    
             }
             else
             {

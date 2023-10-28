@@ -558,8 +558,19 @@ namespace PizzaEcki
                 _databaseManager.SaveOrder(order);
                 SendOrderItems(order);
 
-                Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
-                PrintReceipt(order, customer);
+                if (PhoneNumberTextBox.Text != "1" && PhoneNumberTextBox.Text != "2")
+
+                {
+                    Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
+                    PrintReceipt(order, customer);
+                }
+                else
+                {
+                    PrintReceipt(order, null);
+                }
+
+               
+               
 
 
 
@@ -630,10 +641,14 @@ namespace PizzaEcki
             DatabaseManager dbManager = new DatabaseManager();
             List<Driver> driversFromDb = dbManager.GetAllDrivers();
 
-            Drivers = new ObservableCollection<Driver>(driversFromDb);
+            // Filtere nur 'Theke' und 'Kasse1'
+            var driversForCounter = driversFromDb.Where(d => d.Name == "Theke" || d.Name == "Kasse1").ToList();
 
-            DriversComboBox.ItemsSource = driversFromDb;
+            DriversComboBox.Items.Clear();
+            DriversComboBox.ItemsSource = driversForCounter;
         }
+
+
         private void SizeComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
