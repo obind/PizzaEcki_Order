@@ -67,7 +67,7 @@ namespace PizzaEcki
             TimePicker.Value = DateTime.Now;
             TimePicker.Value = DateTime.Now.AddMinutes(15);
             TimePicker.TimeInterval = new TimeSpan(0, 30, 0);
-
+            
             //Fahrer laden 
             LoadDrivers();
             DataContext = this; // Setzen Sie den DataContext auf diese Instanz, damit die Bindung funktioniert
@@ -180,8 +180,12 @@ namespace PizzaEcki
             if (DishComboBox.SelectedItem == null)
             {
                 SizeComboBox.ItemsSource = null; // Leere die SizeComboBox, wenn kein Gericht ausgewählt ist
+                tempOrderItem.Gericht = "";
+                tempOrderItem.Nr = 0;
                 return;
             }
+
+            SizeComboBox.SelectedItem = "L";
 
             // Umwandeln des ausgewählten Items in ein Dish-Objekt, um auf dessen Eigenschaften zugreifen zu können
             Dish selectedDish = (Dish)DishComboBox.SelectedItem;
@@ -198,7 +202,7 @@ namespace PizzaEcki
 
             // Fülle die SizeComboBox mit den verfügbaren Größen für das ausgewählte Gericht
             SizeComboBox.ItemsSource = sizes;
-            SizeComboBox.SelectedItem = "L"; // Setze "L" als Standardgröße
+
 
             // Wenn nur eine Größe verfügbar ist, wähle sie automatisch aus
             if (sizes.Count == 1)
@@ -206,8 +210,8 @@ namespace PizzaEcki
                 SizeComboBox.SelectedIndex = 0;
             }
 
-            string selectedSize = SizeComboBox.SelectedItem.ToString();
-            tempOrderItem.Epreis = GetPriceForSelectedSize(selectedDish, selectedSize);
+
+            //tempOrderItem.Epreis = GetPriceForSelectedSize(selectedDish, selectedSize);
             // Leere die ausgewählten Extras, da sich das ausgewählte Gericht geändert hat
             tempOrderItem.Extras = "";
         }
@@ -393,6 +397,12 @@ namespace PizzaEcki
 
         private void ProcessOrder()
         {
+            if (dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
+            {
+                MessageBox.Show("Du bist zu blöd die Textbox auszufüllen!");
+                return;
+            }
+
             if (string.IsNullOrEmpty(tempOrderItem.Gericht) || tempOrderItem.Menge == 0)
             {
                 MessageBox.Show("Bitte füllen Sie alle erforderlichen Felder aus.");
@@ -409,11 +419,16 @@ namespace PizzaEcki
             tempOrderItem.Epreis = 0;
 
             Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
-            if (selectedDish != null)
-            {
-                string selectedSize = SizeComboBox.SelectedItem.ToString();
-                tempOrderItem.Epreis += GetPriceForSelectedSize(selectedDish, selectedSize);
-            }
+            string selectedSize = SizeComboBox.SelectedItem.ToString();
+            tempOrderItem.Größe = selectedSize;
+            tempOrderItem.Epreis += GetPriceForSelectedSize(selectedDish, selectedSize);
+
+            //Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
+            //if (selectedDish != null)
+            //{
+            //    string selectedSize = SizeComboBox.SelectedItem.ToString();
+            //    
+            //}
 
             if (tempOrderItem.Extras != null)
             {

@@ -131,6 +131,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}" />
                     <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" />
+                    <DataGridTextColumn Width="0.25*" Header="Größe" Binding="{Binding Größe}"/>
                     <DataGridTextColumn Width="0.25*" Header="Extras" Binding="{Binding Extras}" />
                     <DataGridTextColumn Width="0.10*" Header="Menge" Binding="{Binding Menge}" />
                     <DataGridTextColumn Width="0.10*" Header="Epreis" Binding="{Binding Epreis, StringFormat={}{0:F2} €}" />

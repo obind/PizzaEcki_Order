@@ -19,6 +19,7 @@ namespace SharedLibrary
 
         public int Nr { get; set; }
         public string Gericht { get; set; }
+        public string Größe { get; set; }
         public string Extras { get; set; }
         public int Menge { get; set; }
         public double Epreis { get; set; }
