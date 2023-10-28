@@ -569,11 +569,6 @@ namespace PizzaEcki
                     PrintReceipt(order, null);
                 }
 
-               
-               
-
-
-
                 // Leeren Sie die Bestellliste
                 orderItems.Clear();
 
