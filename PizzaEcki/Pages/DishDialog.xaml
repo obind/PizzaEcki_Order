@@ -44,7 +44,7 @@
 
         <!-- HappyHour -->
         <Label Content="HappyHour:" Grid.Row="6" Grid.Column="0" Margin="10"/>
-        <CheckBox Name="HappyHourCheckBox" Grid.Row="6" Grid.Column="1" Margin="10"/>
+        <CheckBox Name="HappyHourCheckBox" Grid.Row="6" Grid.Column="1" Margin="10" VerticalAlignment="Center"/>
 
         <!-- Steuersatz -->
         <Label Content="Steuersatz:" Grid.Row="7" Grid.Column="0" Margin="10"/>
@@ -53,7 +53,7 @@
 
         <!-- Gratis Beilage -->
         <Label Content="Gratis Beilage:" Grid.Row="8" Grid.Column="0" Margin="10"/>
-        <CheckBox Name="FreeSideCheckBox" Grid.Row="8" Grid.Column="1" Margin="10"/>
+        <CheckBox Name="FreeSideCheckBox" Grid.Row="8" Grid.Column="1" Margin="10" VerticalAlignment="Center"/>
 
 
         <!-- Speichern Button -->

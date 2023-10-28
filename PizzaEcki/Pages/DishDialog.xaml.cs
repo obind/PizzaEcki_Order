@@ -40,7 +40,8 @@ namespace PizzaEcki.Pages
             PriceXLTextBox.Text = Dish.Preis_XL.ToString();
             CategoryComboBox.ItemsSource = Enum.GetValues(typeof(DishCategory)).Cast<DishCategory>();
             CategoryComboBox.SelectedItem = Dish.Kategorie;
-          
+            HappyHourCheckBox.IsChecked = Dish.HappyHour == "1";
+            FreeSideCheckBox.IsChecked = Dish.GratisBeilage == 1;
         }
 
 
