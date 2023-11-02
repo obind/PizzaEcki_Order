@@ -75,12 +75,7 @@ namespace PizzaEcki
 
             currentBonNumber = _databaseManager.GetCurrentBonNumber();
 
-            //Lade unzugerordnete Bestellungen
-            orders = _databaseManager.GetUnassignedOrders();
-            foreach (Order order in orders)
-            {
-                cb_bonNummer.Items.Add(order.BonNumber);
-            }
+            ReloadeUnassignedOrders();
 
         }
 
@@ -566,6 +561,7 @@ namespace PizzaEcki
 
                 _databaseManager.SaveOrder(order);
                 SendOrderItems(order);
+                ReloadeUnassignedOrders();
 
                 if (PhoneNumberTextBox.Text != "1" && PhoneNumberTextBox.Text != "2")
 
@@ -771,11 +767,7 @@ namespace PizzaEcki
                     cb_cashRegister.SelectedItem = null;
                     cb_bonNummer.Items.Clear();
 
-                    orders = _databaseManager.GetUnassignedOrders();
-                    foreach (Order order in orders)
-                    {
-                        cb_bonNummer.Items.Add(order.BonNumber);
-                    }
+                    ReloadeUnassignedOrders();
                 }
                 else
                 {
@@ -786,6 +778,19 @@ namespace PizzaEcki
             {
                 // Fehlerbehandlung, falls nichts ausgewählt wurde
             }
+        }
+
+        public void ReloadeUnassignedOrders()
+        {
+            orders = _databaseManager.GetUnassignedOrders();
+            cb_bonNummer.Items.Clear();
+            foreach (Order order in orders)
+            {
+                if (order.IsDelivery == false)
+                {
+                    cb_bonNummer.Items.Add(order.BonNumber);
+                }
+            }   
         }
 
     }

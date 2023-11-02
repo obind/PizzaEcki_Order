@@ -10,6 +10,8 @@ using System.Windows.Documents;
 using PizzaEcki.Database;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Xml.Linq;
+using System.IO;
 
 namespace PizzaKitchenClient
 {
@@ -29,24 +31,34 @@ namespace PizzaKitchenClient
             LoadUnassignedOrders();
         }
 
-        private void LoadDrivers()
-        {
-            List<Driver> driversFromDb = dbManager.GetAllDrivers();
-
-            // Filtere 'Theke' und 'Kasse1' heraus
-            var driversForKitchen = driversFromDb.Where(d => d.Name != "Theke" && d.Name != "Kasse1").ToList();
-
-            DriversComboBox.ItemsSource = driversForKitchen;
-        }
-
-
-
         private void InitializeHubConnection()
         {
+
+            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "KitchenClientSettings.xml");
+
+            // Überprüfe, ob die Datei existiert
+            if (!File.Exists(settingsPath))
+            {
+                MessageBox.Show("Die Einstellungsdatei wurde nicht gefunden.");
+                Application.Current.Shutdown();
+                return; // Beende die Methode, wenn die Datei nicht existiert
+            }
+            
+
+            // Lade die XML-Datei
+            XDocument settingsDoc = XDocument.Load(settingsPath);
+
+            // Lese die Einstellungen
+            var connectionSettings = settingsDoc.Element("Settings").Element("ConnectionSettings");
+            var settingsXMLServer = connectionSettings.Element("Server").Value;
+            var settingsXMLPort = connectionSettings.Element("Port").Value;
+            var settingsXMLEndpoint = connectionSettings.Element("Endpoint").Value;
+
             hubConnection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:7166/pizzaHub")
+                .WithUrl("https://" + settingsXMLServer + ":" + settingsXMLPort + "/" + settingsXMLEndpoint) // Kombiniere die Adresse mit dem Hub-Namen
                 .Build();
 
+            // Registriere die Ereignisse für den Hub
             hubConnection.On<Order>("ReceiveOrder", (order) =>
             {
                 Dispatcher.Invoke(() =>
@@ -55,8 +67,10 @@ namespace PizzaKitchenClient
                 });
             });
 
+            // Starte die Verbindung
             StartHubConnection();
         }
+
 
         private async Task StartHubConnection()
         {
@@ -70,7 +84,15 @@ namespace PizzaKitchenClient
                 MessageBox.Show(ex.Message);
             }
         }
+        private void LoadDrivers()
+        {
+            List<Driver> driversFromDb = dbManager.GetAllDrivers();
 
+            // Filtere 'Theke' und 'Kasse1' heraus
+            var driversForKitchen = driversFromDb.Where(d => d.Name != "Theke" && d.Name != "Kasse1").ToList();
+
+            DriversComboBox.ItemsSource = driversForKitchen;
+        }
         private void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {
 
@@ -125,5 +147,7 @@ namespace PizzaKitchenClient
                 OrdersList.Items.Add(order);  // Füge jede nicht zugewiesene Bestellung zur OrdersList hinzu
             }
         }
+
+
     }
 }

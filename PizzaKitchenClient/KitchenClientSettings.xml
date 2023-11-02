@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+	<ConnectionSettings>
+		<Server>localhost</Server>
+		<Port>7166</Port>
+		<Endpoint>pizzaHub</Endpoint>
+	</ConnectionSettings>	
+</Settings>
