@@ -14,8 +14,29 @@
         <ListView Name="OrdersList" Margin="10" Grid.ColumnSpan="12" FontSize="16">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Bonnummer" Width="120" DisplayMemberBinding="{Binding BonNumber}" />
-                    <GridViewColumn Header="Anzahl der Gerichte" Width="50" DisplayMemberBinding="{Binding OrderItems.Count}" />
+                    <GridViewColumn Header="Bon" Width="50">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding BonNumber}"  HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Lieferart" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding LieferStatus}" HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Anzahl" Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding OrderItems.Count}" HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Gerichte" Width="500">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -23,16 +44,15 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
-                                               
-                                                <TextBlock Text="Menge:" Width="50" />
+                                                <TextBlock Text="Menge: " Width="50" />
                                                 <TextBlock Text="{Binding Menge}" Width="50" FontWeight="Bold" />
                                                 
-                                                <TextBlock Text="Größe:" Width="50" />
+                                                <TextBlock Text="Größe: " Width="50" />
                                                 
                                                 <TextBlock Text="{Binding Größe}" Width="30" FontWeight="Bold" />
                                                 <TextBlock Text="{Binding Gericht}" Width="200" FontWeight="Bold" />
 
-                                                <TextBlock Text="Extras:" Width="70" />
+                                                <TextBlock Text="Extras: " Width="70" />
                                                 <TextBlock Text="{Binding Extras}" FontWeight="Bold" />
                                             </StackPanel>
                                         </DataTemplate>
@@ -43,6 +63,11 @@
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
         <ComboBox Name="DriversComboBox" Grid.Row="1" Margin="10,0,0,5" Loaded="DriversComboBox_Loaded" VerticalAlignment="Center"/>
         <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,5" Click="OnAssignButtonClicked" Grid.RowSpan="2" VerticalAlignment="Center" FontWeight="Bold" Background="#21aa00" Padding="1,5,1,5"/>

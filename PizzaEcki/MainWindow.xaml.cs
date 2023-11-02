@@ -45,7 +45,7 @@ namespace PizzaEcki
         private bool isProgrammaticChange = false;
 
 
-
+        public List<Order> orders;
         public MainWindow()
         {
             InitializeComponent();
@@ -74,6 +74,14 @@ namespace PizzaEcki
             DataContext = this;
 
             currentBonNumber = _databaseManager.GetCurrentBonNumber();
+
+            //Lade unzugerordnete Bestellungen
+            orders = _databaseManager.GetUnassignedOrders();
+            foreach (Order order in orders)
+            {
+                cb_bonNummer.Items.Add(order.BonNumber);
+            }
+
         }
 
         private void PhoneNumberTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -550,6 +558,7 @@ namespace PizzaEcki
                 {
                     OrderId = Guid.NewGuid(),
                     BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
+                    IsDelivery = isDelivery,
                     OrderItems = orderItems,
                     PaymentMethod = paymentMethod // Zuweisen der Zahlungsmethode
                 };
@@ -639,8 +648,8 @@ namespace PizzaEcki
             // Filtere nur 'Theke' und 'Kasse1'
             var driversForCounter = driversFromDb.Where(d => d.Name == "Theke" || d.Name == "Kasse1").ToList();
 
-            DriversComboBox.Items.Clear();
-            DriversComboBox.ItemsSource = driversForCounter;
+            cb_cashRegister.Items.Clear();
+            cb_cashRegister.ItemsSource = driversForCounter;
         }
 
 
@@ -734,6 +743,49 @@ namespace PizzaEcki
         {
             TableView tableView = new TableView();
             tableView.ShowDialog();
+        }
+
+        private void Btn_zuordnen_Click(object sender, RoutedEventArgs e)
+        {
+            if (cb_bonNummer.SelectedItem != null && cb_cashRegister.SelectedItem != null)
+            {
+                // Hier nehmen wir an, dass die 'BonNumber' in 'cb_bonNummer' ausgewählt wird
+                int selectedBonNumber = (int)cb_bonNummer.SelectedItem;
+
+                // Finde die ausgewählte Order basierend auf der Bonnummer
+                Order selectedOrder = orders.FirstOrDefault(o => o.BonNumber == selectedBonNumber);
+
+                // Wir gehen davon aus, dass 'Name' in 'cb_cashRegister' ausgewählt wird
+                Driver selectedDriver = (Driver)cb_cashRegister.SelectedItem;
+
+                if (selectedOrder != null && selectedDriver != null)
+                {
+                    // Berechne den Gesamtpreis der Bestellung
+                    double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt); // Hier 'Price' statt 'Gesamt', falls das das korrekte Property ist.
+
+                    // Speichere die Zuordnung
+                    _databaseManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
+
+                    // Setze die ausgewählte Items zurück
+                    cb_bonNummer.SelectedItem = null;
+                    cb_cashRegister.SelectedItem = null;
+                    cb_bonNummer.Items.Clear();
+
+                    orders = _databaseManager.GetUnassignedOrders();
+                    foreach (Order order in orders)
+                    {
+                        cb_bonNummer.Items.Add(order.BonNumber);
+                    }
+                }
+                else
+                {
+                    // Fehlerbehandlung, falls keine Order oder kein Driver gefunden wurde
+                }
+            }
+            else
+            {
+                // Fehlerbehandlung, falls nichts ausgewählt wurde
+            }
         }
 
     }

@@ -83,28 +83,45 @@ namespace PizzaKitchenClient
         {
             if (OrdersList.SelectedItem is Order selectedOrder && DriversComboBox.SelectedItem is Driver selectedDriver)
             {
-                // Berechne den Gesamtpreis der Bestellung
-                double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
+                if (!selectedOrder.IsDelivery)
+                {
+                    MessageBox.Show("Fahrer können keine Abholungen übernehmen.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                else
+                {
+                    // Berechne den Gesamtpreis der Bestellung
+                    double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
 
-                // Speichere die Zuordnung
-                dbManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
+                    // Speichere die Zuordnung
+                    dbManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
 
-                // Entferne die Bestellung aus der Liste
-                OrdersList.Items.Remove(selectedOrder);
+                    // Entferne die Bestellung aus der Liste
+                    OrdersList.Items.Remove(selectedOrder);
 
-                DriversComboBox.SelectedItem = null;    
+                    DriversComboBox.SelectedItem = null;
+                }
+            }
+            else if (OrdersList.SelectedItem is Order anotherSelectedOrder && !anotherSelectedOrder.IsDelivery)
+            {
+            
+            
+                    // Entferne die Bestellung aus der Liste
+                    OrdersList.Items.Remove(anotherSelectedOrder);
+             
             }
             else
             {
-                MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
 
         }
         private void LoadUnassignedOrders()
         {
-            List<Order> unassignedOrders = dbManager.GetUnassignedOrders();  // Rufe die Methode GetUnassignedOrders auf
+            List<Order> unassignedOrders = dbManager.GetUnassignedOrders();
             foreach (Order order in unassignedOrders)
             {
+                
                 OrdersList.Items.Add(order);  // Füge jede nicht zugewiesene Bestellung zur OrdersList hinzu
             }
         }

@@ -608,11 +608,12 @@ namespace PizzaEcki.Database
         public void SaveOrder(Order order)
         {
             // Speichern der Bestellung in der Orders Tabelle
-            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber, PaymentMethod) VALUES (@OrderId, @BonNumber, @PaymentMethod)";
+            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod)";
             using (SqliteCommand commandOrder = new SqliteCommand(sqlOrder, _connection))
             {
                 commandOrder.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
                 commandOrder.Parameters.AddWithValue("@BonNumber", order.BonNumber);
+                commandOrder.Parameters.AddWithValue("@IsDelivery", order.IsDelivery);
                 commandOrder.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
                 commandOrder.ExecuteNonQuery();
             }
@@ -712,10 +713,21 @@ namespace PizzaEcki.Database
                         }
                         else
                         {
+                            // Hier nimmst du die Daten für IsDelivery aus der Datenbank
+                            var isDeliveryValue = reader["IsDelivery"];
+                            bool isDelivery = false;
+
+                            // Wenn der Wert aus der Datenbank kommt, musst du ihn entsprechend konvertieren.
+                            if (isDeliveryValue != DBNull.Value)
+                            {
+                                isDelivery = Convert.ToInt32(isDeliveryValue) != 0;
+                            }
+
                             order = new Order
                             {
                                 OrderId = currentOrderId,
                                 BonNumber = Convert.ToInt32(reader["BonNumber"]),
+                                IsDelivery = isDelivery, // Setze den Lieferstatus hier
                             };
                             unassignedOrders.Add(order);
                         }
