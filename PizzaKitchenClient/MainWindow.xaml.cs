@@ -18,81 +18,50 @@ namespace PizzaKitchenClient
     public partial class MainWindow : Window
     {
         private HubConnection hubConnection;
-        private readonly HttpClient httpClient = new HttpClient();
-        public ObservableCollection<Driver> Drivers { get; set; }
-        private const string DriversApiUrl = "https://localhost:7166/api/drivers"; // Ersetze die URL durch die tatsächliche Adresse deiner API
-        DatabaseManager dbManager = new DatabaseManager();
+
+        private readonly SignalRService signalRService = new SignalRService();
 
         public MainWindow()
         {
             InitializeComponent();
-            InitializeHubConnection();
-            LoadDrivers();
-            LoadUnassignedOrders();
+            Loaded += MainWindow_Loaded;
         }
 
-        private void InitializeHubConnection()
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            await signalRService.HubConnection.StartAsync();
+        }
 
-            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "KitchenClientSettings.xml");
 
-            // Überprüfe, ob die Datei existiert
-            if (!File.Exists(settingsPath))
-            {
-                MessageBox.Show("Die Einstellungsdatei wurde nicht gefunden.");
-                Application.Current.Shutdown();
-                return; // Beende die Methode, wenn die Datei nicht existiert
-            }
-            
-
-            // Lade die XML-Datei
-            XDocument settingsDoc = XDocument.Load(settingsPath);
-
-            // Lese die Einstellungen
-            var connectionSettings = settingsDoc.Element("Settings").Element("ConnectionSettings");
-            var settingsXMLServer = connectionSettings.Element("Server").Value;
-            var settingsXMLPort = connectionSettings.Element("Port").Value;
-            var settingsXMLEndpoint = connectionSettings.Element("Endpoint").Value;
-
+        private async void ConnectToHub()
+        {
             hubConnection = new HubConnectionBuilder()
-                .WithUrl("https://" + settingsXMLServer + ":" + settingsXMLPort + "/" + settingsXMLEndpoint) // Kombiniere die Adresse mit dem Hub-Namen
+                .WithUrl("http://localhost:5062/pizzaHub")
                 .Build();
 
-            // Registriere die Ereignisse für den Hub
-            hubConnection.On<Order>("ReceiveOrder", (order) =>
+            hubConnection.On<string>("ReceiveOrder", (order) =>
             {
+                // Update UI to show the order
                 Dispatcher.Invoke(() =>
                 {
-                    OrdersList.Items.Add(order);
+                    // UI updates must be done on the UI thread
+                    // AddOrderToList(order);
                 });
             });
 
-            // Starte die Verbindung
-            StartHubConnection();
-        }
-
-
-        private async Task StartHubConnection()
-        {
             try
             {
                 await hubConnection.StartAsync();
             }
             catch (Exception ex)
             {
-                // Handle connection error
-                MessageBox.Show(ex.Message);
+                // Handle connection errors
             }
-        }
-        private void LoadDrivers()
-        {
-            List<Driver> driversFromDb = dbManager.GetAllDrivers();
 
-            // Filtere 'Theke' und 'Kasse1' heraus
-            var driversForKitchen = driversFromDb.Where(d => d.Name != "Theke" && d.Name != "Kasse1").ToList();
 
-            DriversComboBox.ItemsSource = driversForKitchen;
         }
+        
+
         private void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {
 
@@ -116,7 +85,7 @@ namespace PizzaKitchenClient
                     double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
 
                     // Speichere die Zuordnung
-                    dbManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
+                  //  dbManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
 
                     // Entferne die Bestellung aus der Liste
                     OrdersList.Items.Remove(selectedOrder);
@@ -138,15 +107,7 @@ namespace PizzaKitchenClient
             }
 
         }
-        private void LoadUnassignedOrders()
-        {
-            List<Order> unassignedOrders = dbManager.GetUnassignedOrders();
-            foreach (Order order in unassignedOrders)
-            {
-                
-                OrdersList.Items.Add(order);  // Füge jede nicht zugewiesene Bestellung zur OrdersList hinzu
-            }
-        }
+        
 
 
     }
