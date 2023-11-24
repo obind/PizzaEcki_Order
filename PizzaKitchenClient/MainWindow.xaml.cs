@@ -20,47 +20,41 @@ namespace PizzaKitchenClient
         private HubConnection hubConnection;
 
         private readonly SignalRService signalRService = new SignalRService();
+        private ApiService _apiService = new ApiService();
 
         public MainWindow()
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
+            LoadUnassignedOrdersAsync().ConfigureAwait(false);
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await signalRService.HubConnection.StartAsync();
+           // await signalRService.HubConnection.StartAsync();
         }
 
-
-        private async void ConnectToHub()
+        private async Task LoadUnassignedOrdersAsync()
         {
-            hubConnection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5062/pizzaHub")
-                .Build();
-
-            hubConnection.On<string>("ReceiveOrder", (order) =>
-            {
-                // Update UI to show the order
-                Dispatcher.Invoke(() =>
-                {
-                    // UI updates must be done on the UI thread
-                    // AddOrderToList(order);
-                });
-            });
-
             try
             {
-                await hubConnection.StartAsync();
+                List<Order> unassignedOrders = await _apiService.GetUnassignedOrdersAsync();
+                OrdersList.Items.Clear(); // Bereinige die aktuelle Liste bevor neue Daten hinzugefügt werden
+
+                foreach (Order order in unassignedOrders)
+                {
+                    OrdersList.Items.Add(order); // Füge jede nicht zugewiesene Bestellung zur OrdersList hinzu
+                }
             }
             catch (Exception ex)
             {
-                // Handle connection errors
+                // Hier solltest du eine angemessene Fehlerbehandlung durchführen
+                MessageBox.Show("Fehler beim Laden unzugewiesener Bestellungen: " + ex.Message);
             }
-
-
         }
-        
+
+
+
 
         private void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {

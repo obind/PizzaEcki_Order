@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,21 +16,22 @@ namespace SharedLibrary
         public OrderItem() {
 
             Nr = ++currentMaxId;
-        }  
-
-
-        public int Nr { get; set; }
+        }
+        [Key]
+        public int OrderItemId { get; set; }
         public string Gericht { get; set; }
         public string Größe { get; set; }
-        public string Extras { get; set; }
+        public string? Extras { get; set; }
         public int Menge { get; set; }
         public double Epreis { get; set; }
         public double Gesamt { get; set; }
 
-        public string Uhrzeit { get; set; }
+        public string? Uhrzeit { get; set; }
         public int LieferungsArt { get; set; }
 
         // ... weitere Eigenschaften und Methoden nach Bedarf
+        [NotMapped]
+        public int Nr { get; set; }
     }
 
 }

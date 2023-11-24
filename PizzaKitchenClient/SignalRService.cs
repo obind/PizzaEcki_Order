@@ -21,7 +21,7 @@ namespace PizzaKitchenClient
             HubConnection.On<string, string>("ReceiveMessage", (user, message) =>
             {
                 // Handle the message
-                Debug.WriteLine($"Message received from {user}: {message}");
+                Debug.WriteLine($"Geilo es  Geht {user}: {message}");
                 // Hier könntest du auch eine Event-Auslösung haben, um die UI zu aktualisieren
             });
         }

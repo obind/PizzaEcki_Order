@@ -5,49 +5,78 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddSignalR(); // Add SignalR services
-
+builder.Services.AddSignalR();
+builder.Services.AddDbContext<PizzaDbContext>();
+builder.Services.AddScoped<PizzaDataService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
         builder
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .WithOrigins("https://localhost:7166", "http://localhost:5062") // HTTPS und HTTP Ports des Servers
+        .WithOrigins("https://localhost:7166", "http://localhost:5062")
         .AllowCredentials());
 });
 
-
-
-
-// Rest deines Codes...
-
 var app = builder.Build();
-// Dann in der app-Konfiguration:
-app.UseCors("CorsPolicy");
-// Configure the HTTP request pipeline.
+
+// Konfigurieren der Middleware-Reihenfolge.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
-//API
-app.MapGet("/sendmessage", async (IHubContext<PizzaHub> hubContext, string user, string message) =>
-{
-    await hubContext.Clients.All.SendAsync("ReceiveMessage", user, message);
-    return Results.Ok($"Nachricht '{message}' von '{user}' gesendet");
-});
-
-
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseCors("CorsPolicy");
 
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapHub<PizzaHub>("/pizzaHub"); // Map the PizzaHub
+// API-Endpunkte
+app.MapGet("/drivers", async (PizzaDataService service) =>
+{
+    try
+    {
+        var drivers = await service.GetAllDriversAsync();
+        return Results.Ok(drivers);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
+app.MapPost("/orderAssignments", async (PizzaDataService service, OrderAssignmentDto dto) =>
+{
+    try
+    {
+        await service.SaveOrderAssignmentAsync(dto.OrderId, dto.DriverId, dto.Price);
+        return Results.Ok();
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
+app.MapGet("/unassignedOrders", async (PizzaDataService service) =>
+{
+    try
+    {
+        var orders = await service.GetUnassignedOrdersAsync();
+        return Results.Ok(orders);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
+app.MapHub<PizzaHub>("/pizzaHub"); // Map the SignalR Hub
 
 app.MapRazorPages();
 
