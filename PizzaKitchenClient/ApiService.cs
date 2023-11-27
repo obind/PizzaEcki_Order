@@ -12,9 +12,12 @@ public class ApiService
 
     public ApiService()
     {
-        _apiBaseUrl = "http://localhost:5000";
+        _apiBaseUrl = "http://localhost:5062";
     }
-
+    public async Task<HttpResponseMessage> CheckConnectionAsync()
+    {
+        return await _httpClient.GetAsync($"{_apiBaseUrl}/healthcheck"); // Ein einfacher Endpunkt auf dem Server, der eine schnelle Antwort gibt
+    }
     public async Task<List<Order>> GetUnassignedOrdersAsync()
     {
         var response = await _httpClient.GetAsync($"{_apiBaseUrl}/unassignedOrders");

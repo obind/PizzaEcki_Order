@@ -6,6 +6,7 @@ using SharedLibrary;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Threading;
+using System.Windows.Media;
 
 namespace PizzaKitchenClient
 {
@@ -28,7 +29,7 @@ namespace PizzaKitchenClient
             refreshTimer.Interval = TimeSpan.FromSeconds(2); // Aktualisiere alle 30 Sekunden
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
-
+            CheckServerConnection();
         }
         private async void RefreshTimer_Tick(object sender, EventArgs e)
         {
@@ -101,8 +102,29 @@ namespace PizzaKitchenClient
                 MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-
-
+        private async void CheckServerConnection()
+        {
+            try
+            {
+                // Versuche, eine Testanfrage an den Server zu senden
+                var response = await _apiService.CheckConnectionAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    ConnectionStatusLabel.Content = "Verbunden";
+                    ConnectionStatusLabel.Foreground = new SolidColorBrush(Colors.Green);
+                }
+                else
+                {
+                    ConnectionStatusLabel.Content = "Fehler bei der Verbindung";
+                    ConnectionStatusLabel.Foreground = new SolidColorBrush(Colors.Red);
+                }
+            }
+            catch
+            {
+                ConnectionStatusLabel.Content = "Server nicht erreichbar";
+                ConnectionStatusLabel.Foreground = new SolidColorBrush(Colors.Red);
+            }
+        }
 
     }
 }

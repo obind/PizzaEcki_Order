@@ -6,6 +6,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
@@ -69,8 +70,10 @@
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
-        <ComboBox Name="DriversComboBox" Grid.Row="1" Margin="10,0,0,5" Loaded="DriversComboBox_Loaded" VerticalAlignment="Center"/>
-        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,5" Click="OnAssignButtonClicked" Grid.RowSpan="2" VerticalAlignment="Center" FontWeight="Bold" Background="#21aa00" Padding="1,5,1,5"/>
+        <ComboBox Name="DriversComboBox" Grid.Row="1" Margin="10,0,0,0" Loaded="DriversComboBox_Loaded" VerticalAlignment="Center"/>
+        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,5" Click="OnAssignButtonClicked" Grid.RowSpan="2" VerticalAlignment="Top" FontWeight="Bold" Background="#21aa00" Padding="1,5,1,5"/>
+        <!-- MainWindow.xaml -->
+        <Label x:Name="ConnectionStatusLabel" Grid.Row="2" Grid.Column="1" Content="Nicht verbunden" HorizontalAlignment="Right" Margin="9,0,10,0"/>
 
     </Grid>
 </Window>
