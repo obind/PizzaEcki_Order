@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace SharedLibrary
 {
-
     public class Driver
     {
+        [JsonPropertyName("id")]
         public int Id { get; set; }
+
+        [JsonPropertyName("name")]
         public string Name { get; set; }
+
+        [JsonPropertyName("phoneNumber")]
         public string PhoneNumber { get; set; }
 
-        // Überschreiben der ToString-Methode
         public override string ToString()
         {
             return Name;
         }
-        
     }
-
-
 }

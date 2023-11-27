@@ -1,34 +1,39 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using SharedLibrary;
-using System.Windows.Documents;
-using PizzaEcki.Database;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Xml.Linq;
-using System.IO;
+using System.Windows.Threading;
 
 namespace PizzaKitchenClient
 {
     public partial class MainWindow : Window
     {
-        private HubConnection hubConnection;
+        private ObservableCollection<Order> UnassignedOrders = new ObservableCollection<Order>();
 
-        private readonly SignalRService signalRService = new SignalRService();
+       // private readonly SignalRService signalRService = new SignalRService();
         private ApiService _apiService = new ApiService();
+        private DispatcherTimer refreshTimer = new DispatcherTimer();
+
 
         public MainWindow()
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
+            OrdersList.ItemsSource = UnassignedOrders; 
             LoadUnassignedOrdersAsync().ConfigureAwait(false);
-        }
 
+            refreshTimer.Interval = TimeSpan.FromSeconds(2); // Aktualisiere alle 30 Sekunden
+            refreshTimer.Tick += RefreshTimer_Tick;
+            refreshTimer.Start();
+
+        }
+        private async void RefreshTimer_Tick(object sender, EventArgs e)
+        {
+            await LoadUnassignedOrdersAsync();
+        }
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
            // await signalRService.HubConnection.StartAsync();
@@ -39,32 +44,35 @@ namespace PizzaKitchenClient
             try
             {
                 List<Order> unassignedOrders = await _apiService.GetUnassignedOrdersAsync();
-                OrdersList.Items.Clear(); // Bereinige die aktuelle Liste bevor neue Daten hinzugefügt werden
+                UnassignedOrders.Clear(); // Bereinige die ObservableCollection
 
                 foreach (Order order in unassignedOrders)
                 {
-                    OrdersList.Items.Add(order); // Füge jede nicht zugewiesene Bestellung zur OrdersList hinzu
+                    UnassignedOrders.Add(order); // Füge jede Bestellung zur ObservableCollection hinzu
                 }
             }
             catch (Exception ex)
             {
-                // Hier solltest du eine angemessene Fehlerbehandlung durchführen
                 MessageBox.Show("Fehler beim Laden unzugewiesener Bestellungen: " + ex.Message);
             }
         }
 
-
-
-
-        private void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
+        private async void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {
-
-            //List<Driver> driversFromDb = dbManager.GetAllDrivers();
-            //Drivers = new ObservableCollection<Driver>(driversFromDb);
-            //DriversComboBox.ItemsSource = driversFromDb;
+            try
+            {
+                List<Driver> driversFromApi = await _apiService.GetAllDriversAsync();
+                DriversComboBox.ItemsSource = driversFromApi;
+            }
+            catch (Exception ex)
+            {
+                // Fehlerbehandlung hier
+                MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
+            }
         }
 
-        private void OnAssignButtonClicked(object sender, RoutedEventArgs e)
+
+        private async void OnAssignButtonClicked(object sender, RoutedEventArgs e)
         {
             if (OrdersList.SelectedItem is Order selectedOrder && DriversComboBox.SelectedItem is Driver selectedDriver)
             {
@@ -73,35 +81,27 @@ namespace PizzaKitchenClient
                     MessageBox.Show("Fahrer können keine Abholungen übernehmen.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
-                else
+
+                double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
+
+
+                try
                 {
-                    // Berechne den Gesamtpreis der Bestellung
-                    double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
-
-                    // Speichere die Zuordnung
-                  //  dbManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
-
-                    // Entferne die Bestellung aus der Liste
-                    OrdersList.Items.Remove(selectedOrder);
-
+                    await _apiService.SaveOrderAssignmentAsync(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
+                    UnassignedOrders.Remove(selectedOrder); // Entferne die Bestellung aus der ObservableCollection
                     DriversComboBox.SelectedItem = null;
                 }
-            }
-            else if (OrdersList.SelectedItem is Order anotherSelectedOrder && !anotherSelectedOrder.IsDelivery)
-            {
-            
-            
-                    // Entferne die Bestellung aus der Liste
-                    OrdersList.Items.Remove(anotherSelectedOrder);
-             
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Fehler beim Zuweisen der Bestellung: " + ex.Message);
+                }
             }
             else
             {
                 MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-
         }
-        
+
 
 
     }
