@@ -1,32 +1,51 @@
-﻿//using Microsoft.AspNetCore.SignalR.Client;
-//using System;
-//using System.Collections.Generic;
-//using System.Diagnostics;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using System;
+using System.Configuration; // Du musst das System.Configuration NuGet-Paket hinzufügen
+using System.Diagnostics;
+using System.Threading.Tasks;
 
-//namespace PizzaKitchenClient
-//{
-//    public class SignalRService
-//    {
-//        public HubConnection HubConnection { get; }
 
-//        //public SignalRService()
-//        //{
-//        //    HubConnection = new HubConnectionBuilder()
-//        //        .WithUrl("http://localhost:5062/pizzaHub")
-//        //        .Build();
+namespace PizzaKitchenClient
+{
+    public class SignalRService
+    {
+        public HubConnection HubConnection { get; }
 
-//        //    HubConnection.On<string, string>("ReceiveMessage", (user, message) =>
-//        //    {
-//        //        // Handle the message
-//        //        Debug.WriteLine($"Geilo es  Geht {user}: {message}");
-//        //        // Hier könntest du auch eine Event-Auslösung haben, um die UI zu aktualisieren
-//        //    });
-//        //}
+        public SignalRService()
+        {
+            // Lade die URL aus der Konfigurationsdatei
+            string hubUrl = ConfigurationManager.AppSettings["SignalRHubUrl"];
 
-//        // ... Rest der Klasse
-//    }
+            HubConnection = new HubConnectionBuilder()
+                .WithUrl(hubUrl)
+                .Build();
 
-//}
+            HubConnection.Closed += async (error) =>
+            {
+                // Logge das Trennungsereignis
+                Debug.WriteLine($"Verbindung getrennt: {error?.Message}");
+
+                // Versuche die Verbindung wiederherzustellen
+                await Task.Delay(new Random().Next(0, 5) * 1000);
+                try
+                {
+                    await HubConnection.StartAsync();
+                }
+                catch (Exception ex)
+                {
+                    // Logge Fehler beim Wiederverbindungsversuch
+                    Debug.WriteLine($"Fehler beim Wiederverbinden: {ex.Message}");
+                }
+            };
+
+            HubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+            {
+                // Handle the message
+                Debug.WriteLine($"Geilo es  Geht {user}: {message}");
+                // Hier könntest du auch eine Event-Auslösung haben, um die UI zu aktualisieren
+            });
+        }
+
+        // ... Rest der Klasse
+    }
+}

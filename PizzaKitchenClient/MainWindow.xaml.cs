@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Threading;
 using System.Windows.Media;
+using System.Windows.Controls;
 
 namespace PizzaKitchenClient
 {
@@ -17,16 +18,17 @@ namespace PizzaKitchenClient
        // private readonly SignalRService signalRService = new SignalRService();
         private ApiService _apiService = new ApiService();
         private DispatcherTimer refreshTimer = new DispatcherTimer();
+        private Order _selectedOrder;
 
 
         public MainWindow()
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
-            OrdersList.ItemsSource = UnassignedOrders; 
-            LoadUnassignedOrdersAsync().ConfigureAwait(false);
+            OrdersList.ItemsSource = UnassignedOrders;
+            OrdersList.SelectionChanged += OrdersList_SelectionChanged_1;
 
-            refreshTimer.Interval = TimeSpan.FromSeconds(2); // Aktualisiere alle 30 Sekunden
+            refreshTimer.Interval = TimeSpan.FromSeconds(15); // Aktualisiere alle 30 Sekunden
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
             CheckServerConnection();
@@ -91,6 +93,7 @@ namespace PizzaKitchenClient
                     await _apiService.SaveOrderAssignmentAsync(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
                     UnassignedOrders.Remove(selectedOrder); // Entferne die Bestellung aus der ObservableCollection
                     DriversComboBox.SelectedItem = null;
+                    HighlightSelectedItem(); // Aktualisiere die Hervorhebung
                 }
                 catch (Exception ex)
                 {
@@ -123,6 +126,26 @@ namespace PizzaKitchenClient
             {
                 ConnectionStatusLabel.Content = "Server nicht erreichbar";
                 ConnectionStatusLabel.Foreground = new SolidColorBrush(Colors.Red);
+            }
+        }
+
+        private void OrdersList_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        {
+            // Aktualisiere das ausgewählte Item
+            _selectedOrder = OrdersList.SelectedItem as Order;
+            HighlightSelectedItem();
+        }
+
+
+        private void HighlightSelectedItem()
+        {
+            foreach (var item in OrdersList.Items)
+            {
+                var listViewItem = (ListViewItem)OrdersList.ItemContainerGenerator.ContainerFromItem(item);
+                if (listViewItem != null)
+                {
+                    listViewItem.Background = item == _selectedOrder ? new SolidColorBrush(Colors.LightBlue) : new SolidColorBrush(Colors.White);
+                }
             }
         }
 

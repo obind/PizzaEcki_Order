@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using SharedLibrary;
 using System.Text;
+using System.Configuration;
 
 public class ApiService
 {
@@ -12,7 +13,8 @@ public class ApiService
 
     public ApiService()
     {
-        _apiBaseUrl = "http://localhost:5062";
+        // Lade die Basis-URL aus der Konfigurationsdatei
+        _apiBaseUrl = ConfigurationManager.AppSettings["ApiBaseUrl"] ?? "http://localhost:5062";
     }
     public async Task<HttpResponseMessage> CheckConnectionAsync()
     {
