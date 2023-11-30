@@ -2,7 +2,6 @@
 <Settings>
 	<ConnectionSettings>
 		<Server>localhost</Server>
-		<Port>7166</Port>
-		<Endpoint>pizzaHub</Endpoint>
+		<Port>5000</Port>
 	</ConnectionSettings>	
 </Settings>

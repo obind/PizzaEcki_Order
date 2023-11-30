@@ -14,7 +14,7 @@ public class ApiService
     public ApiService()
     {
         // Lade die Basis-URL aus der Konfigurationsdatei
-        _apiBaseUrl = ConfigurationManager.AppSettings["ApiBaseUrl"] ?? "http://localhost:5062";
+        _apiBaseUrl = ConfigurationManager.AppSettings["ApiBaseUrl"] ?? "http://localhost:5000";
     }
     public async Task<HttpResponseMessage> CheckConnectionAsync()
     {
