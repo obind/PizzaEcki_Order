@@ -76,6 +76,21 @@ app.MapGet("/unassignedOrders", async (PizzaDataService service) =>
     }
 });
 
+
+app.MapGet("/GetCustomer", async (PizzaDataService service, string phoneNumber) =>
+{
+    try
+    {
+        var customer = await service.GetCustomerByPhoneNumber(phoneNumber);
+        return customer != null ? Results.Ok(customer) : Results.NotFound();
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
+
 app.MapGet("/healthcheck", () => "Server OK");
 
 app.MapHub<PizzaHub>("/pizzaHub"); // Map the SignalR Hub

@@ -19,6 +19,7 @@ namespace PizzaKitchenClient
         private ApiService _apiService = new ApiService();
         private DispatcherTimer refreshTimer = new DispatcherTimer();
         private Order _selectedOrder;
+        private Order order;
 
 
         public MainWindow()
@@ -32,6 +33,7 @@ namespace PizzaKitchenClient
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
             CheckServerConnection();
+            
         }
         private async void RefreshTimer_Tick(object sender, EventArgs e)
         {
@@ -48,10 +50,17 @@ namespace PizzaKitchenClient
             {
                 List<Order> unassignedOrders = await _apiService.GetUnassignedOrdersAsync();
                 UnassignedOrders.Clear(); // Bereinige die ObservableCollection
-
                 foreach (Order order in unassignedOrders)
                 {
-                    UnassignedOrders.Add(order); // Füge jede Bestellung zur ObservableCollection hinzu
+                    if (order != null && !string.IsNullOrEmpty(order.CustomerPhoneNumber))
+                    {
+                        Customer customer = await GetCustomerByPhoneNumberAsync(order.CustomerPhoneNumber);
+                        if (customer != null)
+                        {
+                            order.Customer = customer; // Zuweisen des Customer-Objekts zur Order
+                            UnassignedOrders.Add(order);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -59,6 +68,31 @@ namespace PizzaKitchenClient
                 MessageBox.Show("Fehler beim Laden unzugewiesener Bestellungen: " + ex.Message);
             }
         }
+
+
+        private async Task<Customer> GetCustomerByPhoneNumberAsync(string phoneNumber)
+        {
+            if (string.IsNullOrEmpty(phoneNumber))
+            {
+                // Optional: Zeigen Sie eine Meldung an oder führen Sie eine andere Aktion aus
+                MessageBox.Show("Keine Telefonnummer angegeben.");
+                return null;
+            }
+
+            try
+            {
+                var customer = await _apiService.GetCustomerByPhoneNumberAsync(phoneNumber);
+                return customer;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Fehler beim Laden des Kunden: " + ex.Message);
+                return null;
+            }
+        }
+
+
+
 
         private async void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {

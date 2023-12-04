@@ -469,6 +469,7 @@ namespace PizzaEcki
 
             // Fügen Sie das tempOrderItem zur Liste hinzu
             tempOrderItem.Nr = orderItems.Count + 1;
+            tempOrderItem.Uhrzeit = TimePicker.Value.Value.ToString("HH:mm");
             orderItems.Add(tempOrderItem);
             myDataGrid.ItemsSource = null;
             myDataGrid.ItemsSource = orderItems;
@@ -555,7 +556,8 @@ namespace PizzaEcki
                     BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
                     IsDelivery = isDelivery,
                     OrderItems = orderItems,
-                    PaymentMethod = paymentMethod // Zuweisen der Zahlungsmethode
+                    PaymentMethod = paymentMethod, // Zuweisen der Zahlungsmethode
+                    CustomerPhoneNumber = _customerNr
                 };
                 _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
 

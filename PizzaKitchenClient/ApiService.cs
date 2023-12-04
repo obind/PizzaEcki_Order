@@ -5,6 +5,8 @@ using System.Text.Json;
 using SharedLibrary;
 using System.Text;
 using System.Configuration;
+using System.Windows;
+using System;
 
 public class ApiService
 {
@@ -14,7 +16,7 @@ public class ApiService
     public ApiService()
     {
         // Lade die Basis-URL aus der Konfigurationsdatei
-        _apiBaseUrl = ConfigurationManager.AppSettings["ApiBaseUrl"] ?? "http://localhost:5000";
+        _apiBaseUrl = ConfigurationManager.AppSettings["ApiBaseUrl"] ?? "http://localhost:5062";
     }
     public async Task<HttpResponseMessage> CheckConnectionAsync()
     {
@@ -55,5 +57,43 @@ public class ApiService
         var response = await _httpClient.PostAsync($"{_apiBaseUrl}/orderAssignments", requestContent);
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task<Customer> GetCustomerByPhoneNumberAsync(string phoneNumber)
+    {
+        // Überprüfen, ob die Telefonnummer gültig ist
+        if (string.IsNullOrEmpty(phoneNumber))
+        {
+            MessageBox.Show("Keine Telefonnummer angegeben.");
+            return null;
+        }
+
+        try
+        {
+            // Erstellen der URL mit dem Query-Parameter für die Telefonnummer
+            var url = $"{_apiBaseUrl}/GetCustomer?phoneNumber={phoneNumber}";
+
+            // Senden der GET-Anfrage
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            // Lesen und Deserialisieren der Antwort
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Customer customer = JsonSerializer.Deserialize<Customer>(responseContent);
+
+            return customer;
+        }
+        catch (HttpRequestException ex)
+        {
+            MessageBox.Show($"Fehler bei der HTTP-Anfrage: {ex.Message}");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Fehler beim Laden des Kunden: {ex.Message}");
+            return null;
+        }
+    }
+
+
 
 }

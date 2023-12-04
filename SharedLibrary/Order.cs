@@ -19,11 +19,15 @@ namespace SharedLibrary
         [JsonPropertyName("orderItems")]
         public List<OrderItem> OrderItems { get; set; }
 
+        [JsonPropertyName("phoneNumber")]
+        public string CustomerPhoneNumber { get; set; }
+
         public string LieferStatus
         {
             get { return IsDelivery ? "Lieferung" : "Abholung"; }
         }
 
+        public Customer Customer { get; set; }
 
         public Order()
         {

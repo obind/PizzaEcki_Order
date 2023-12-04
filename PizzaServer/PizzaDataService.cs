@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary;
 using System.Data;
+using System.Data.Common;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PizzaServer
 {
@@ -70,18 +72,18 @@ namespace PizzaServer
             await connection.OpenAsync();
 
             string sql = @"
-            SELECT 
-                Orders.*,
-                OrderItems.*
-            FROM 
-                Orders
-            LEFT JOIN 
-                OrderItems ON Orders.OrderId = OrderItems.OrderId
-            LEFT JOIN 
-                OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
-            WHERE 
-                OrderAssignments.DriverId IS NULL
-        ";
+                SELECT 
+                    Orders.*,
+                    OrderItems.*
+                FROM 
+                    Orders
+                LEFT JOIN 
+                    OrderItems ON Orders.OrderId = OrderItems.OrderId
+                LEFT JOIN 
+                    OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
+                WHERE 
+                    OrderAssignments.DriverId IS NULL
+            ";
 
             using (SqliteCommand command = new SqliteCommand(sql, connection))
             {
@@ -119,7 +121,9 @@ namespace PizzaServer
                             {
                                 OrderId = currentOrderId,
                                 BonNumber = Convert.ToInt32(reader["BonNumber"]),
-                                IsDelivery = isDelivery, // Setze den Lieferstatus hier
+                                IsDelivery = isDelivery,
+                                PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader.GetString(reader.GetOrdinal("PaymentMethod")),
+                                CustomerPhoneNumber = reader.IsDBNull(reader.GetOrdinal("CustomerPhoneNumber")) ? null : reader.GetString(reader.GetOrdinal("CustomerPhoneNumber")),
                             };
                             unassignedOrders.Add(order);
                         }
@@ -137,15 +141,50 @@ namespace PizzaServer
                             LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
                         };
 
-                        order.OrderItems.Add(orderItem);
+
+                    order.OrderItems.Add(orderItem);
+                }
+            }
+        }
+
+        await connection.CloseAsync();
+
+            return unassignedOrders;
+        }
+
+        public async Task<Customer> GetCustomerByPhoneNumber(string phoneNumber)
+        {
+            string sql = @"SELECT c.PhoneNumber, c.Name, a.Street, a.City, c.AdditionalInfo 
+                   FROM Customers c
+                   INNER JOIN Addresses a ON c.AddressId = a.Id
+                   WHERE c.PhoneNumber = @PhoneNumber";
+
+            var connection = (SqliteConnection)_context.Database.GetDbConnection();
+            await connection.OpenAsync();
+
+            using (SqliteCommand command = new SqliteCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
+
+                using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    if (reader.Read())
+                    {
+                        return new Customer
+                        {
+                            PhoneNumber = reader.GetString(0),
+                            Name = reader.GetString(1),
+                            Street = reader.GetString(2),
+                            City = reader.IsDBNull(3) ? null : reader.GetString(3), // Überprüfe auf NULL
+                            AdditionalInfo = reader.IsDBNull(4) ? null : reader.GetString(4) // Überprüfe auf NULL
+                        };
                     }
                 }
             }
 
-            await connection.CloseAsync();
-
-            return unassignedOrders;
+            return null;
         }
+
 
     }
 }

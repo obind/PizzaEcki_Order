@@ -608,13 +608,14 @@ namespace PizzaEcki.Database
         public void SaveOrder(Order order)
         {
             // Speichern der Bestellung in der Orders Tabelle
-            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod)";
+            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod,CustomerPhoneNumber) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber)";
             using (SqliteCommand commandOrder = new SqliteCommand(sqlOrder, _connection))
             {
                 commandOrder.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
                 commandOrder.Parameters.AddWithValue("@BonNumber", order.BonNumber);
                 commandOrder.Parameters.AddWithValue("@IsDelivery", order.IsDelivery);
                 commandOrder.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
+                commandOrder.Parameters.AddWithValue("@CustomerPhoneNumber", order.CustomerPhoneNumber); 
                 commandOrder.ExecuteNonQuery();
             }
 
