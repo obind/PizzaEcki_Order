@@ -28,7 +28,7 @@ public class ApiService
         catch (Exception ex)
         {
             MessageBox.Show($"Fehler beim Laden der Konfigurationsdatei: {ex.Message}");
-            _apiBaseUrl = "http://localhost:5057"; // Fallback-Wert
+            _apiBaseUrl = "http://localhost:5000"; // Fallback-Wert
         }
     }
     public async Task<HttpResponseMessage> CheckConnectionAsync()
