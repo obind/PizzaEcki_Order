@@ -123,7 +123,8 @@ namespace PizzaEcki.Database
                 IsDelivery BOOLEAN,
                 PaymentMethod TEXT,
                 CustomerPhoneNumber TEXT,
-                Timestamp DATETIME
+                Timestamp DATETIME,
+                DeliveryUntil TEXT
             )";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -608,14 +609,16 @@ namespace PizzaEcki.Database
         public void SaveOrder(Order order)
         {
             // Speichern der Bestellung in der Orders Tabelle
-            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod,CustomerPhoneNumber) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber)";
+            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod,CustomerPhoneNumber, Timestamp, DeliveryUntil) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber, @Timestamp, @DeliveryUntil)";
             using (SqliteCommand commandOrder = new SqliteCommand(sqlOrder, _connection))
             {
                 commandOrder.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
                 commandOrder.Parameters.AddWithValue("@BonNumber", order.BonNumber);
                 commandOrder.Parameters.AddWithValue("@IsDelivery", order.IsDelivery);
                 commandOrder.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
-                commandOrder.Parameters.AddWithValue("@CustomerPhoneNumber", order.CustomerPhoneNumber); 
+                commandOrder.Parameters.AddWithValue("@CustomerPhoneNumber", order.CustomerPhoneNumber);
+                commandOrder.Parameters.AddWithValue("@Timestamp", order.Timestamp);
+                commandOrder.Parameters.AddWithValue("@DeliveryUntil", order.DeliveryUntil);
                 commandOrder.ExecuteNonQuery();
             }
 

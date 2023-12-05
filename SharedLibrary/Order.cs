@@ -22,6 +22,12 @@ namespace SharedLibrary
         [JsonPropertyName("phoneNumber")]
         public string CustomerPhoneNumber { get; set; }
 
+        [JsonPropertyName("timestamp")]
+        public string Timestamp { get; set; }
+
+        [JsonPropertyName("deliveryUntil")]
+        public string DeliveryUntil { get; set; }
+
         public string LieferStatus
         {
             get { return IsDelivery ? "Lieferung" : "Abholung"; }

@@ -20,7 +20,7 @@ namespace PizzaKitchenClient
         private DispatcherTimer refreshTimer = new DispatcherTimer();
         private Order _selectedOrder;
         private Order order;
-
+        private bool isErrorMessageDisplayed = false;
 
         public MainWindow()
         {
@@ -29,7 +29,7 @@ namespace PizzaKitchenClient
             OrdersList.ItemsSource = UnassignedOrders;
             OrdersList.SelectionChanged += OrdersList_SelectionChanged_1;
 
-            refreshTimer.Interval = TimeSpan.FromSeconds(15); // Aktualisiere alle 30 Sekunden
+            refreshTimer.Interval = TimeSpan.FromSeconds(1); // Aktualisiere alle 30 Sekunden
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
             CheckServerConnection();
@@ -48,18 +48,31 @@ namespace PizzaKitchenClient
         {
             try
             {
-                List<Order> unassignedOrders = await _apiService.GetUnassignedOrdersAsync();
-                UnassignedOrders.Clear(); // Bereinige die ObservableCollection
-                foreach (Order order in unassignedOrders)
+                List<Order> unassignedOrdersFromApi = await _apiService.GetUnassignedOrdersAsync();
+
+                // Entferne alle Bestellungen aus UnassignedOrders, die nicht mehr in unassignedOrdersFromApi sind
+                foreach (var order in UnassignedOrders.ToList())
                 {
-                    if (order != null && !string.IsNullOrEmpty(order.CustomerPhoneNumber))
+                    if (!unassignedOrdersFromApi.Any(o => o.OrderId == order.OrderId))
                     {
-                        Customer customer = await GetCustomerByPhoneNumberAsync(order.CustomerPhoneNumber);
-                        if (customer != null)
+                        UnassignedOrders.Remove(order);
+                    }
+                }
+
+                // Füge neue Bestellungen aus unassignedOrdersFromApi hinzu, die nicht in UnassignedOrders sind
+                foreach (var order in unassignedOrdersFromApi)
+                {
+                    if (!UnassignedOrders.Any(o => o.OrderId == order.OrderId))
+                    {
+                        if (!string.IsNullOrEmpty(order.CustomerPhoneNumber))
                         {
-                            order.Customer = customer; // Zuweisen des Customer-Objekts zur Order
-                            UnassignedOrders.Add(order);
+                            Customer customer = await GetCustomerByPhoneNumberAsync(order.CustomerPhoneNumber);
+                            if (customer != null)
+                            {
+                                order.Customer = customer;
+                            }
                         }
+                        UnassignedOrders.Add(order);
                     }
                 }
             }
@@ -182,6 +195,13 @@ namespace PizzaKitchenClient
                 }
             }
         }
-
+        private void ShowError(string message)
+        {
+            if (!isErrorMessageDisplayed)
+            {
+                MessageBox.Show(message);
+                isErrorMessageDisplayed = true; // Setze die Flagge, um anzuzeigen, dass die Fehlermeldung bereits angezeigt wurde
+            }
+        }
     }
 }

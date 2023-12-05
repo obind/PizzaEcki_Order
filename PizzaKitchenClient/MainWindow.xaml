@@ -31,6 +31,25 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
+                    <GridViewColumn Header="Offen seit" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Timestamp}" HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Lieferung Bis" Width="120">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DeliveryUntil}" HorizontalAlignment="Center" />
+                            </DataTemplate>                   
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                   
+
                     <GridViewColumn Header="Name" Width="150">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -59,29 +78,40 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    
                     <GridViewColumn Header="Gerichte" Width="500">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ItemsControl ItemsSource="{Binding OrderItems}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="Menge: " Width="50" />
-                                                <TextBlock Text="{Binding Menge}" Width="50" FontWeight="Bold" />
-                                                
-                                                <TextBlock Text="Größe: " Width="50" />
-                                                
-                                                <TextBlock Text="{Binding Größe}" Width="30" FontWeight="Bold" />
-                                                <TextBlock Text="{Binding Gericht}" Width="200" FontWeight="Bold" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
 
-                                                <TextBlock Text="Extras: " Width="70" />
-                                                <TextBlock Text="{Binding Extras}" FontWeight="Bold" />
-                                            </StackPanel>
+                                                <TextBlock Grid.Column="0" Text="Menge: " Margin="0,0,5,0" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Menge}" FontWeight="Bold" Margin="0,0,5,0" />
+
+                                                <TextBlock Grid.Column="2" Text="Größe: " Margin="0,0,5,0" />
+                                                <TextBlock Grid.Column="3" Text="{Binding Größe}" FontWeight="Bold" Margin="0,0,5,0" />
+
+                                                <TextBlock Grid.Column="4" Text="{Binding Gericht}" FontWeight="Bold" Margin="0,0,5,0" />
+
+                                                <TextBlock Grid.Column="5" Text="Extras: " Margin="0,0,5,0" />
+                                                <TextBlock Grid.Column="6" Text="{Binding Extras}" FontWeight="Bold" />
+                                            </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
+
                     </GridViewColumn>
                 </GridView>
             </ListView.View>

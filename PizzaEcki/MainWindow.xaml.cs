@@ -15,6 +15,7 @@ using System.Drawing.Printing;
 using System.Drawing;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PizzaEcki
 {
@@ -66,8 +67,7 @@ namespace PizzaEcki
             ExtrasComboBox.ItemsSource = extrasList;
 
             //Den Time Picker Vorbereiten zum Programm start 
-            TimePicker.Value = DateTime.Now;
-            TimePicker.Value = DateTime.Now.AddMinutes(15);
+            TimePicker.Value = null;      
             TimePicker.TimeInterval = new TimeSpan(0, 30, 0);
 
             LoadDrivers();
@@ -319,7 +319,7 @@ namespace PizzaEcki
             }
         }
 
-        private void ExtrasComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private async void ExtrasComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
             if (textBox == null)
@@ -339,12 +339,14 @@ namespace PizzaEcki
             }
             else if (e.Key == Key.Enter)
             {
+
+                await Task.Delay(50); 
                 tempOrderItem.Extras = textBox.Text;
                 amountComboBox.Focus();  // Verschiebe den Fokus zur amountComboBox
             }
         }
 
-        private void ExtrasComboBox_KeyDown(object sender, KeyEventArgs e)
+        private async void ExtrasComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
             if (textBox == null)
@@ -365,8 +367,14 @@ namespace PizzaEcki
             else if (e.Key == Key.Enter)
             {
                 tempOrderItem.Extras = textBox.Text;
-                amountComboBox.Focus();  // Verschiebe den Fokus zur amountComboBox
+                await Task.Delay(50);
+                amountComboBox.Focus();
+                e.Handled = true;
             }
+        }
+        private bool ShouldProcessOrder()
+        {
+            return !string.IsNullOrWhiteSpace(tempOrderItem.Extras) && tempOrderItem.Menge > 0;
         }
 
         //Anzahl in das tempOrderItem Schreiben 
@@ -375,7 +383,11 @@ namespace PizzaEcki
             if (e.Key == Key.Enter)
             {
                 UpdateTempOrderItemAmount();
-                ProcessOrder();
+                if (ShouldProcessOrder())
+                {
+                    ProcessOrder();
+                }
+                e.Handled = true;
             }
         }
 
@@ -397,9 +409,15 @@ namespace PizzaEcki
         {
             if (e.Key == Key.Enter)
             {
-                ProcessOrder();
+                // Überprüfen, ob TimePicker einen Wert hat
+                if (TimePicker.Value.HasValue)
+                {
+                    //tempOrderItem.Uhrzeit = TimePicker.Value.Value.ToString("HH:mm");
+                    ProcessOrder();
+                }
             }
         }
+
         private double GetPriceForSelectedSize(Dish selectedDish, string selectedSize)
         {
             switch (selectedSize)
@@ -419,7 +437,7 @@ namespace PizzaEcki
         {
             if (dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
             {
-                MessageBox.Show("Du bist zu blöd die Textbox auszufüllen!");
+                MessageBox.Show("Bitte gebe ein Gericht an.");
                 return;
             }
 
@@ -469,7 +487,6 @@ namespace PizzaEcki
 
             // Fügen Sie das tempOrderItem zur Liste hinzu
             tempOrderItem.Nr = orderItems.Count + 1;
-            tempOrderItem.Uhrzeit = TimePicker.Value.Value.ToString("HH:mm");
             orderItems.Add(tempOrderItem);
             myDataGrid.ItemsSource = null;
             myDataGrid.ItemsSource = orderItems;
@@ -515,7 +532,6 @@ namespace PizzaEcki
         }
         private void myDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            MessageBox.Show(e.Key.ToString());
             if (e.Key == Key.Back || e.Key == Key.Delete)
             {
                 // Ausgewählte Zeile holen
@@ -557,43 +573,48 @@ namespace PizzaEcki
                     IsDelivery = isDelivery,
                     OrderItems = orderItems,
                     PaymentMethod = paymentMethod, // Zuweisen der Zahlungsmethode
-                    CustomerPhoneNumber = _customerNr
+                    CustomerPhoneNumber = _customerNr,
+                    Timestamp = DateTime.Now.ToString("HH:mm"),
+                    DeliveryUntil = TimePicker.Value.Value.ToString("HH:mm")
                 };
+             
+
                 _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
 
-                _databaseManager.SaveOrder(order);
-                SendOrderItems(order);
-                ReloadeUnassignedOrders();
+                    _databaseManager.SaveOrder(order);
+                    SendOrderItems(order);
+                    ReloadeUnassignedOrders();
 
-                if (PhoneNumberTextBox.Text != "1" && PhoneNumberTextBox.Text != "2")
+                    if (PhoneNumberTextBox.Text != "1" && PhoneNumberTextBox.Text != "2")
 
-                {
-                    Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
-                    PrintReceipt(order, customer);
-                }
-                else
-                {
-                    PrintReceipt(order, null);
-                }
+                    {
+                        Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
+                        PrintReceipt(order, customer);
+                    }
+                    else
+                    {
+                        PrintReceipt(order, null);
+                    }
 
-                // Leeren Sie die Bestellliste
-                orderItems.Clear();
+                    // Leeren Sie die Bestellliste
+                    orderItems.Clear();
 
-                TotalPriceLabel.Content = $"0.00 €";
+                    TotalPriceLabel.Content = $"0.00 €";
 
-                // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
-                myDataGrid.Items.Refresh();
+                    // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
+                    myDataGrid.Items.Refresh();
 
-                //Aktualisiere Lieferungsart
-                AuslieferungLabel.Content = Lieferung;
-                MitnehmerLabel.Content = Mitnehmer;
-                SelbstabholerLabel.Content = Selbstabholer;
-            }
-            else
-            {
-                MessageBox.Show("Bitte eine Kundenummer Eingeben");
-            }
+                    //Aktualisiere Lieferungsart
+                    AuslieferungLabel.Content = Lieferung;
+                    MitnehmerLabel.Content = Mitnehmer;
+                    SelbstabholerLabel.Content = Selbstabholer;
         }
+        else
+        {
+            MessageBox.Show("Bitte eine Kundenummer Eingeben");
+        }
+    }
+
 
         private int GetNextReceiptNumber()
         {

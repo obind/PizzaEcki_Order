@@ -7,6 +7,7 @@ using System.Text;
 using System.Configuration;
 using System.Windows;
 using System;
+using System.Xml.Linq;
 
 public class ApiService
 {
@@ -15,8 +16,20 @@ public class ApiService
 
     public ApiService()
     {
-        // Lade die Basis-URL aus der Konfigurationsdatei
-        _apiBaseUrl = ConfigurationManager.AppSettings["ApiBaseUrl"] ?? "http://localhost:5062";
+        try
+        {
+            // Lade die XML-Datei
+            XDocument doc = XDocument.Load("KitchenClientSettings.xml");
+            var server = doc.Root.Element("ConnectionSettings").Element("Server").Value;
+            var port = doc.Root.Element("ConnectionSettings").Element("Port").Value;
+
+            _apiBaseUrl = $"http://{server}:{port}";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Fehler beim Laden der Konfigurationsdatei: {ex.Message}");
+            _apiBaseUrl = "http://localhost:5057"; // Fallback-Wert
+        }
     }
     public async Task<HttpResponseMessage> CheckConnectionAsync()
     {
