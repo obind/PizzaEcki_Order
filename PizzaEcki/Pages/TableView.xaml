@@ -6,11 +6,42 @@
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
         Title="TableView" Height="450" Width="800">
-    <Grid>
+    <Grid Background="#FF1D1E20">
         <ComboBox x:Name="tablesComboBox" 
-                  SelectionChanged="TablesComboBox_SelectionChanged"
-                  Margin="10" VerticalAlignment="Top"/>
+          SelectionChanged="TablesComboBox_SelectionChanged"
+          Margin="10" VerticalAlignment="Top"
+          FontSize="12" Height="30" Padding="5,0,5,0" 
+            Background="#FF5F6269" Foreground="#FF5F6269" BorderBrush="#FF5F6269" VerticalContentAlignment="Center">
+            <ComboBox.Resources>
+                <!-- Anpassung des Hintergrunds für das Dropdown -->
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="Transparent"/>
+            </ComboBox.Resources>
+            <ComboBox.ItemContainerStyle>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="Padding" Value="5,0,5,0"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontSize" Value="12"/>
+
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+
+                </Style>
+            </ComboBox.ItemContainerStyle>
+        </ComboBox>
+
+
         <DataGrid x:Name="dataGrid" 
-                  Margin="10,50,10,10"/>
+                  Margin="10,50,10,10" Background="#FF474747">
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#3d4248"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <!-- Optional: Farbe des Textes im Header -->
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+        </DataGrid> 
     </Grid>
 </Window>
