@@ -191,7 +191,10 @@ namespace PizzaKitchenClient
                 var listViewItem = (ListViewItem)OrdersList.ItemContainerGenerator.ContainerFromItem(item);
                 if (listViewItem != null)
                 {
-                    listViewItem.Background = item == _selectedOrder ? new SolidColorBrush(Colors.LightBlue) : new SolidColorBrush(Colors.White);
+                    listViewItem.Background = item == _selectedOrder
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#5f6269"))
+                    : new SolidColorBrush(Colors.White);
+
                 }
             }
         }
