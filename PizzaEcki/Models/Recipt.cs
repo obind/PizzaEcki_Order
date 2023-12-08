@@ -1,6 +1,7 @@
 using PizzaEcki.Models;
 using System.Collections.Generic;
 using System.Linq;
+using SharedLibrary;
 
 public class Receipt
 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PizzaEcki.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
@@ -13,24 +14,39 @@ namespace PizzaEcki.Models
     public enum DishCategory
     {
         Pizza,
-        Salad,
-        Noodles,
-        Other,
+        Salate,
+        Baguette,
+        Pasta,
+        Nudeln,
+        Döner,
+        Omelette,
+        Schnitzel,
+        Kartoffelaufläufe, 
+        TexMex,
+        Extras,
+        Getränke 
+
         // Weitere Kategorien können hier hinzugefügt werden
     }
 
+
     public class Dish
     {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public double Price { get; set; }
-            public DishCategory Category { get; set; }
-            public string Size { get; set; } = "L";
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public double Preis_S { get; set; }
+        public double Preis_L { get; set; }
+        public double Preis_XL { get; set; }
+        public DishCategory Kategorie { get; set; }
+        public string Größe { get; set; } // Du könntest dies auch als Enum definieren
+        public string HappyHour { get; set; }
+        public double Steuersatz { get; set; }
+        public int GratisBeilage { get; set; }
 
         public override string ToString()
-            {
-                return $"{Id} - " + $"{Name}";
-            }
+        {
+            return $"{Id} - " + $"{Name}";
+        }
     }
 
 }

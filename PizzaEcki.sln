@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PizzaEcki", "PizzaEcki\PizzaEcki.csproj", "{64F239E6-4178-4A38-A605-A41A929B6B01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PizzaEcki", "PizzaEcki\PizzaEcki.csproj", "{64F239E6-4178-4A38-A605-A41A929B6B01}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PizzaServer", "PizzaServer\PizzaServer.csproj", "{FBE821A5-AD03-46F8-96DC-09BEF0039C17}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PizzaKitchenClient", "PizzaKitchenClient\PizzaKitchenClient.csproj", "{14340DEA-7EF7-4DB2-AAF8-358FB87AB993}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedLibrary", "SharedLibrary\SharedLibrary.csproj", "{1EC41D73-13FC-4EE6-B98C-F2E586393BA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{64F239E6-4178-4A38-A605-A41A929B6B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64F239E6-4178-4A38-A605-A41A929B6B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64F239E6-4178-4A38-A605-A41A929B6B01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBE821A5-AD03-46F8-96DC-09BEF0039C17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBE821A5-AD03-46F8-96DC-09BEF0039C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBE821A5-AD03-46F8-96DC-09BEF0039C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBE821A5-AD03-46F8-96DC-09BEF0039C17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14340DEA-7EF7-4DB2-AAF8-358FB87AB993}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14340DEA-7EF7-4DB2-AAF8-358FB87AB993}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14340DEA-7EF7-4DB2-AAF8-358FB87AB993}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14340DEA-7EF7-4DB2-AAF8-358FB87AB993}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EC41D73-13FC-4EE6-B98C-F2E586393BA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EC41D73-13FC-4EE6-B98C-F2E586393BA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EC41D73-13FC-4EE6-B98C-F2E586393BA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EC41D73-13FC-4EE6-B98C-F2E586393BA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

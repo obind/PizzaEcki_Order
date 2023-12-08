@@ -4,36 +4,46 @@ using SQLitePCL;
 using PizzaEcki.Models;
 using System.Collections.Generic;
 using Microsoft.Win32.SafeHandles;
+using System.IO;
+using SharedLibrary;
+using System.Data;
+using System.Linq;
 
 namespace PizzaEcki.Database
 {
-    class DatabaseManager : IDisposable
+    public class DatabaseManager : IDisposable
     {
         private SqliteConnection _connection;
-        private readonly string databaseFilePath = "./database.sqlite";
+        private readonly string userDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private readonly string databaseFolderName = "PizzaEckiDb";
+        private readonly string databaseFileName = "database.sqlite";
+        private readonly string fullPathToDatabaseFolder;
+        private readonly string fullPathToDatabase;
 
-        //Database Managment
         public DatabaseManager()
         {
             Batteries.Init(); // Initialisierung von SQLitePCLRaw
 
-            _connection = new SqliteConnection($"Data Source={databaseFilePath};");
-            string fullPath = System.IO.Path.GetFullPath(databaseFilePath);
-            Console.WriteLine(fullPath);
+            fullPathToDatabaseFolder = Path.Combine(userDocumentsFolder, databaseFolderName);
+            fullPathToDatabase = Path.Combine(fullPathToDatabaseFolder, databaseFileName);
+
+            // Erstelle den Ordner, falls er nicht existiert
+            Directory.CreateDirectory(fullPathToDatabaseFolder);
+
+            _connection = new SqliteConnection($"Data Source={fullPathToDatabase};");
+            Console.WriteLine(fullPathToDatabase);
 
             _connection.Open();
 
             CreateTable();
             InitializeDishes();
-
-
         }
+
 
         //Customers
         private void CreateTable()
         {
             //Customer Table
-            // Customer Table
             string sql = "CREATE TABLE IF NOT EXISTS Customers (PhoneNumber TEXT PRIMARY KEY, Name TEXT, AddressId INTEGER, AdditionalInfo TEXT, FOREIGN KEY(AddressId) REFERENCES Addresses(Id))";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -49,7 +59,7 @@ namespace PizzaEcki.Database
 
 
             //Dishes Table
-            sql = "CREATE TABLE IF NOT EXISTS Dishes (Id INTEGER PRIMARY KEY, Name TEXT, Price REAL, Category INTEGER, Size TEXT)";
+            sql = "CREATE TABLE IF NOT EXISTS Gerichte (Id INTEGER PRIMARY KEY, Name TEXT, Preis_S REAL, Preis_L REAL, Preis_XL REAL, Kategorie TEXT, HappyHour TEXT, Steuersatz REAL, GratisBeilage INTEGER)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
@@ -61,7 +71,124 @@ namespace PizzaEcki.Database
             {
                 command.ExecuteNonQuery();
             }
+
+            // Driver Table
+            sql = "CREATE TABLE IF NOT EXISTS Drivers (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, PhoneNumber TEXT)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+            InitializeStaticDrivers();
+
+
+            //Settings
+
+            sql = "CREATE TABLE IF NOT EXISTS Settings (LastResetDate TEXT, CurrentBonNumber INTEGER)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            // Initialer Eintrag, falls die Tabelle gerade erstellt wurde
+            sql = "INSERT INTO Settings (LastResetDate, CurrentBonNumber) SELECT @date, @number WHERE NOT EXISTS (SELECT 1 FROM Settings)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@date", DateTime.Now.Date);
+                command.Parameters.AddWithValue("@number", 1);
+                command.ExecuteNonQuery();
+            }
+
+
+            //Zuordnungstabelle
+            sql = @"
+                CREATE TABLE IF NOT EXISTS OrderAssignments (
+                    OrderId TEXT,
+                    DriverId INTEGER,
+                    Price REAL,
+                    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
+                    FOREIGN KEY(OrderId) REFERENCES Orders(OrderId),
+                    FOREIGN KEY(DriverId) REFERENCES Drivers(Id)
+                );
+            ";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+
+            sql = @"
+            CREATE TABLE IF NOT EXISTS Orders (
+                OrderId TEXT PRIMARY KEY,
+                BonNumber INTEGER,
+                IsDelivery BOOLEAN,
+                PaymentMethod TEXT,
+                CustomerPhoneNumber TEXT,
+                Timestamp DATETIME,
+                DeliveryUntil TEXT
+            )";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+         
+            sql = @"
+            CREATE TABLE IF NOT EXISTS OrderItems (
+                OrderItemId INTEGER PRIMARY KEY AUTOINCREMENT,
+                OrderId TEXT,
+                Gericht TEXT,
+                Größe TEXT,
+                Extras TEXT,
+                Menge INTEGER,
+                Epreis REAL,
+                Gesamt REAL,
+                Uhrzeit TEXT,
+                LieferungsArt INTEGER,
+                FOREIGN KEY(OrderId) REFERENCES Orders(OrderId)
+            )";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
         }
+
+        //Tabellen
+        public List<string> GetTableNames()
+        {
+            List<string> tableNames = new List<string>();
+            string sql = "SELECT name FROM sqlite_master WHERE type='table';";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tableNames.Add(reader.GetString(0));
+                    }
+                }
+            }
+
+            return tableNames;
+        }
+
+        public DataTable GetTableData(string tableName)
+        {
+            DataTable tableData = new DataTable();
+            string sql = $"SELECT * FROM {tableName};";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    tableData.Load(reader);
+                }
+            }
+
+            return tableData;
+        }
+
+
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
         {
             string sql = @"SELECT c.PhoneNumber, c.Name, a.Street, a.City, c.AdditionalInfo 
@@ -117,8 +244,6 @@ namespace PizzaEcki.Database
             }
         }
 
-
-
         //Dishes
         public void AddDishes(List<Dish> dishes)
         {
@@ -129,17 +254,103 @@ namespace PizzaEcki.Database
         }
         public void AddOrUpdateDish(Dish dish)
         {
-            string sql = "INSERT OR REPLACE INTO Dishes (Id, Name, Price, Category, Size) VALUES (@Id, @Name, @Price, @Category, @Size)";
+            string sql = "INSERT OR REPLACE INTO Gerichte (Id, Name, Preis_S, Preis_L, Preis_XL, Kategorie, HappyHour, Steuersatz, GratisBeilage) VALUES (@Id, @Name, @Preis_S, @Preis_L, @Preis_XL, @Kategorie, @HappyHour, @Steuersatz, @GratisBeilage)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.Parameters.AddWithValue("@Id", dish.Id);
                 command.Parameters.AddWithValue("@Name", dish.Name);
-                command.Parameters.AddWithValue("@Price", dish.Price);
-                command.Parameters.AddWithValue("@Category", (int)dish.Category);
-                command.Parameters.AddWithValue("@Size", dish.Size); 
+                command.Parameters.AddWithValue("@Preis_S", dish.Preis_S);
+                command.Parameters.AddWithValue("@Preis_L", dish.Preis_L);
+                command.Parameters.AddWithValue("@Preis_XL", dish.Preis_XL);
+                command.Parameters.AddWithValue("@Kategorie", dish.Kategorie.ToString());
+                command.Parameters.AddWithValue("@HappyHour", dish.HappyHour);
+                command.Parameters.AddWithValue("@Steuersatz", dish.Steuersatz);
+                command.Parameters.AddWithValue("@GratisBeilage", dish.GratisBeilage);
                 command.ExecuteNonQuery();
             }
         }
+
+
+        public List<Dish> GetAllDishes()
+        {
+            List<Dish> dishes = new List<Dish>();
+            string sql = "SELECT * FROM Gerichte";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Dish dish = new Dish();
+
+                        if (int.TryParse(reader["Id"].ToString(), out int Id))
+                        {
+                            dish.Id = Id;
+                        }
+
+                        dish.Name = reader["Name"].ToString();
+
+                        if (double.TryParse(reader["Preis_S"].ToString(), out double preis_s))
+                        {
+                            dish.Preis_S = preis_s;
+                        }
+
+                        if (double.TryParse(reader["Preis_L"].ToString(), out double preis_l))
+                        {
+                            dish.Preis_L = preis_l;
+                        }
+
+                        if (double.TryParse(reader["Preis_XL"].ToString(), out double preis_xl))
+                        {
+                            dish.Preis_XL = preis_xl;
+                        }
+
+
+                         dish.Kategorie = Enum.Parse<DishCategory>(reader["Kategorie"].ToString());
+                       
+
+                        dish.HappyHour = reader["HappyHour"].ToString();
+
+                        if (double.TryParse(reader["Steuersatz"].ToString(), out double steuersatz))
+                        {
+                            dish.Steuersatz = steuersatz;
+                        }
+
+                        if (int.TryParse(reader["GratisBeilage"].ToString(), out int gratisBeilage))
+                        {
+                            dish.GratisBeilage = gratisBeilage;
+                        }
+
+                        dishes.Add(dish);
+                    }
+                }
+            }
+            return dishes;
+        }
+        public bool IsIdExists(int id)
+        {
+            string sql = "SELECT COUNT(*) FROM Gerichte WHERE Id = @Id";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Id", id);
+                var result = command.ExecuteScalar();
+                return Convert.ToInt32(result) > 0;
+            }
+        }
+
+
+
+        public void DeleteDish(int id)
+        {
+            string sql = "DELETE FROM Gerichte WHERE Id = @Id";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Id", id);
+                command.ExecuteNonQuery();
+            }
+        }
+
+
 
         public List<string> GetAllStreets()
         {
@@ -176,31 +387,31 @@ namespace PizzaEcki.Database
         }
 
 
-        public List<Dish> GetDishes()
-        {
-            List<Dish> dishes = new List<Dish>();
-            string sql = "SELECT * FROM Dishes";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        Dish dish = new Dish
-                        {
-                            Id = Convert.ToInt32(reader["Id"]),
-                            Name = reader["Name"].ToString(),
-                            Price = Convert.ToDouble(reader["Price"]),
-                            Category = (DishCategory)Convert.ToInt32(reader["Category"]),
-                            Size = reader["Size"].ToString()
-                        };
+        //public List<Dish> GetDishes()
+        //{
+        //    List<Dish> dishes = new List<Dish>();
+        //    string sql = "SELECT * FROM Gerichte";
+        //    using (SqliteCommand command = new SqliteCommand(sql, _connection))
+        //    {
+        //        using (SqliteDataReader reader = command.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                Dish dish = new Dish
+        //                {
+        //                    Id = Convert.ToInt32(reader["Id"]),
+        //                    Name = reader["Name"].ToString(),
+        //                    Preis = Convert.ToDouble(reader["Preis"]),
+        //                    Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
+        //                    Größe = reader["Größe"].ToString()
+        //                };
 
-                        dishes.Add(dish);
-                    }
-                }
-            }
-            return dishes;
-        }
+        //                dishes.Add(dish);
+        //            }
+        //        }
+        //    }
+        //    return dishes;
+        //}
 
 
         //Extras
@@ -245,7 +456,428 @@ namespace PizzaEcki.Database
             }
 
             return extras;
-        }    
+        }
+
+
+
+        //Driver Methodes
+        public void AddDriver(Driver driver)
+        {
+            string sql = "INSERT INTO Drivers (Name, PhoneNumber) VALUES (@Name, @PhoneNumber)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Name", driver.Name);
+                command.Parameters.AddWithValue("@PhoneNumber", driver.PhoneNumber);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void UpdateDriver(Driver driver)
+        {
+            string sql = "UPDATE Drivers SET Name = @Name, PhoneNumber = @PhoneNumber WHERE Id = @Id";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Id", driver.Id);
+                command.Parameters.AddWithValue("@Name", driver.Name);
+                command.Parameters.AddWithValue("@PhoneNumber", driver.PhoneNumber);
+                command.ExecuteNonQuery();
+            }
+        }
+        public void InitializeStaticDrivers()
+        {
+            string sql = "INSERT OR IGNORE INTO Drivers (Id, Name, PhoneNumber) VALUES (-1, 'Theke', ''), (-2, 'Kasse1', '')";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
+        public void DeleteDriver(int id)
+        {
+            string sql = "DELETE FROM Drivers WHERE Id = @Id";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Id", id);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public List<Driver> GetDrivers()
+        {
+            List<Driver> drivers = new List<Driver>();
+            string sql = "SELECT Id, Name, PhoneNumber FROM Drivers";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            using (SqliteDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    drivers.Add(new Driver
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1),
+                        PhoneNumber = reader.GetString(2),
+                    });
+                }
+            }
+            return drivers;
+        }
+
+        public List<Driver> GetAllDrivers()
+        {
+            List<Driver> drivers = new List<Driver>();
+
+            // SQL-Abfrage, um alle Fahrer abzurufen
+            string sql = "SELECT * FROM Drivers";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Driver driver = new Driver
+                        {
+                            // Stellen Sie sicher, dass Sie die Spalten in der richtigen Reihenfolge abrufen
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            PhoneNumber = reader.GetString(2)
+                        };
+                        drivers.Add(driver);
+                    }
+                }
+            }
+
+            return drivers;
+        }
+
+        //Settings 
+        public int GetCurrentBonNumber()
+        {
+            string sql = "SELECT LastResetDate, CurrentBonNumber FROM Settings";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return int.Parse(reader["CurrentBonNumber"].ToString());
+                    }
+                    else
+                    {
+                        // Fehlerbehandlung, falls kein Eintrag gefunden wurde
+                        throw new Exception("Settings entry not found in the database.");
+                    }
+                }
+            }
+        }
+
+        public void SaveOrderAssignment(string orderId, int driverId, double price)
+        {
+            string checkSql = "SELECT COUNT(*) FROM OrderAssignments WHERE OrderId = @OrderId";
+            using (SqliteCommand checkCommand = new SqliteCommand(checkSql, _connection))
+            {
+                checkCommand.Parameters.AddWithValue("@OrderId", orderId);
+                int count = Convert.ToInt32(checkCommand.ExecuteScalar());
+                if (count > 0)
+                {
+                    // Ein Eintrag für die angegebene OrderId existiert bereits, aktualisieren Sie ihn
+                    string updateSql = "UPDATE OrderAssignments SET DriverId = @DriverId, Price = @Price, Timestamp = @Timestamp WHERE OrderId = @OrderId";
+                    using (SqliteCommand updateCommand = new SqliteCommand(updateSql, _connection))
+                    {
+                        updateCommand.Parameters.AddWithValue("@OrderId", orderId);
+                        updateCommand.Parameters.AddWithValue("@DriverId", driverId);
+                        updateCommand.Parameters.AddWithValue("@Price", price);
+                        updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                        updateCommand.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    // Kein Eintrag für die angegebene OrderId, erstellen Sie einen neuen Eintrag
+                    string insertSql = "INSERT INTO OrderAssignments (OrderId, DriverId, Price, Timestamp) VALUES (@OrderId, @DriverId, @Price, @Timestamp)";
+                    using (SqliteCommand insertCommand = new SqliteCommand(insertSql, _connection))
+                    {
+                        insertCommand.Parameters.AddWithValue("@OrderId", orderId);
+                        insertCommand.Parameters.AddWithValue("@DriverId", driverId);
+                        insertCommand.Parameters.AddWithValue("@Price", price);
+                        insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                        insertCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        public void SaveOrder(Order order)
+        {
+            // Speichern der Bestellung in der Orders Tabelle
+            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod,CustomerPhoneNumber, Timestamp, DeliveryUntil) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber, @Timestamp, @DeliveryUntil)";
+            using (SqliteCommand commandOrder = new SqliteCommand(sqlOrder, _connection))
+            {
+                commandOrder.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                commandOrder.Parameters.AddWithValue("@BonNumber", order.BonNumber);
+                commandOrder.Parameters.AddWithValue("@IsDelivery", order.IsDelivery);
+                commandOrder.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
+                commandOrder.Parameters.AddWithValue("@CustomerPhoneNumber", order.CustomerPhoneNumber);
+                commandOrder.Parameters.AddWithValue("@Timestamp", order.Timestamp);
+                commandOrder.Parameters.AddWithValue("@DeliveryUntil", order.DeliveryUntil);
+                commandOrder.ExecuteNonQuery();
+            }
+
+            // Speichern der OrderItems in der OrderItems Tabelle
+            foreach (var item in order.OrderItems)
+            {
+                string sqlItem = @"
+                    INSERT INTO OrderItems 
+                    (
+                        OrderId, 
+                        Gericht, 
+                        Größe,
+                        Extras, 
+                        Menge, 
+                        Epreis, 
+                        Gesamt, 
+                        Uhrzeit, 
+                        LieferungsArt
+                    ) 
+                    VALUES 
+                    (
+                        @OrderId, 
+                        @Gericht, 
+                        @Größe,
+                        @Extras, 
+                        @Menge, 
+                        @Epreis, 
+                        @Gesamt, 
+                        @Uhrzeit, 
+                        @LieferungsArt
+                    )
+                ";
+                using (SqliteCommand commandItem = new SqliteCommand(sqlItem, _connection))
+                {
+                    commandItem.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                    commandItem.Parameters.Add("@Gericht", SqliteType.Text).Value = (object)item.Gericht ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Größe", SqliteType.Text).Value = (object)item.Größe ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Extras", SqliteType.Text).Value = (object)item.Extras ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Menge", SqliteType.Integer).Value = (object)item.Menge ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Epreis", SqliteType.Real).Value = (object)item.Epreis ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Gesamt", SqliteType.Real).Value = (object)item.Gesamt ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Uhrzeit", SqliteType.Text).Value = (object)item.Uhrzeit ?? DBNull.Value;
+                    commandItem.Parameters.Add("@LieferungsArt", SqliteType.Integer).Value = (object)item.LieferungsArt ?? DBNull.Value;
+
+                    commandItem.ExecuteNonQuery();
+                }
+            }
+
+            // Erstellen eines Eintrags in der OrderAssignments Tabelle mit einer NULL DriverId
+            // Erstellen eines Eintrags in der OrderAssignments Tabelle mit einer NULL DriverId
+            string sqlAssignment = "INSERT INTO OrderAssignments (OrderId, DriverId) VALUES (@OrderId, NULL)";
+            using (SqliteCommand commandAssignment = new SqliteCommand(sqlAssignment, _connection))
+            {
+                commandAssignment.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                commandAssignment.ExecuteNonQuery();
+            }
+
+        }
+
+
+        public List<Order> GetUnassignedOrders()
+        {
+            List<Order> unassignedOrders = new List<Order>();
+            string sql = @"
+                SELECT 
+                    Orders.*,
+                    OrderItems.*
+                FROM 
+                    Orders
+                LEFT JOIN 
+                    OrderItems ON Orders.OrderId = OrderItems.OrderId
+                LEFT JOIN 
+                    OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
+                WHERE 
+                    OrderAssignments.DriverId IS NULL
+            ";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var orderIdValue = reader["OrderId"].ToString();
+                        if (string.IsNullOrEmpty(orderIdValue))
+                        {
+                            var bonNumber = reader["BonNumber"].ToString();
+                            Console.WriteLine($"Fehler: OrderId ist null oder leer für BonNumber: {bonNumber}");
+                            continue;  // Überspringe diesen Datensatz
+                        }
+                        Guid currentOrderId = Guid.Parse(orderIdValue);
+
+                        Order order;
+                        if (unassignedOrders.Any(o => o.OrderId == currentOrderId))
+                        {
+                            order = unassignedOrders.First(o => o.OrderId == currentOrderId);
+                        }
+                        else
+                        {
+                            // Hier nimmst du die Daten für IsDelivery aus der Datenbank
+                            var isDeliveryValue = reader["IsDelivery"];
+                            bool isDelivery = false;
+
+                            // Wenn der Wert aus der Datenbank kommt, musst du ihn entsprechend konvertieren.
+                            if (isDeliveryValue != DBNull.Value)
+                            {
+                                isDelivery = Convert.ToInt32(isDeliveryValue) != 0;
+                            }
+
+                            order = new Order
+                            {
+                                OrderId = currentOrderId,
+                                BonNumber = Convert.ToInt32(reader["BonNumber"]),
+                                IsDelivery = isDelivery, // Setze den Lieferstatus hier
+                            };
+                            unassignedOrders.Add(order);
+                        }
+
+                        OrderItem orderItem = new OrderItem
+                        {
+                            Nr = reader.IsDBNull(reader.GetOrdinal("OrderItemId")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+                            Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+                            Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                            Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
+                            Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+                            Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+                            Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                            Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                            LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                        };
+
+                        order.OrderItems.Add(orderItem);
+                    }
+                }
+            }
+            return unassignedOrders;
+        }
+
+
+        public List<OrderItem> GetOrderItems(Guid orderId)
+        {
+            List<OrderItem> orderItems = new List<OrderItem>();
+            string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@OrderId", orderId);
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        OrderItem orderItem = new OrderItem
+                        {
+                            Nr = reader.GetInt32(reader.GetOrdinal("Nr")),
+                            Gericht = reader.GetString(reader.GetOrdinal("Gericht")),
+                            Größe = reader.GetString(reader.GetOrdinal("Größe")),
+                            Extras = reader.GetString(reader.GetOrdinal("Extras")),
+                            Menge = reader.GetInt32(reader.GetOrdinal("Menge")),
+                            Epreis = reader.GetDouble(reader.GetOrdinal("Epreis")),
+                            Gesamt = reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                            Uhrzeit = reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                            LieferungsArt = reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                        };
+                        orderItems.Add(orderItem);
+                    }
+                }
+            }
+            return orderItems;
+        }
+
+
+        public List<OrderAssignment> GetOrderAssignments()
+        {
+            List<OrderAssignment> assignments = new List<OrderAssignment>();
+            string sql = "SELECT BonNumber, DriverId, Price, Timestamp FROM OrderAssignments";  // Preis hinzugefügt
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        OrderAssignment assignment = new OrderAssignment
+                        {
+                            BonNumber = reader.GetInt32(0),
+                            DriverId = reader.GetInt32(1),
+                            Price = reader.GetDouble(2),  // Preis hinzugefügt
+                            Timestamp = reader.GetDateTime(3)
+                        };
+                        assignments.Add(assignment);
+                    }
+                }
+            }
+            return assignments;
+        }
+
+
+        public double GetTotalSalesForDate(DateTime date)
+        {
+            string sql = "SELECT SUM(Price) FROM OrderAssignments WHERE AssignmentDate = @Date";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+                object result = command.ExecuteScalar();
+                return result != DBNull.Value ? Convert.ToDouble(result) : 0;
+            }
+        }
+
+        public List<DailySalesInfo> GetDailySales(DateTime date)
+        {
+            List<DailySalesInfo> dailySalesInfoList = new List<DailySalesInfo>();
+
+            // SQL-Query, um die täglichen Umsätze abzurufen
+            string sql = @"
+            SELECT
+                IFNULL(Drivers.Name, 'Theke') as Name,
+                SUM(OrderAssignments.Price) as DailySales
+            FROM
+                OrderAssignments
+            LEFT JOIN
+                Drivers ON OrderAssignments.DriverId = Drivers.Id
+            WHERE
+                date(OrderAssignments.Timestamp) = date(@Date)
+            GROUP BY
+                IFNULL(Drivers.Name, 'Theke');
+            ";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        DailySalesInfo dailySalesInfo = new DailySalesInfo
+                        {
+                            Name = reader.GetString(0),
+                            DailySales = reader.IsDBNull(1) ? 0 : reader.GetDouble(1)  // Überprüfung auf NULL
+                        };
+                        dailySalesInfoList.Add(dailySalesInfo);
+                    }
+                }
+            }
+
+            return dailySalesInfoList;
+        }
+
+
+
+        public void UpdateCurrentBonNumber(int newNumber)
+        {
+            string sql = "UPDATE Settings SET CurrentBonNumber = @number";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@number", newNumber);
+                command.ExecuteNonQuery();
+            }
+        }
+
+
+
         public void Dispose()
         {
             _connection?.Close();
@@ -256,82 +888,82 @@ namespace PizzaEcki.Database
         {
             List<Dish> dishes = new List<Dish>
             {
-            //Salate
-                new Dish { Id = 10, Name = "Bauernsalat", Price = 8.20 , Category = DishCategory.Salad },
-                new Dish { Id = 11, Name = "Gemischter Salat", Price = 7.90 , Category = DishCategory.Salad },
-                new Dish { Id = 12, Name = "Cetrioli Salat", Price = 8.20 , Category = DishCategory.Salad},
-                new Dish { Id = 13, Name = "Tomaten Salat", Price = 7.90 , Category = DishCategory.Salad},
-                new Dish { Id = 14, Name = "Mozzarella Salat", Price = 8.20 , Category = DishCategory.Salad},
-                new Dish { Id = 15, Name = "Thunfisch Salat", Price = 8.90 , Category = DishCategory.Salad},
-                new Dish { Id = 16, Name = "Italia Salat", Price = 9.20 , Category = DishCategory.Salad},
-                new Dish { Id = 17, Name = "Fisch Salat", Price = 9.20 , Category = DishCategory.Salad},
-                new Dish { Id = 18, Name = "Chef Salat", Price = 10.20 , Category = DishCategory.Salad},
-                new Dish { Id = 19, Name = "Chicken-Salat", Price = 9.90 , Category = DishCategory.Salad},
-                new Dish { Id = 600, Name = "Lachs-Salat", Price = 9.80 , Category = DishCategory.Salad},
-                new Dish { Id = 601, Name = "Rucola-Salat", Price = 9.80 , Category = DishCategory.Salad},
-                new Dish { Id = 602, Name = "Döner-Salat", Price = 9.80 , Category = DishCategory.Salad},
+            ////Salate
+            //    new Dish { Id = 10, Name = "Bauernsalat", Price = 8.20 , Category = DishCategory.Salad },
+            //    new Dish { Id = 11, Name = "Gemischter Salat", Price = 7.90 , Category = DishCategory.Salad },
+            //    new Dish { Id = 12, Name = "Cetrioli Salat", Price = 8.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 13, Name = "Tomaten Salat", Price = 7.90 , Category = DishCategory.Salad},
+            //    new Dish { Id = 14, Name = "Mozzarella Salat", Price = 8.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 15, Name = "Thunfisch Salat", Price = 8.90 , Category = DishCategory.Salad},
+            //    new Dish { Id = 16, Name = "Italia Salat", Price = 9.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 17, Name = "Fisch Salat", Price = 9.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 18, Name = "Chef Salat", Price = 10.20 , Category = DishCategory.Salad},
+            //    new Dish { Id = 19, Name = "Chicken-Salat", Price = 9.90 , Category = DishCategory.Salad},
+            //    new Dish { Id = 600, Name = "Lachs-Salat", Price = 9.80 , Category = DishCategory.Salad},
+            //    new Dish { Id = 601, Name = "Rucola-Salat", Price = 9.80 , Category = DishCategory.Salad},
+            //    new Dish { Id = 602, Name = "Döner-Salat", Price = 9.80 , Category = DishCategory.Salad},
 
-            //Baugette
-                new Dish { Id = 100, Name = "Käse", Price = 7.30 , Category = DishCategory.Other},
-                new Dish { Id = 101, Name = "Mozzarella", Price = 8.60 , Category = DishCategory.Other},
-                new Dish { Id = 102, Name = "Salami", Price = 7.80 , Category = DishCategory.Other},
-                new Dish { Id = 103, Name = "Schinken", Price = 7.80 , Category = DishCategory.Other},
-                new Dish { Id = 104, Name = "Thunfisch", Price = 8.80 , Category = DishCategory.Other},
-                new Dish { Id = 105, Name = "Weißkäse", Price = 9.30 , Category = DishCategory.Other},
-                new Dish { Id = 106, Name = "Vegetaria", Price = 9.30 , Category = DishCategory.Other},
-                new Dish { Id = 107, Name = "Chicken", Price = 10.30 , Category = DishCategory.Other},
-                new Dish { Id = 108, Name = "Ei", Price = 7.80 , Category = DishCategory.Other},
-                new Dish { Id = 109, Name = "Lachs", Price = 10.30 , Category = DishCategory.Other},
-                new Dish { Id = 110, Name = "Hawaii", Price = 8.80 , Category = DishCategory.Other},
-                new Dish { Id = 111, Name = "Dönero", Price = 9.30 , Category = DishCategory.Other},
-                new Dish { Id = 112, Name = "Knoblauchwurst", Price = 9.30 , Category = DishCategory.Other},
+            ////Baugette
+            //    new Dish { Id = 100, Name = "Käse", Price = 7.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 101, Name = "Mozzarella", Price = 8.60 , Category = DishCategory.Other},
+            //    new Dish { Id = 102, Name = "Salami", Price = 7.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 103, Name = "Schinken", Price = 7.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 104, Name = "Thunfisch", Price = 8.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 105, Name = "Weißkäse", Price = 9.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 106, Name = "Vegetaria", Price = 9.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 107, Name = "Chicken", Price = 10.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 108, Name = "Ei", Price = 7.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 109, Name = "Lachs", Price = 10.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 110, Name = "Hawaii", Price = 8.80 , Category = DishCategory.Other},
+            //    new Dish { Id = 111, Name = "Dönero", Price = 9.30 , Category = DishCategory.Other},
+            //    new Dish { Id = 112, Name = "Knoblauchwurst", Price = 9.30 , Category = DishCategory.Other},
            
-            // Pizzen
-                new Dish { Id = 20, Name = "Margherita", Price = 6.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 21, Name = "Champignons", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 22, Name = "Spinat", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 23, Name = "Sardellen", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 24, Name = "Cipolla", Price = 6.20 , Category = DishCategory.Pizza},
-                new Dish { Id = 25, Name = "Adrinta", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 26, Name = "Salami", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 27, Name = "Schinken", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 28, Name = "Bolognese", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 29, Name = "Vesuvio", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 30, Name = "Funghi", Price = 6.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 31, Name = "Romana", Price = 7.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 32, Name = "Hawaii", Price = 7.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 33, Name = "Tonno", Price = 7.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 34, Name = "Billa", Price = 7.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 35, Name = "Quattro Stagione", Price = 8.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 36, Name = "Apollo", Price = 7.70 , Category = DishCategory.Pizza},
-                new Dish { Id = 37, Name = "Cosa Nostra", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 38, Name = "Primavera", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 39, Name = "Mista", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 40, Name = "Vegetaria", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 41, Name = "Bacio", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 42, Name = "Calzone", Price = 9.60 , Category = DishCategory.Pizza},
-                new Dish { Id = 43, Name = "Weißkäse", Price = 7.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 44, Name = "Gorgonzola", Price = 7.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 45, Name = "Riesengarnele", Price = 8.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 46, Name = "Laguna", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 47, Name = "Polio", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 48, Name = "Pollana", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 49, Name = "Spezial", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 500, Name = "Capri", Price = 7.00 , Category = DishCategory.Pizza},
-                new Dish { Id = 501, Name = "Spaghetti", Price = 8.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 502, Name = "Mexicana", Price = 8.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 503, Name = "Sicilia", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 504, Name = "Picante", Price = 8.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 505, Name = "Calzone", Price = 9.60 , Category = DishCategory.Pizza},
-                new Dish { Id = 506, Name = "Spargel", Price = 8.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 507, Name = "Döner", Price = 8.90 , Category = DishCategory.Pizza},
-                new Dish { Id = 508, Name = "Döner", Price = 9.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 509, Name = "Calzone", Price = 10.30 , Category = DishCategory.Pizza},
-                new Dish { Id = 510, Name = "Spinat", Price = 7.40 , Category = DishCategory.Pizza},
-                new Dish { Id = 511, Name = "Polio", Price = 9.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 512, Name = "Parmenzola", Price = 8.50 , Category = DishCategory.Pizza},
-                new Dish { Id = 513, Name = "Jalapeno", Price = 9.80 , Category = DishCategory.Pizza},
-                new Dish { Id = 514, Name = "Melanzana", Price = 9.80 , Category = DishCategory.Pizza},
+            //// Pizzen
+            //    new Dish { Id = 20, Name = "Margherita", Price = 6.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 21, Name = "Champignons", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 22, Name = "Spinat", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 23, Name = "Sardellen", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 24, Name = "Cipolla", Price = 6.20 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 25, Name = "Adrinta", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 26, Name = "Salami", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 27, Name = "Schinken", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 28, Name = "Bolognese", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 29, Name = "Vesuvio", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 30, Name = "Funghi", Price = 6.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 31, Name = "Romana", Price = 7.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 32, Name = "Hawaii", Price = 7.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 33, Name = "Tonno", Price = 7.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 34, Name = "Billa", Price = 7.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 35, Name = "Quattro Stagione", Price = 8.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 36, Name = "Apollo", Price = 7.70 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 37, Name = "Cosa Nostra", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 38, Name = "Primavera", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 39, Name = "Mista", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 40, Name = "Vegetaria", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 41, Name = "Bacio", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 42, Name = "Calzone", Price = 9.60 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 43, Name = "Weißkäse", Price = 7.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 44, Name = "Gorgonzola", Price = 7.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 45, Name = "Riesengarnele", Price = 8.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 46, Name = "Laguna", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 47, Name = "Polio", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 48, Name = "Pollana", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 49, Name = "Spezial", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 500, Name = "Capri", Price = 7.00 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 501, Name = "Spaghetti", Price = 8.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 502, Name = "Mexicana", Price = 8.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 503, Name = "Sicilia", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 504, Name = "Picante", Price = 8.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 505, Name = "Calzone", Price = 9.60 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 506, Name = "Spargel", Price = 8.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 507, Name = "Döner", Price = 8.90 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 508, Name = "Döner", Price = 9.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 509, Name = "Calzone", Price = 10.30 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 510, Name = "Spinat", Price = 7.40 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 511, Name = "Polio", Price = 9.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 512, Name = "Parmenzola", Price = 8.50 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 513, Name = "Jalapeno", Price = 9.80 , Category = DishCategory.Pizza},
+            //    new Dish { Id = 514, Name = "Melanzana", Price = 9.80 , Category = DishCategory.Pizza},
             };
 
             AddDishes(dishes);
