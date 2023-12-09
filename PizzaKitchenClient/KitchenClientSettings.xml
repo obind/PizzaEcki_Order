@@ -2,6 +2,6 @@
 <Settings>
 	<ConnectionSettings>
 		<Server>localhost</Server>
-		<Port>5000</Port>
+		<Port>5062</Port>
 	</ConnectionSettings>	
 </Settings>
