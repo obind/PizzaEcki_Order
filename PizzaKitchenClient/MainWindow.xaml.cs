@@ -75,10 +75,15 @@ namespace PizzaKitchenClient
                         UnassignedOrders.Add(order);
                     }
                 }
+                isErrorMessageDisplayed = false;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Fehler beim Laden unzugewiesener Bestellungen: " + ex.Message);
+                if (!isErrorMessageDisplayed)
+                {
+                
+                    isErrorMessageDisplayed = true; 
+                }
             }
         }
 
@@ -198,13 +203,6 @@ namespace PizzaKitchenClient
                 }
             }
         }
-        private void ShowError(string message)
-        {
-            if (!isErrorMessageDisplayed)
-            {
-                MessageBox.Show(message);
-                isErrorMessageDisplayed = true; // Setze die Flagge, um anzuzeigen, dass die Fehlermeldung bereits angezeigt wurde
-            }
-        }
+    
     }
 }

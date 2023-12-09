@@ -38,15 +38,22 @@ public class ApiService
     public async Task<List<Order>> GetUnassignedOrdersAsync()
     {
         var response = await _httpClient.GetAsync($"{_apiBaseUrl}/unassignedOrders");
-        response.EnsureSuccessStatusCode();
+
+        // Prüfe, ob der Statuscode erfolgreich ist
+        if (!response.IsSuccessStatusCode)
+        {
+            // Behandle den Fall, dass der Statuscode nicht erfolgreich ist
+            // Du kannst hier eine detaillierte Fehlermeldung anzeigen oder loggen
+            throw new HttpRequestException($"Error: {response.StatusCode}");
+        }
 
         string responseContent = await response.Content.ReadAsStringAsync();
         var orders = JsonSerializer.Deserialize<List<Order>>(responseContent);
         return orders;
     }
 
-    // In deinem ApiService
-    public async Task<List<Driver>> GetAllDriversAsync()
+        // In deinem ApiService
+        public async Task<List<Driver>> GetAllDriversAsync()
     {
         var response = await _httpClient.GetAsync($"{_apiBaseUrl}/drivers");
         response.EnsureSuccessStatusCode();
