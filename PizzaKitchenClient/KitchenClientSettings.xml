@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Settings>
 	<ConnectionSettings>
-		<Server>localhost</Server>
+		<Server>192.168.2.115</Server>
 		<Port>5062</Port>
 	</ConnectionSettings>	
 </Settings>
