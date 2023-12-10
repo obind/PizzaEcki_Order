@@ -24,12 +24,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.3*"/>
         </Grid.ColumnDefinitions>
-        <ListView Name="OrdersList" Margin="10" Grid.ColumnSpan="2" FontSize="16" SelectionMode="Single" Foreground="White" Background="#FF3D4248">
+        <ListView Name="OrdersList" Margin="10" Grid.ColumnSpan="3" FontSize="16" SelectionMode="Single" Foreground="White" Background="#FF3D4248" HorizontalContentAlignment="Center">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <!-- Setze hier weitere Setters für Standard-Style-Eigenschaften -->
-
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                     <!-- Trigger für die Mouseover-Effekte -->
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -98,13 +99,6 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Anzahl" Width="60">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding OrderItems.Count}" HorizontalAlignment="Center" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
 
                     <GridViewColumn Header="Gerichte" Width="600">
                         <GridViewColumn.CellTemplate>
@@ -114,7 +108,7 @@
                                         <DataTemplate>
                                             <Border BorderBrush="#FFFF5D48" BorderThickness="0,0,0,1" Margin="0,5">
                                                 <!-- Trennlinie zwischen den Items -->
-                                                <StackPanel Orientation="Horizontal">
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                                     <TextBlock Text="Menge: " Width="50" />
                                                     <TextBlock Text="{Binding Menge}" Width="50" FontWeight="Bold" />
                                                     <TextBlock Text="Größe: " Width="50" />
@@ -126,12 +120,6 @@
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemContainerStyle>
-                                        <Style TargetType="ContentPresenter">
-                                            <Setter Property="Margin" Value="0,2"/>
-                                            <!-- Leichter Abstand zwischen den Items -->
-                                        </Style>
-                                    </ItemsControl.ItemContainerStyle>
                                 </ItemsControl>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -161,7 +149,9 @@
         </ComboBox>
         <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,0" Click="OnAssignButtonClicked"  Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
         <!-- MainWindow.xaml -->
-        <Label x:Name="ConnectionStatusLabel" Grid.Row="2" Grid.Column="1" Content="Nicht verbunden" HorizontalAlignment="Right" Margin="9,0,10,0"/>
+        <Button Name="PrintButton" Grid.Column="2" Grid.Row="1" Content="Drucken" Margin="10,0,10,0"  Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Click="PrintButton_Click"/>
+
+        <Label x:Name="ConnectionStatusLabel" Grid.Row="2" Grid.Column="2" Content="Nicht verbunden" HorizontalAlignment="Center" Foreground="White"/>
 
     </Grid>
 </Window>
