@@ -53,7 +53,8 @@
             <Button x:Name="EinstellungenBtn" Grid.Column="1" Content="Einstellungen" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Click="EinstellungenBtn_Click" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
             <Button Grid.Column="2" Content="Auswertung" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
         </Grid>
-        <Grid  Background="#FF3D4248" Margin="50,5,0,0" Grid.Row="1" >
+        <Border Background="#FF3D4248" Margin="50,5,5,5" Grid.Row="1" CornerRadius="10,10,0,0">
+        <Grid  Grid.Row="1" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="3*"/>
@@ -83,187 +84,204 @@
             <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
             <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
             <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-            <Button x:Name="SaveButton" Grid.Row="6" Grid.Column="1" Content="Speichern" HorizontalAlignment="Right" Background="#ff5d48" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Margin="0,0,10,0" Height="30" Width="58" Visibility="Collapsed"        />
+            <Button x:Name="SaveButton" Grid.Row="6" Grid.Column="1" Content="Speichern" HorizontalAlignment="Right" Background="#ff5d48" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Margin="0,0,10,2" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold"        >
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Border.CornerRadius" Value="50"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#E54B3C"/>
+                                    <!-- Etwas dunklere Farbe bei MouseOver -->
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button> 
         </Grid>
+        </Border>
+        <Border Background="#FF3D4248" Margin="5,5,10,5" Grid.Row="1" Grid.Column="1" CornerRadius="10,10,0,0">
+            <Grid Grid.Column="1" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1*"/>
 
-        <Grid Grid.Column="1" Grid.Row="1"  Background="#FF3D4248" Margin="5,5,50,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="1.5*"/>
-                <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+                <Border Background="#FFFF5D48" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="3" VerticalAlignment="Top" Margin="0,0,0,0">
+                    <Label Content="Eingabe" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center"/>
+                </Border>
+                <Label Grid.Row="1" Content="Gericht" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" FontStretch="ExtraCondensed" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
+                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" IsEditable="True" SelectionChanged ="DishComboBox_TextChanged"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" VerticalAlignment="Bottom" Grid.Column="1" Padding="5,0,5,0" Grid.IsSharedSizeScope="True" TabIndex="5" Background="#FF5F6269" BorderBrush="#FF5F6269" />
 
-            <Border Background="#FFFF5D48" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="3" VerticalAlignment="Top" Margin="0,0,0,0">
-                <Label Content="Eingabe" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center"/>
-            </Border>
-            <Label Grid.Row="1" Content="Gericht" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" FontStretch="ExtraCondensed" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
-            <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" IsEditable="True" SelectionChanged ="DishComboBox_TextChanged"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" VerticalAlignment="Bottom" Grid.Column="1" Padding="5,0,5,0" Grid.IsSharedSizeScope="True" TabIndex="5" Background="#FF5F6269" BorderBrush="#FF5F6269" />
+                <Label Grid.Row="2" Content="Extras" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
+                <ComboBox x:Name="ExtrasComboBox" Grid.Row="2" Margin="0,0,10,0" Padding="5,0,5,0" IsEditable="True" 
+                 VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
+                VerticalAlignment="Center" Grid.Column="1"  TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" />
 
-            <Label Grid.Row="2" Content="Extras" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
-            <ComboBox x:Name="ExtrasComboBox" Grid.Row="2" Margin="0,0,10,0" Padding="5,0,5,0" IsEditable="True" 
-             VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
-            VerticalAlignment="Center" Grid.Column="1"  TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" />
-
-            <Label Grid.Row="2" Grid.Column="3" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
-            <ComboBox x:Name="amountComboBox" Grid.Row="2" Grid.Column="3" 
-          VerticalAlignment="Center" FontSize="18" 
-          KeyDown="amountComboBox_KeyDown" 
-          HorizontalContentAlignment="Stretch" 
-          VerticalContentAlignment="Center" 
-           Margin="80,0,10,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
-          IsEditable="True" TabIndex="8" 
-          Text="1" />
-
-
-            <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
-            <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="80,0,10,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" />
-
-            <Label Grid.Row="3" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Center" Padding="5,0,5,0" MinHeight="20"/>
-            <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,10,0" Padding="5,0,5,0" Grid.Column="1" HorizontalContentAlignment="Left" TabIndex="9"/>
-
-        </Grid>
-        <Grid Grid.Row="2" Background="#474747" Margin="50,5,50,0" Grid.ColumnSpan="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*" MinHeight="25"/>
-            </Grid.RowDefinitions>
-            <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#FFFF5D48" CornerRadius="10">
-                <!-- CornerRadius für abgerundete Ecken -->
-                <Label Content="Bestellung" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
-            </Border>
-
-            <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top" BorderBrush="{x:Null}" FontWeight="Bold">
-                <DataGrid.ColumnHeaderStyle>
-                    <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#3d4248"/>
-                        <Setter Property="Foreground" Value="White"/>
-                        <Setter Property="BorderBrush" Value="Transparent" />
-                        <!-- Optional: Farbe des Textes im Header -->
-                    </Style>
-                </DataGrid.ColumnHeaderStyle>
-                <DataGrid.Columns>
-                    <!-- Nr. Spalte -->
-                    <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}"  Foreground="White">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="#5f6269"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <!-- Gericht Spalte -->
-                    <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" Foreground="White">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="#5f6269"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <!-- Größe Spalte -->
-                    <DataGridTextColumn Width="0.25*" Header="Größe" Binding="{Binding Größe}" Foreground="White">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="#5f6269"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <!-- Extras Spalte -->
-                    <DataGridTextColumn Width="0.25*" Header="Extras" Binding="{Binding Extras}" Foreground="White">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="#5f6269"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <!-- Menge Spalte -->
-                    <DataGridTextColumn Width="0.10*" Header="Menge" Binding="{Binding Menge}" Foreground="White">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="#5f6269"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <!-- Epreis Spalte -->
-                    <DataGridTextColumn Width="0.10*" Header="Epreis" Binding="{Binding Epreis, StringFormat={}{0:F2} €}" Foreground="White">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="#5f6269"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <!-- Gesamt Spalte -->
-                    <DataGridTextColumn Width="0.10*" Header="Gesamt" Binding="{Binding Gesamt, StringFormat={}{0:F2} €}" Foreground="White">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="#5f6269"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Grid>
+                <Label Grid.Row="2" Grid.Column="3" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
+                <ComboBox x:Name="amountComboBox" Grid.Row="2" Grid.Column="3" 
+                  VerticalAlignment="Center" FontSize="18" 
+                  KeyDown="amountComboBox_KeyDown" 
+                  HorizontalContentAlignment="Stretch" 
+                  VerticalContentAlignment="Center" 
+                   Margin="80,0,10,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
+                  IsEditable="True" TabIndex="8" 
+                Text="1" />
 
 
-        <Grid Grid.Row="4" Background="#FF3D4248" Margin="50,5,0,5" VerticalAlignment="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="0.2*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="0.5*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <!-- Überschrift -->
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
+                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="80,0,10,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" />
 
-            <Border Grid.Row="0" Grid.ColumnSpan="4" Background="#FFFF5D48" CornerRadius="10" Padding="2,2,2,2" Height="42" VerticalAlignment="Center">
-                <Label Content="Offene Bestellung" Foreground="White" FontSize="18" FontWeight="Bold" VerticalContentAlignment="Center"/>
-            </Border>
+                <Label Grid.Row="3" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Center" Padding="5,0,5,0" MinHeight="20"/>
+                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,10,0" Padding="5,0,5,0" Grid.Column="1" HorizontalContentAlignment="Left" TabIndex="9"/>
 
-            <Label Content="Mitnehmer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Margin="50,0,0,0" />
-            <Label x:Name="MitnehmerLabel" Grid.Row="1" Grid.Column="1" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,10,0" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="MitnehmerLabel_MouseDown"/>
+            </Grid>
+        </Border>
+        <Border Background="#FF3D4248"  Grid.ColumnSpan="2" Margin="50,5,10,5" Grid.Row="2" CornerRadius="10,10,0,0">
+            <Grid Grid.Row="2" Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" MinHeight="25"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#FFFF5D48" CornerRadius="10">
+                    <!-- CornerRadius für abgerundete Ecken -->
+                    <Label Content="Bestellung" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
+                </Border>
 
-            <Label Grid.Row="2" Content="Selbstabholer" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="50,0,0,0"/>
-            <Label x:Name="SelbstabholerLabel" Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" MouseDown="SelbstabholerLabel_MouseDown"/>
+                <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top" BorderBrush="{x:Null}" FontWeight="Bold">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#3d4248"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderBrush" Value="Transparent" />
+                            <!-- Optional: Farbe des Textes im Header -->
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <!-- Nr. Spalte -->
+                        <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}"  Foreground="White">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!-- Gericht Spalte -->
+                        <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" Foreground="White">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!-- Größe Spalte -->
+                        <DataGridTextColumn Width="0.25*" Header="Größe" Binding="{Binding Größe}" Foreground="White">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!-- Extras Spalte -->
+                        <DataGridTextColumn Width="0.25*" Header="Extras" Binding="{Binding Extras}" Foreground="White">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!-- Menge Spalte -->
+                        <DataGridTextColumn Width="0.10*" Header="Menge" Binding="{Binding Menge}" Foreground="White">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!-- Epreis Spalte -->
+                        <DataGridTextColumn Width="0.10*" Header="Epreis" Binding="{Binding Epreis, StringFormat={}{0:F2} €}" Foreground="White">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <!-- Gesamt Spalte -->
+                        <DataGridTextColumn Width="0.10*" Header="Gesamt" Binding="{Binding Gesamt, StringFormat={}{0:F2} €}" Foreground="White">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
 
-            <Label Grid.Column="0" Grid.Row="3" Content="Auslieferung" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="50,0,0,0"/>
-            <Label x:Name="AuslieferungLabel" Grid.Row="3" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Column="1" Padding="5,5,5,5" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="AuslieferungLabel_MouseDown"/>
+        <Border Background="#FF3D4248" Margin="50,5,5,20" Grid.Row="3" CornerRadius="10,10,0,0">
+            <Grid Grid.Row="4" VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="0.2*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="0.5*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Überschrift -->
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <Label Grid.Column="2" Grid.Row="1" Content="Bon" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
-            <ComboBox x:Name="cb_bonNummer" Grid.Column="3" Grid.Row="1" Margin="0,2,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="Black" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.5,0.5"/>
+                <Border Grid.Row="0" Grid.ColumnSpan="4" Background="#FFFF5D48" CornerRadius="10" Padding="2,2,2,2" Height="42" VerticalAlignment="Center">
+                    <Label Content="Offene Bestellung" Foreground="White" FontSize="18" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                </Border>
+
+                <Label Content="Mitnehmer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Margin="50,0,0,0" />
+                <Label x:Name="MitnehmerLabel" Grid.Row="1" Grid.Column="1" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,10,0" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="MitnehmerLabel_MouseDown"/>
+
+                <Label Grid.Row="2" Content="Selbstabholer" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="50,0,0,0"/>
+                <Label x:Name="SelbstabholerLabel" Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" MouseDown="SelbstabholerLabel_MouseDown"/>
+
+                <Label Grid.Column="0" Grid.Row="3" Content="Auslieferung" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="50,0,0,0"/>
+                <Label x:Name="AuslieferungLabel" Grid.Row="3" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Column="1" Padding="5,5,5,5" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="AuslieferungLabel_MouseDown"/>
+
+                <Label Grid.Column="2" Grid.Row="1" Content="Bon" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
+                <ComboBox x:Name="cb_bonNummer" Grid.Column="3" Grid.Row="1" Margin="0,2,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="Black" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.5,0.5"/>
 
 
 
-            <Label Grid.Column="2" Grid.Row="2" Content="Kasse" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
-            <ComboBox x:Name="cb_cashRegister" Grid.Column="3" Grid.Row="2" Margin="0,2,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" FontSize="18" DisplayMemberPath="Name" >
-                <ComboBoxItem Content="Theke" />
-                <ComboBoxItem Content="Kasse1" />
-            </ComboBox>
-            <Button x:Name="btn_zuordnen" Grid.Row="3" Grid.Column="3" Content="Zuordnen" HorizontalAlignment="Right" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Margin="0,5,10,5" Click="Btn_zuordnen_Click" Padding="10,5" BorderThickness="0">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Border.CornerRadius" Value="50"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#E54B3C"/>
-                                <!-- Etwas dunklere Farbe bei MouseOver -->
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
+                <Label Grid.Column="2" Grid.Row="2" Content="Kasse" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
+                <ComboBox x:Name="cb_cashRegister" Grid.Column="3" Grid.Row="2" Margin="0,2,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" FontSize="18" DisplayMemberPath="Name" >
+                    <ComboBoxItem Content="Theke" />
+                    <ComboBoxItem Content="Kasse1" />
+                </ComboBox>
+                <Button x:Name="btn_zuordnen" Grid.Row="3" Grid.Column="3" Content="Zuordnen" HorizontalAlignment="Right" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Margin="0,5,10,5" Click="Btn_zuordnen_Click" Padding="10,5" BorderThickness="0">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Border.CornerRadius" Value="50"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#E54B3C"/>
+                                    <!-- Etwas dunklere Farbe bei MouseOver -->
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
 
-        </Grid>
-        <Grid Grid.Row="4" Grid.Column="1" Margin="97,10,0,0" VerticalAlignment="Top">
+            </Grid>
+        </Border>
+        <Grid Grid.Row="4" Grid.Column="1" Margin="97,0,0,0" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
