@@ -27,6 +27,7 @@ namespace PizzaKitchenClient
         public MainWindow()
         {
             InitializeComponent();
+            this.WindowState = WindowState.Maximized;
             Loaded += MainWindow_Loaded;
             OrdersList.ItemsSource = UnassignedOrders;
             OrdersList.SelectionChanged += OrdersList_SelectionChanged_1;
