@@ -368,10 +368,10 @@ namespace PizzaEcki
                 }
                 e.Handled = true;  // Verhindere, dass die Leertaste ein Leerzeichen einfügt
             }
-            else if (e.Key == Key.Enter)
+             if (e.Key == Key.Enter)
             {
                 tempOrderItem.Extras = textBox.Text;
-                await Task.Delay(50);
+                await Task.Delay(10);
                 amountComboBox.Focus();
                 e.Handled = true;
             }
