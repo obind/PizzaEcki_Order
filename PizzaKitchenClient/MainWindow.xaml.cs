@@ -40,6 +40,7 @@ namespace PizzaKitchenClient
         private async void RefreshTimer_Tick(object sender, EventArgs e)
         {
             await LoadUnassignedOrdersAsync();
+            CheckServerConnection();
         }
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -48,7 +49,6 @@ namespace PizzaKitchenClient
 
         private async Task LoadUnassignedOrdersAsync()
         {
-            
             try
             {
                 List<Order> unassignedOrdersFromApi = await _apiService.GetUnassignedOrdersAsync();
@@ -74,6 +74,16 @@ namespace PizzaKitchenClient
                             {
                                 order.Customer = customer;
                             }
+
+                            // Hier wird die Logik hinzugefügt, um den OrderType zu ändern
+                            if (order.CustomerPhoneNumber == "1")
+                            {
+                                order.CustomerPhoneNumber = "Selbstabholer";
+                            }
+                            else if (order.CustomerPhoneNumber == "2")
+                            {
+                                order.CustomerPhoneNumber = "Mitnehmer";
+                            }
                         }
                         UnassignedOrders.Add(order);
                     }
@@ -84,11 +94,12 @@ namespace PizzaKitchenClient
             {
                 if (!isErrorMessageDisplayed)
                 {
-                
-                    isErrorMessageDisplayed = true; 
+                    // Fehlerbehandlung hier
+                    isErrorMessageDisplayed = true;
                 }
             }
         }
+
 
 
         private async Task<Customer> GetCustomerByPhoneNumberAsync(string phoneNumber)

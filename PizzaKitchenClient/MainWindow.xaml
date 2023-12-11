@@ -11,11 +11,8 @@
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="5"/>
-            <!-- Weitere Stileinstellungen nach Bedarf -->
-            
-            
         </Style>
-
+        
         <Style x:Key="CustomButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#FFFF5D48"/>
             <Setter Property="Foreground" Value="White"/>
@@ -42,6 +39,20 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="ListViewItem">
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Margin" Value="0,20,0,20"/>
+            <!-- Erhöhter Abstand -->
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF5F6269" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid Background="#FF1D1E20">
@@ -53,29 +64,34 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="0.3*"/>
+            <ColumnDefinition Width="0.4*"/>
         </Grid.ColumnDefinitions>
         <ListView Name="OrdersList" Margin="10" Grid.ColumnSpan="3" FontSize="16" SelectionMode="Single" Foreground="White" Background="#FF3D4248" HorizontalContentAlignment="Center">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <!-- Setze hier weitere Setters für Standard-Style-Eigenschaften -->
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Margin" Value="0,10,0,10"/>
+                    <!-- Erhöhter Abstand zwischen den Zeilen -->
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0"/>
                     <!-- Trigger für die Mouseover-Effekte -->
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="#FF5F6269" />
                             <Setter Property="Foreground" Value="White" />
-                            <!-- Weitere Setters für Mouseover-Style-Eigenschaften -->
                         </Trigger>
                     </Style.Triggers>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Bon" Width="50">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding BonNumber}"  HorizontalAlignment="Center" />
+                <GridView >
+                    <GridViewColumn Header="Bon" Width="50" >
+                        <GridViewColumn.CellTemplate >
+                            <DataTemplate >
+                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                                    <TextBlock Text="{Binding BonNumber}"  HorizontalAlignment="Center" />
+                                </Border> 
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -84,48 +100,58 @@
                     <GridViewColumn Header="Kunde" Width="150">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding CustomerPhoneNumber}" HorizontalAlignment="Center" />
+                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                                    <TextBlock Text="{Binding CustomerPhoneNumber}" HorizontalAlignment="Center" />
+                                </Border>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
+                    <GridViewColumn Header="Name" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                                    <TextBlock Text="{Binding Customer.Name}" HorizontalAlignment="Center" />
+                                </Border> 
+                                </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
                     <GridViewColumn Header="Offen seit" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Timestamp}" HorizontalAlignment="Center" />
-                            </DataTemplate>
+                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                                    <TextBlock Text="{Binding Timestamp}" HorizontalAlignment="Center" />
+                                </Border> 
+                                </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
                     <GridViewColumn Header="Lieferung Bis" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DeliveryUntil}" HorizontalAlignment="Center" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-
-
-                    <GridViewColumn Header="Name" Width="150">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Customer.Name}" HorizontalAlignment="Center" />
+                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                                    <TextBlock Text="{Binding DeliveryUntil}" HorizontalAlignment="Center" />
+                                </Border>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="Starße" Width="150">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Customer.Street}" HorizontalAlignment="Center" />
-                            </DataTemplate>
+                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                                    <TextBlock Text="{Binding Customer.Street}" HorizontalAlignment="Center" />
+                                </Border> 
+                                </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="Lieferart" Width="150">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding LieferStatus}" HorizontalAlignment="Center" />
-                            </DataTemplate>
+                                <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
+                                    <TextBlock Text="{Binding LieferStatus}" HorizontalAlignment="Center" />
+                                </Border> 
+                                </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
@@ -135,7 +161,7 @@
                                 <ItemsControl ItemsSource="{Binding OrderItems}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border BorderBrush="#FFFF5D48" BorderThickness="0,0,0,1" Margin="0,5">
+                                            <Border BorderBrush="#FFFF5D48" BorderThickness="0,0,0,0" Margin="0,5">
                                                 <!-- Trennlinie zwischen den Items -->
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                                     <TextBlock Text="Menge: " Width="50" />
@@ -153,10 +179,11 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
                 </GridView>
             </ListView.View>
         </ListView>
+    
+    
         <ComboBox Name="DriversComboBox" Grid.Row="1" Margin="10,0,0,0" Loaded="DriversComboBox_Loaded" 
           VerticalAlignment="Center" FontSize="18" Height="40" Padding="5,10"
           Background="#FF5F6269" Foreground="#FF5F6269" BorderBrush="#FF5F6269">
