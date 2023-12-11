@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="DailyEarnings" Height="450" Width="800">
+        Title="Tagesumsatz" Height="450" Width="800">
     <Grid>
         <DataGrid x:Name="DailySalesDataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False">
             <DataGrid.Columns>

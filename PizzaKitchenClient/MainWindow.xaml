@@ -127,7 +127,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Lieferung Bis" Width="120">
+                    <GridViewColumn Header="Lieferung bis" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
@@ -136,7 +136,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Starße" Width="150">
+                    <GridViewColumn Header="Straße" Width="150">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1">

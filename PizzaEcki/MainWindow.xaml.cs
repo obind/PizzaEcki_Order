@@ -122,7 +122,7 @@ namespace PizzaEcki
                         else // Kunde nicht gefunden
                         {
                             // Aufforderung zur Erstellung eines neuen Kunden
-                            MessageBoxResult result = MessageBox.Show("Es ist noch kein Kunde mit der Nummer bekann. \n Wollen sie einen Anelgen?", "Frage", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            MessageBoxResult result = MessageBox.Show("Es ist noch kein Kunde mit der Nummer bekannt. \nWollen Sie einen anlegen?", "Frage", MessageBoxButton.YesNo, MessageBoxImage.Question);
                             if (result == MessageBoxResult.Yes)
                             {
                                 SaveButton.Visibility = Visibility.Visible;
