@@ -12,6 +12,35 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="5"/>
             <!-- Weitere Stileinstellungen nach Bedarf -->
+            
+            
+        </Style>
+
+        <Style x:Key="CustomButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FFFF5D48"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="1,5,1,5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Trigger für den deaktivierten Zustand -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="LightGray"/>
+                                <!-- Deaktivierte Hintergrundfarbe -->
+                                <Setter Property="Foreground" Value="Gray"/>
+                                <!-- Deaktivierte Textfarbe -->
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
@@ -147,8 +176,7 @@
                 </Style>
             </ComboBox.ItemContainerStyle>
         </ComboBox>
-        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,0" Click="OnAssignButtonClicked"  Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
-        <!-- MainWindow.xaml -->
+        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,0" Click="OnAssignButtonClicked" Style="{StaticResource CustomButtonStyle}"/>       <!-- MainWindow.xaml -->
         <Button Name="PrintButton" Grid.Column="2" Grid.Row="1" Content="Drucken" Margin="10,0,10,0"  Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Click="PrintButton_Click"/>
 
         <Label x:Name="ConnectionStatusLabel" Grid.Row="2" Grid.Column="2" Content="Nicht verbunden" HorizontalAlignment="Center" Foreground="White"/>

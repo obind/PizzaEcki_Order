@@ -23,13 +23,14 @@ namespace PizzaKitchenClient
         private Order order;
         private bool isErrorMessageDisplayed = false;
         private bool isDelivery = false;
+
         public MainWindow()
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             OrdersList.ItemsSource = UnassignedOrders;
             OrdersList.SelectionChanged += OrdersList_SelectionChanged_1;
-
+            AssignButton.IsEnabled = false;
             refreshTimer.Interval = TimeSpan.FromSeconds(1); // Aktualisiere alle 30 Sekunden
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
@@ -47,6 +48,7 @@ namespace PizzaKitchenClient
 
         private async Task LoadUnassignedOrdersAsync()
         {
+            
             try
             {
                 List<Order> unassignedOrdersFromApi = await _apiService.GetUnassignedOrdersAsync();
@@ -132,6 +134,13 @@ namespace PizzaKitchenClient
         {
             if (OrdersList.SelectedItem is Order selectedOrder && DriversComboBox.SelectedItem is Driver selectedDriver)
             {
+                // Deaktiviere den Button, wenn CustomerPhoneNumber 1 oder 2 ist
+                if (selectedOrder.CustomerPhoneNumber == "1" || selectedOrder.CustomerPhoneNumber == "2")
+                {
+                    MessageBox.Show("Diese Bestellung kann nicht zugewiesen werden.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return; // Verlasse die Methode frühzeitig
+                }
+
                 if (!selectedOrder.IsDelivery)
                 {
                     MessageBox.Show("Fahrer können keine Abholungen übernehmen.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -139,7 +148,6 @@ namespace PizzaKitchenClient
                 }
 
                 double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
-
 
                 try
                 {
@@ -158,6 +166,7 @@ namespace PizzaKitchenClient
                 MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+
         private async void CheckServerConnection()
         {
             try
@@ -187,6 +196,15 @@ namespace PizzaKitchenClient
             // Aktualisiere das ausgewählte Item
             _selectedOrder = OrdersList.SelectedItem as Order;
             HighlightSelectedItem();
+            if (OrdersList.SelectedItem is Order selectedOrder)
+            {
+                // Deaktiviere den Zuordnen-Button, wenn die PhoneNumber 1 oder 2 ist
+                AssignButton.IsEnabled = !(selectedOrder.CustomerPhoneNumber == "1" || selectedOrder.CustomerPhoneNumber == "2");
+            }
+            else
+            {
+                AssignButton.IsEnabled = false; // Deaktiviere den Button, wenn nichts ausgewählt ist
+            }
         }
 
 

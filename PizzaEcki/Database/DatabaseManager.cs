@@ -730,6 +730,7 @@ namespace PizzaEcki.Database
                             order = new Order
                             {
                                 OrderId = currentOrderId,
+                                CustomerPhoneNumber = reader["CustomerPhoneNumber"].ToString(),
                                 BonNumber = Convert.ToInt32(reader["BonNumber"]),
                                 IsDelivery = isDelivery, // Setze den Lieferstatus hier
                             };

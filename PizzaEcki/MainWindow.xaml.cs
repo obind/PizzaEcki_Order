@@ -91,6 +91,7 @@ namespace PizzaEcki
                     // Behandlung von speziellen Telefonnummern "1" und "2"
                     if (_customerNr == "1")
                     {
+                        
                         isDelivery = false;
                         Selbstabholer++;
                         DishComboBox.Focus();
@@ -556,6 +557,10 @@ namespace PizzaEcki
                 MessageBox.Show("Es wurden keine Order-Items hinzugefügt. Bitte füge mindestens ein Order-Item hinzu, bevor du die Bestellung abschließt.");
                 return; // Verlasse die Methode frühzeitig
             }
+            if (!isDelivery)
+            { 
+            
+            }
 
             if (PhoneNumberTextBox.Text != "")
             {
@@ -605,14 +610,16 @@ namespace PizzaEcki
                     myDataGrid.Items.Refresh();
 
                     //Aktualisiere Lieferungsart
-                    AuslieferungLabel.Content = Lieferung;
-                    MitnehmerLabel.Content = Mitnehmer;
-                    SelbstabholerLabel.Content = Selbstabholer;
-        }
-        else
-        {
-            MessageBox.Show("Bitte eine Kundenummer Eingeben");
-        }
+                    //AuslieferungLabel.Content = Lieferung;
+                    //MitnehmerLabel.Content = Mitnehmer;
+                    //SelbstabholerLabel.Content = Selbstabholer;
+            }
+            else
+            {
+                MessageBox.Show("Bitte eine Kundenummer Eingeben");
+               
+        
+            }
     }
 
 
@@ -922,7 +929,37 @@ namespace PizzaEcki
                 {
                     cb_bonNummer.Items.Add(order.BonNumber);
                 }
-            }   
+            }
+            UpdateOrderCounts();
+        }
+
+        private void UpdateOrderCounts()
+        {
+            var orders = _databaseManager.GetUnassignedOrders();
+            int auslieferungCount = 0;
+            int mitnehmerCount = 0;
+            int selbstabholerCount = 0;
+
+            foreach (var order in orders)
+            {
+                if (order.CustomerPhoneNumber.Length > 2) // Prüft, ob es eine Telefonnummer ist
+                {
+                    auslieferungCount++;
+                }
+                else if (order.CustomerPhoneNumber == "1")
+                {
+                    selbstabholerCount++;
+                }
+                else if (order.CustomerPhoneNumber == "2")
+                {
+                    mitnehmerCount++;
+                }
+            }
+
+            // Aktualisiere die Labels
+            AuslieferungLabel.Content = auslieferungCount.ToString();
+            MitnehmerLabel.Content = mitnehmerCount.ToString();
+            SelbstabholerLabel.Content = selbstabholerCount.ToString();
         }
 
     }

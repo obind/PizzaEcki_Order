@@ -8,13 +8,16 @@ builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<PizzaDbContext>();
 builder.Services.AddScoped<PizzaDataService>();
+
+var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
         builder
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .WithOrigins("https://localhost:7166", "http://localhost:5062")
+        .WithOrigins(allowedOrigins) // Verwende die konfigurierten URLs
         .AllowCredentials());
 });
 

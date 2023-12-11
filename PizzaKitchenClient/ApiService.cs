@@ -87,6 +87,12 @@ public class ApiService
             return null;
         }
 
+        // Überspringe die HTTP-Anfrage, wenn die Telefonnummer "1" oder "2" ist
+        if (phoneNumber == "1" || phoneNumber == "2")
+        {
+            return null;
+        }
+
         try
         {
             // Erstellen der URL mit dem Query-Parameter für die Telefonnummer
@@ -113,6 +119,7 @@ public class ApiService
             return null;
         }
     }
+
 
 
 
