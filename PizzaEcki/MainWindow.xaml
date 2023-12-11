@@ -125,7 +125,7 @@
             <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="80,0,10,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" />
 
             <Label Grid.Row="3" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Center" Padding="5,0,5,0" MinHeight="20"/>
-            <xctk:TimePicker Name="TimePicker" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,10,0" Padding="5,0,5,0" Grid.Column="1" HorizontalContentAlignment="Left" TabIndex="9"/>
+            <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,10,0" Padding="5,0,5,0" Grid.Column="1" HorizontalContentAlignment="Left" TabIndex="9"/>
 
         </Grid>
         <Grid Grid.Row="2" Background="#474747" Margin="50,5,50,0" Grid.ColumnSpan="2">

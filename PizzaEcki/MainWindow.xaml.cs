@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics.Eventing.Reader;
 
+
 namespace PizzaEcki
 {
 
@@ -69,8 +70,8 @@ namespace PizzaEcki
             ExtrasComboBox.ItemsSource = extrasList;
 
             //Den Time Picker Vorbereiten zum Programm start 
-            TimePicker.Value = null;      
-            TimePicker.TimeInterval = new TimeSpan(0, 30, 0);
+            TimePickermein.Value = null;      
+            TimePickermein.TimeInterval = new TimeSpan(0, 30, 0);
 
             LoadDrivers();
             DataContext = this;
@@ -387,11 +388,9 @@ namespace PizzaEcki
             if (e.Key == Key.Enter)
             {
                 UpdateTempOrderItemAmount();
-                if (ShouldProcessOrder())
-                {
-                    ProcessOrder();
-                }
+                TimePickermein.Focus();
                 e.Handled = true;
+                
             }
         }
 
@@ -413,12 +412,10 @@ namespace PizzaEcki
         {
             if (e.Key == Key.Enter)
             {
-                // Überprüfen, ob TimePicker einen Wert hat
-                if (TimePicker.Value.HasValue)
-                {
-                    //tempOrderItem.Uhrzeit = TimePicker.Value.Value.ToString("HH:mm");
-                    ProcessOrder();
-                }
+
+                //tempOrderItem.Uhrzeit = TimePicker.Value.Value.ToString("HH:mm");
+                ProcessOrder();
+               
             }
         }
 
@@ -451,10 +448,14 @@ namespace PizzaEcki
                 return;
             }
 
-            if (TimePicker.Value == null || TimePicker.Value.Value <= DateTime.Now)
+            if (TimePickermein.Value != null)
             {
-                MessageBox.Show("Die eingegebene Uhrzeit muss in der Zukunft liegen.");
-                return;
+                // Überprüfe, ob die ausgewählte Uhrzeit in der Zukunft liegt
+                if (TimePickermein.Value.Value <= DateTime.Now)
+                {
+                    MessageBox.Show("Die eingegebene Uhrzeit muss in der Zukunft liegen.");
+                    return;
+                }
             }
 
             // Setze den Epreis zurück
@@ -583,7 +584,7 @@ namespace PizzaEcki
                     PaymentMethod = paymentMethod, // Zuweisen der Zahlungsmethode
                     CustomerPhoneNumber = _customerNr,
                     Timestamp = DateTime.Now.ToString("HH:mm"),
-                    DeliveryUntil = TimePicker.Value.Value.ToString("HH:mm") //Hier ist Liefern bis 
+                    DeliveryUntil = TimePickermein.Value.Value.ToString("HH:mm") //Hier ist Liefern bis 
                 };
              
 
