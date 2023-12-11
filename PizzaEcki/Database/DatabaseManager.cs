@@ -731,10 +731,15 @@ namespace PizzaEcki.Database
                             {
                                 OrderId = currentOrderId,
                                 CustomerPhoneNumber = reader["CustomerPhoneNumber"].ToString(),
+                                // Konvertiere DateTime? zu String, wenn es nicht null ist, sonst setze String auf null
+                                Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString("o"),                                                                                                                                           
+                                DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader["DeliveryUntil"].ToString(),
+                                PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader["PaymentMethod"].ToString(),
                                 BonNumber = Convert.ToInt32(reader["BonNumber"]),
-                                IsDelivery = isDelivery, // Setze den Lieferstatus hier
+                                IsDelivery = isDelivery,
                             };
                             unassignedOrders.Add(order);
+
                         }
 
                         OrderItem orderItem = new OrderItem

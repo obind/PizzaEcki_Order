@@ -15,6 +15,7 @@ using System.Drawing.Printing;
 using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.Eventing.Reader;
 
 namespace PizzaEcki
 {
@@ -44,6 +45,8 @@ namespace PizzaEcki
         private bool isDelivery = false;
         private bool isProgrammaticChange = false;
 
+        private BestellungenFenster _bestellungenFenster;
+        private string _currentBestellungsTyp;
 
         public List<Order> orders;
         public MainWindow()
@@ -961,6 +964,87 @@ namespace PizzaEcki
             MitnehmerLabel.Content = mitnehmerCount.ToString();
             SelbstabholerLabel.Content = selbstabholerCount.ToString();
         }
+
+        private void AuslieferungLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+           
+            BestellungenAnzeigen("");
+
+        }
+
+        private void SelbstabholerLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            BestellungenAnzeigen("1");
+        }
+
+        private void MitnehmerLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            BestellungenAnzeigen("2");
+        }
+        private void BestellungenAnzeigen(string bestellungsTyp)
+        {
+            var unassignedOrders = _databaseManager.GetUnassignedOrders();
+            List<Order> filteredOrders;
+
+            if (bestellungsTyp == "1" || bestellungsTyp == "2")
+            {
+                // Filtere Bestellungen für Selbstabholer und Mitnehmer
+                filteredOrders = unassignedOrders
+                    .Where(order => order.CustomerPhoneNumber == bestellungsTyp)
+                    .ToList();
+            }
+            else
+            {
+                // Filtere Bestellungen für Auslieferung
+                filteredOrders = unassignedOrders
+                    .Where(order => !string.IsNullOrEmpty(order.CustomerPhoneNumber) &&
+                                    order.CustomerPhoneNumber != "1" &&
+                                    order.CustomerPhoneNumber != "2")
+                    .ToList();
+            }
+
+            // Überprüfe, ob das Fenster für einen anderen Bestellungstyp geöffnet werden soll
+            if (_bestellungenFenster != null && _currentBestellungsTyp != bestellungsTyp)
+            {
+                // Schließe das aktuelle Fenster und setze die Referenz zurück
+                _bestellungenFenster.Close();
+                _bestellungenFenster = null;
+            }
+
+            // Öffne das Fenster nur, wenn es noch nicht existiert
+            if (_bestellungenFenster == null)
+            {
+                _bestellungenFenster = new BestellungenFenster(filteredOrders);
+                // Setze den Titel des Fensters basierend auf dem Bestellungstyp
+                switch (bestellungsTyp)
+                {
+                    case "1":
+                        _bestellungenFenster.Title = "Bestellungen - Selbstabholer";
+                        break;
+                    case "2":
+                        _bestellungenFenster.Title = "Bestellungen - Mitnehmer";
+                        break;
+                    default:
+                        _bestellungenFenster.Title = "Bestellungen - Auslieferung";
+                        break;
+                }
+                _currentBestellungsTyp = bestellungsTyp; // Speichere den aktuellen Bestellungstyp
+                _bestellungenFenster.Closed += (s, e) =>
+                {
+                    _bestellungenFenster = null;
+                    _currentBestellungsTyp = null; // Setze den Bestellungstyp zurück, wenn das Fenster geschlossen wird
+                };
+                _bestellungenFenster.Show();
+            }
+            else
+            {
+                // Wenn das Fenster bereits geöffnet ist, bringe es in den Vordergrund
+                _bestellungenFenster.Focus();
+            }
+        }
+
+
+
 
     }
 }

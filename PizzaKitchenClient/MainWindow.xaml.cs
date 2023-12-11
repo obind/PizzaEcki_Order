@@ -163,7 +163,7 @@ namespace PizzaKitchenClient
             }
             else
             {
-                MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Bitte wählen Sie einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
