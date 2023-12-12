@@ -1,6 +1,8 @@
-﻿using SharedLibrary;
+﻿using PizzaEcki.Database;
+using SharedLibrary;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,11 +22,16 @@ namespace PizzaEcki.Pages
     /// </summary>
     public partial class BestellungenFenster : Window
     {
+        private DatabaseManager _databaseManager;
+        // Verwende ObservableCollection, um die UI automatisch zu aktualisieren
+        private ObservableCollection<SharedLibrary.Order> _orders;
+
         public BestellungenFenster(List<SharedLibrary.Order> orders)
         {
             InitializeComponent();
-            // Hier wird die Liste den Items der ListView zugewiesen oder ähnliches
-            BestellungenListView.ItemsSource = orders;
+            _databaseManager = new DatabaseManager(); // Stelle sicher, dass DatabaseManager initialisiert wird
+            _orders = new ObservableCollection<SharedLibrary.Order>(orders);
+            BestellungenListView.ItemsSource = _orders;
         }
 
         private void LoadOrders(string bestellungsTyp)
@@ -37,7 +44,29 @@ namespace PizzaEcki.Pages
            // BestellungenListView.ItemsSource = bestellungen;
         }
 
-      
-
+        private async void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F4 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                var selectedOrder = BestellungenListView.SelectedItem as SharedLibrary.Order;
+                if (selectedOrder != null)
+                {
+                    bool success = await _databaseManager.DeleteOrderAsync(selectedOrder.OrderId);
+                    if (success)
+                    {
+                        _orders.Remove(selectedOrder);
+                        MessageBox.Show("Bestellung wurde gelöscht.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Fehler beim Löschen der Bestellung.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Keine Bestellung ausgewählt.");
+                }
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ using System.IO;
 using SharedLibrary;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PizzaEcki.Database
 {
@@ -566,6 +567,62 @@ namespace PizzaEcki.Database
                         // Fehlerbehandlung, falls kein Eintrag gefunden wurde
                         throw new Exception("Settings entry not found in the database.");
                     }
+                }
+            }
+        }
+        public async Task<bool> DeleteOrderAsync(Guid orderId)
+        {
+            
+            try
+            {
+                await _connection.OpenAsync();
+
+                using (var transaction = _connection.BeginTransaction())
+                {
+                    int result = 0;
+
+                    // Lösche zugehörige Einträge in OrderItems
+                    string sqlDeleteOrderItems = "DELETE FROM OrderItems WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteOrderItems, _connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    // Lösche zugehörige Einträge in OrderAssignments
+                    string sqlDeleteAssignments = "DELETE FROM OrderAssignments WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteAssignments, _connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    // Lösche den Eintrag in der Orders-Tabelle
+                    string sqlDeleteOrder = "DELETE FROM Orders WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteOrder, _connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    transaction.Commit();
+
+                    // Prüfe, ob irgendeine Zeile betroffen war
+                    return result > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Loggen Sie die Ausnahme oder handeln Sie sie entsprechend.
+                // Zum Beispiel:
+                // _logger.LogError(ex, "An error occurred while deleting order with ID {OrderId}", orderId);
+                return false;
+            }
+            finally
+            {
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    await _connection.CloseAsync();
                 }
             }
         }
