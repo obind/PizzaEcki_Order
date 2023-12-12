@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Drawing.Printing;
 using System.Drawing;
+using System.Windows.Input;
 
 namespace PizzaKitchenClient
 {
@@ -32,9 +33,10 @@ namespace PizzaKitchenClient
             OrdersList.ItemsSource = UnassignedOrders;
             OrdersList.SelectionChanged += OrdersList_SelectionChanged_1;
             AssignButton.IsEnabled = false;
-            refreshTimer.Interval = TimeSpan.FromSeconds(1); // Aktualisiere alle 30 Sekunden
+            refreshTimer.Interval = TimeSpan.FromSeconds(5); // Aktualisiere alle 30 Sekunden
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
+            this.KeyDown += Window_KeyDown;
             CheckServerConnection();
             
         }
@@ -101,8 +103,6 @@ namespace PizzaKitchenClient
             }
         }
 
-
-
         private async Task<Customer> GetCustomerByPhoneNumberAsync(string phoneNumber)
         {
             if (string.IsNullOrEmpty(phoneNumber))
@@ -124,9 +124,6 @@ namespace PizzaKitchenClient
             }
         }
 
-
-
-
         private async void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -140,8 +137,7 @@ namespace PizzaKitchenClient
                 MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
             }
         }
-
-
+  
         private async void OnAssignButtonClicked(object sender, RoutedEventArgs e)
         {
             if (OrdersList.SelectedItem is Order selectedOrder && DriversComboBox.SelectedItem is Driver selectedDriver)
@@ -429,6 +425,26 @@ namespace PizzaKitchenClient
 
             printDoc.Print();
 
+        }
+
+        private async void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F4 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                if (_selectedOrder != null)
+                {
+                    bool success = await _apiService.DeleteOrderAsync(_selectedOrder.OrderId);
+                    if (success)
+                    {
+                        // Entferne die Bestellung aus der Liste, wenn erfolgreich gelöscht
+                        UnassignedOrders.Remove(_selectedOrder);  
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Keine Bestellung ausgewählt.");
+                }
+            }
         }
     }
 }

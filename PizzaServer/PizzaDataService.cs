@@ -154,6 +154,65 @@ namespace PizzaServer
             return unassignedOrders;
         }
 
+        public async Task<bool> DeleteOrderAsync(Guid orderId)
+        {
+            var connection = (SqliteConnection)_context.Database.GetDbConnection();
+            try
+            {
+                await connection.OpenAsync();
+
+                using (var transaction = connection.BeginTransaction())
+                {
+                    int result = 0;
+
+                    // Lösche zugehörige Einträge in OrderItems
+                    string sqlDeleteOrderItems = "DELETE FROM OrderItems WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteOrderItems, connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    // Lösche zugehörige Einträge in OrderAssignments
+                    string sqlDeleteAssignments = "DELETE FROM OrderAssignments WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteAssignments, connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    // Lösche den Eintrag in der Orders-Tabelle
+                    string sqlDeleteOrder = "DELETE FROM Orders WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteOrder, connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    transaction.Commit();
+
+                    // Prüfe, ob irgendeine Zeile betroffen war
+                    return result > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Loggen Sie die Ausnahme oder handeln Sie sie entsprechend.
+                // Zum Beispiel:
+                // _logger.LogError(ex, "An error occurred while deleting order with ID {OrderId}", orderId);
+                return false;
+            }
+            finally
+            {
+                if (connection.State == System.Data.ConnectionState.Open)
+                {
+                    await connection.CloseAsync();
+                }
+            }
+        }
+
+
+
         public async Task<Customer> GetCustomerByPhoneNumber(string phoneNumber)
         {
             string sql = @"SELECT c.PhoneNumber, c.Name, a.Street, a.City, c.AdditionalInfo 

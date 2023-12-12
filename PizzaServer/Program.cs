@@ -79,6 +79,31 @@ app.MapGet("/unassignedOrders", async (PizzaDataService service) =>
     }
 });
 
+app.MapDelete("/deleteOrder/{orderId}", async (PizzaDataService service, Guid orderId) =>
+{
+    try
+    {
+        // Rufen Sie eine Methode in Ihrem Service auf, um die Bestellung zu löschen
+        bool deleteResult = await service.DeleteOrderAsync(orderId);
+
+        // Wenn das Löschen erfolgreich war, senden Sie eine Erfolgsmeldung
+        if (deleteResult)
+        {
+            return Results.Ok();
+        }
+        else
+        {
+            // Wenn das Löschen nicht erfolgreich war (z.B. OrderId nicht gefunden), senden Sie eine Nicht-Gefunden-Meldung
+            return Results.NotFound();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Wenn es einen Fehler gibt, senden Sie eine Fehlermeldung
+        return Results.Problem(ex.Message);
+    }
+});
+
 
 app.MapGet("/GetCustomer", async (PizzaDataService service, string phoneNumber) =>
 {

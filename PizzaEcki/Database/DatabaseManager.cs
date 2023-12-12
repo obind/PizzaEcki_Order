@@ -869,6 +869,69 @@ namespace PizzaEcki.Database
 
             return dailySalesInfoList;
         }
+        public int CheckAndResetBonNumberIfNecessary()
+        {
+            string getSettingsSql = "SELECT LastResetDate, CurrentBonNumber FROM Settings LIMIT 1";
+            string updateSettingsSql = "UPDATE Settings SET CurrentBonNumber = 1, LastResetDate = @LastResetDate";
+            int currentBonNumber = 0;
+
+            using (SqliteCommand getSettingsCommand = new SqliteCommand(getSettingsSql, _connection))
+            {
+                _connection.Open();
+                using (SqliteDataReader reader = getSettingsCommand.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        var lastResetDate = DateTime.Parse(reader["LastResetDate"].ToString());
+                        currentBonNumber = int.Parse(reader["CurrentBonNumber"].ToString());
+                        var currentDate = DateTime.Now.Date;
+
+                        if (currentDate > lastResetDate)
+                        {
+                            // Zurücksetzen der Bonnummer und Aktualisieren des Reset-Datums
+                            using (SqliteCommand updateSettingsCommand = new SqliteCommand(updateSettingsSql, _connection))
+                            {
+                                updateSettingsCommand.Parameters.AddWithValue("@LastResetDate", currentDate.ToString("yyyy-MM-dd"));
+                                updateSettingsCommand.ExecuteNonQuery();
+                            }
+
+                            // Setze die Bonnummer auf den Anfangswert zurück
+                            currentBonNumber = 1;
+                        }
+                    }
+                    else
+                    {
+                        // Fehlerbehandlung, falls kein Eintrag gefunden wurde
+                        throw new Exception("Settings entry not found in the database.");
+                    }
+                }
+                _connection.Close();
+            }
+
+            return currentBonNumber; // Rückgabe der aktuellen oder zurückgesetzten Bonnummer
+        }
+
+
+
+        public void ResetBonNumberForTesting()
+        {
+            string updateSettingsSql = "UPDATE Settings SET CurrentBonNumber = 1, LastResetDate = @LastResetDate";
+
+            _connection.Open();
+            using (SqliteCommand updateSettingsCommand = new SqliteCommand(updateSettingsSql, _connection))
+            {
+                // Setze das LastResetDate auf das aktuelle Datum für Testzwecke
+                updateSettingsCommand.Parameters.AddWithValue("@LastResetDate", DateTime.Now.ToString("yyyy-MM-dd"));
+                int rowsAffected = updateSettingsCommand.ExecuteNonQuery();
+
+                if (rowsAffected == 0)
+                {
+                    // Kein Eintrag wurde aktualisiert, hier könnte eine Fehlerbehandlung erfolgen
+                    throw new Exception("No settings entry was updated. Please check if the settings entry exists.");
+                }
+            }
+            _connection.Close();
+        }
 
 
 

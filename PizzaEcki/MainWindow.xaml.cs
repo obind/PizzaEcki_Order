@@ -16,7 +16,7 @@ using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics.Eventing.Reader;
-
+using System.Windows.Threading;
 
 namespace PizzaEcki
 {
@@ -49,6 +49,8 @@ namespace PizzaEcki
         private BestellungenFenster _bestellungenFenster;
         private string _currentBestellungsTyp;
 
+        private DispatcherTimer _reloadTimer;
+
         public List<Order> orders;
         public MainWindow()
         {
@@ -78,10 +80,26 @@ namespace PizzaEcki
 
             currentBonNumber = _databaseManager.GetCurrentBonNumber();
 
-            ReloadeUnassignedOrders();
+            _reloadTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(2)
+            };
+            _reloadTimer.Tick += ReloadTimer_Tick;     
+            _reloadTimer.Start();
+        }
+        private void ResetBonNumberButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Ersetze "YourDatabaseManagerInstance" mit einer Instanz deiner Datenbankmanagerklasse
+            _databaseManager.ResetBonNumberForTesting();
 
+            MessageBox.Show("Bonnummer wurde erfolgreich zurückgesetzt.");
         }
 
+        private void ReloadTimer_Tick(object sender, EventArgs e)
+        {
+            // Rufe deine Methode hier auf
+            ReloadeUnassignedOrders();
+        }
         private void PhoneNumberTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             // Überprüfung, ob die Enter-Taste gedrückt wurde
@@ -575,6 +593,10 @@ namespace PizzaEcki
                     //OrderItems = GetCurrentOrderItems(),
                 };
 
+                var deliveryUntilStr = TimePickermein.Value.HasValue
+                    ? TimePickermein.Value.Value.ToString("HH:mm")
+                    : "00:00";
+
                 var order = new Order
                 {
                     OrderId = Guid.NewGuid(),
@@ -584,7 +606,7 @@ namespace PizzaEcki
                     PaymentMethod = paymentMethod, // Zuweisen der Zahlungsmethode
                     CustomerPhoneNumber = _customerNr,
                     Timestamp = DateTime.Now.ToString("HH:mm"),
-                    DeliveryUntil = TimePickermein.Value.Value.ToString("HH:mm") //Hier ist Liefern bis 
+                    DeliveryUntil = deliveryUntilStr
                 };
              
 
@@ -923,7 +945,7 @@ namespace PizzaEcki
             }
         }
 
-        public void ReloadeUnassignedOrders()
+        private async Task ReloadeUnassignedOrders()
         {
             orders = _databaseManager.GetUnassignedOrders();
             cb_bonNummer.Items.Clear();
