@@ -126,18 +126,25 @@ namespace PizzaKitchenClient
 
         private async void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                List<Driver> driversFromApi = await _apiService.GetAllDriversAsync();
-                DriversComboBox.ItemsSource = driversFromApi;
-            }
-            catch (Exception ex)
-            {
-                // Fehlerbehandlung hier
-                MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
-            }
+           
+                try
+                {
+                    List<Driver> driversFromApi = await _apiService.GetAllDriversAsync();
+
+                    // Filtere die Liste, um nur Fahrer mit positiver ID zu behalten
+                    var filteredDrivers = driversFromApi.Where(driver => driver.Id >= 0).ToList();
+
+                    DriversComboBox.ItemsSource = filteredDrivers;
+                }
+                catch (Exception ex)
+                {
+                    // Fehlerbehandlung hier
+                    MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
+                
+                }
+
         }
-  
+
         private async void OnAssignButtonClicked(object sender, RoutedEventArgs e)
         {
             if (OrdersList.SelectedItem is Order selectedOrder && DriversComboBox.SelectedItem is Driver selectedDriver)
@@ -236,7 +243,7 @@ namespace PizzaKitchenClient
             {
                 Customer customer = null;
                 // Hier könntest du die Kundeninformationen abrufen, falls notwendig
-                PrintReceipt(_selectedOrder, customer);
+                PrintReceipt(_selectedOrder);
             }
             else
             {
@@ -244,8 +251,10 @@ namespace PizzaKitchenClient
             }
         }
 
-        private void PrintReceipt(Order order, Customer customer)
+        private async void PrintReceipt(Order order)
         {
+            Customer customer1 = await GetCustomerByPhoneNumberAsync(order.CustomerPhoneNumber);
+
             PrintDocument printDoc = new PrintDocument();
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
             printDoc.PrintPage += (sender, e) =>
@@ -290,13 +299,13 @@ namespace PizzaKitchenClient
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += regularFont.GetHeight() + 10;
 
-                if (_selectedOrder.IsDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
+                if (_selectedOrder.IsDelivery && customer1 != null)  // Überprüfen, ob es sich um eine Lieferung handelt
                 {
-                    string addressStr = customer.Name + "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
+                    string addressStr = "Tel: " + customer1.PhoneNumber+ "\r\n" + customer1.Name + "\r\n" + customer1.Street + "\r\n" + customer1.City + "\r\n" + customer1.AdditionalInfo;
                     graphics.DrawString(addressStr, boldFont, Brushes.Black, 0, yOffset);
 
                     // Hier ändern wir den yOffset, um zwei Zeilenhöhen hinzuzufügen, eine für jede Zeile der Adresse.
-                    yOffset += boldFont.GetHeight() * 5;  // Anpassen für den Zeilenumbruch in der Adresse
+                    yOffset += boldFont.GetHeight() * 6;  // Anpassen für den Zeilenumbruch in der Adresse
                 }
 
                 string bonNumberStr = $"Bon Nummer: {order.BonNumber}";
@@ -316,27 +325,15 @@ namespace PizzaKitchenClient
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += 5;
 
-                // Verschoben innerhalb des Ereignishandlers
-
-
-                // Bestellte Gerichte
-
-                // Definiere einen Stift zum Zeichnen der Linien
-
-
-                // Tabellenüberschrift
                 string headerAnz = "Anz";
                 string headerNr = "Nr";
                 string headerGericht = "Gericht";
                 string headerGr = "Gr.";
                 string headerPreis = "Preis";
-
-                // Definiere die Positionen der Spaltenköpfe
                 float headerAnzPosition = 0;
-                float headerNrPosition = 30;  // 
-                float headerGerichtPosition = 50;  // Angenommene Position, anpassen nach Bedarf
-                float headerGrPosition = 200;  // Angenommene Position, anpassen nach Bedarf
-                                               // Preis rechtsbündig, Abstand vom rechten Rand
+                float headerNrPosition = 30; 
+                float headerGerichtPosition = 50; 
+                float headerGrPosition = 200; 
                 float headerPreisPosition = e.PageBounds.Width - graphics.MeasureString(headerPreis, regularFont).Width - 15;
 
                 // Zeichne die Tabellenüberschrift#
@@ -349,7 +346,7 @@ namespace PizzaKitchenClient
                 // Zeichne eine Trennlinie nach der Überschrift
                 yOffset += regularFont.GetHeight();
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
-                yOffset += 3; // Füge einen kleinen Abstand nach der Linie hinzu
+                yOffset += 3;
 
                 // Vorhandener Code für Bestellzeilen ...
                 Font extraFont = new Font("Segoe UI", 10);

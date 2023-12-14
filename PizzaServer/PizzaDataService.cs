@@ -42,7 +42,7 @@ namespace PizzaServer
                         updateCommand.Parameters.AddWithValue("@OrderId", orderId);
                         updateCommand.Parameters.AddWithValue("@DriverId", driverId);
                         updateCommand.Parameters.AddWithValue("@Price", price);
-                        updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                        updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                         await updateCommand.ExecuteNonQueryAsync();
                     }
                 }
@@ -54,7 +54,7 @@ namespace PizzaServer
                         insertCommand.Parameters.AddWithValue("@OrderId", orderId);
                         insertCommand.Parameters.AddWithValue("@DriverId", driverId);
                         insertCommand.Parameters.AddWithValue("@Price", price);
-                        insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                        insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                         await insertCommand.ExecuteNonQueryAsync();
                     }
                 }
@@ -154,7 +154,93 @@ namespace PizzaServer
             return unassignedOrders;
         }
 
-        public async Task<bool> DeleteOrderAsync(Guid orderId)
+        //public async Task<List<Order>> GetAllOrdersAsync()
+        //{
+        //    List<Order> orders = new List<Order>();
+
+        //    var connection = (SqliteConnection)_context.Database.GetDbConnection();
+        //    await connection.OpenAsync();
+        //    string sql = @"
+        //        SELECT 
+        //            Orders.*,
+        //            OrderItems.*
+        //        FROM 
+        //            Orders
+        //        LEFT JOIN 
+        //            OrderItems ON Orders.OrderId = OrderItems.OrderId
+        //    ";
+
+        //    using (SqliteCommand command = new SqliteCommand(sql, connection))
+        //    {
+        //        using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+        //        {
+        //            while (await reader.ReadAsync())
+        //            {
+        //                var orderIdValue = reader["OrderId"].ToString();
+        //                if (string.IsNullOrEmpty(orderIdValue))
+        //                {
+        //                    var bonNumber = reader["BonNumber"].ToString();
+        //                    Console.WriteLine($"Fehler: OrderId ist null oder leer für BonNumber: {bonNumber}");
+        //                    continue;  // Überspringe diesen Datensatz
+        //                }
+        //                Guid currentOrderId = Guid.Parse(orderIdValue);
+
+        //                Order order;
+        //                if (unassignedOrders.Any(o => o.OrderId == currentOrderId))
+        //                {
+        //                    order = unassignedOrders.First(o => o.OrderId == currentOrderId);
+        //                }
+        //                else
+        //                {
+        //                    // Hier nimmst du die Daten für IsDelivery aus der Datenbank
+        //                    var isDeliveryValue = reader["IsDelivery"];
+        //                    bool isDelivery = false;
+
+        //                    // Wenn der Wert aus der Datenbank kommt, musst du ihn entsprechend konvertieren.
+        //                    if (isDeliveryValue != DBNull.Value)
+        //                    {
+        //                        isDelivery = Convert.ToInt32(isDeliveryValue) != 0;
+        //                    }
+
+        //                    order = new Order
+        //                    {
+        //                        OrderId = currentOrderId,
+        //                        BonNumber = Convert.ToInt32(reader["BonNumber"]),
+        //                        IsDelivery = isDelivery,
+        //                        PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader.GetString(reader.GetOrdinal("PaymentMethod")),
+        //                        CustomerPhoneNumber = reader.IsDBNull(reader.GetOrdinal("CustomerPhoneNumber")) ? null : reader.GetString(reader.GetOrdinal("CustomerPhoneNumber")),
+        //                        Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetString(reader.GetOrdinal("Timestamp")),
+        //                        DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader.GetString(reader.GetOrdinal("DeliveryUntil")),
+        //                    };
+        //                    unassignedOrders.Add(order);
+        //                }
+
+        //                OrderItem orderItem = new OrderItem
+        //                {
+        //                    Nr = reader.IsDBNull(reader.GetOrdinal("OrderItemId")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+        //                    Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+        //                    Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+        //                    Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
+        //                    Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+        //                    Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+        //                    Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+        //                    Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+        //                    LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+        //                };
+
+
+        //                order.OrderItems.Add(orderItem);
+        //            }
+        //        }
+        //    }
+
+        //    await connection.CloseAsync();
+
+        //    return unassignedOrders;
+        //}
+
+
+            public async Task<bool> DeleteOrderAsync(Guid orderId)
         {
             var connection = (SqliteConnection)_context.Database.GetDbConnection();
             try

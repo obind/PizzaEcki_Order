@@ -79,6 +79,20 @@ app.MapGet("/unassignedOrders", async (PizzaDataService service) =>
     }
 });
 
+//app.MapGet("/allOrders", async (PizzaDataService service) =>
+//{
+//    try
+//    {
+//        var orders = await service.GetAllOrdersAsync();
+//        return Results.Ok(orders);
+//    }
+//    catch (Exception ex)
+//    {
+//        return Results.Problem(ex.Message);
+//    }
+//});
+
+
 app.MapDelete("/deleteOrder/{orderId}", async (PizzaDataService service, Guid orderId) =>
 {
     try

@@ -53,40 +53,41 @@
 
             <!--<Button Grid.Column="2" Content="Logbuch" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
             <Button x:Name="EinstellungenBtn" Grid.Column="1" Content="Einstellungen" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Click="EinstellungenBtn_Click" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
-            <Button Grid.Column="2" Content="Auswertung" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
+            <Button x:Name="Auswertung_Btn" Grid.Column="2" Content="Auswertung" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Click="Auswertung_Btn_Click"/>
         </Grid>
-        <Border Background="#FF3D4248" Margin="50,5,5,5" Grid.Row="1" CornerRadius="10,10,0,0">
-        <Grid  Grid.Row="1" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" MinHeight="25"/>
-                <RowDefinition Height="*" MinHeight="25"/>
-                <RowDefinition Height="*" MinHeight="25"/>
-                <RowDefinition Height="*" MinHeight="25"/>
-                <RowDefinition Height="*" MinHeight="25"/>
-                <RowDefinition Height="*" MinHeight="25"/>
-                <RowDefinition Height="*" MinHeight="25"/>
+        <Border Background="#FF3D4248" Margin="20,5,5,5" Grid.Row="1" CornerRadius="10,10,10,10">
+            <Grid  Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" MinHeight="25"/>
+                    <RowDefinition Height="*" MinHeight="25"/>
+                    <RowDefinition Height="*" MinHeight="25"/>
+                    <RowDefinition Height="*" MinHeight="25"/>
+                    <RowDefinition Height="*" MinHeight="25"/>
+                    <RowDefinition Height="*" MinHeight="25"/>
+                    <RowDefinition Height="*" MinHeight="25"/>
 
-            </Grid.RowDefinitions>
-            <Border Background="#FFFF5D48" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="2">
-                <!-- CornerRadius bestimmt den Radius der Ecken -->
-                <Label Content="Kundendaten" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
-            </Border>
+                </Grid.RowDefinitions>
+                <Border Background="#FFFF5D48" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="2">
+                    <!-- CornerRadius bestimmt den Radius der Ecken -->
+                    <Label Content="Kundendaten" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
+                </Border>
 
-            <Label Content="KundenNR." VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Row="1" MinHeight="20" Padding="5,0,5,0" Margin="0,0,0,2" />
-            <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,2,10,2" FontSize="16" VerticalContentAlignment="Center" KeyDown="PhoneNumberTextBox_KeyDown" TabIndex="0" Padding="5,0,5,0"/>
-            <Label Content="Name" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Grid.Row="2" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-            <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="16" TabIndex="1" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-            <Label Grid.Row="3" Content="Straße" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-            <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="2" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-            <Label Grid.Row="4" Content="Ort" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-            <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-            <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-            <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-            <Button x:Name="SaveButton" Grid.Row="6" Grid.Column="1" Content="Speichern" HorizontalAlignment="Right" Background="#ff5d48" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Margin="0,0,10,2" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold"        >
+                <Label Content="KundenNR." VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Row="1" MinHeight="20" Padding="5,0,5,0" Margin="0,0,0,2" />
+                <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,2,10,2" FontSize="16" VerticalContentAlignment="Center" KeyDown="PhoneNumberTextBox_KeyDown" TabIndex="0" Padding="5,0,5,0"/>
+                <Label Content="Name" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Grid.Row="2" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
+                <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="16" TabIndex="1" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
+                <Label Grid.Row="3" Content="Straße" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
+                <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="2" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
+                <Label Grid.Row="4" Content="Ort" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
+                <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
+                <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
+                <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
+                <Border x:Name="SaveButtonBorder"  Grid.Row="6" Grid.Column="1" Background="#FFFF5D48" CornerRadius="10" HorizontalAlignment="Right"  Margin="0,0,10,2" Visibility="Collapsed">
+                    <Button x:Name="SaveButton" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}"        >
                     <Button.Style>
                         <Style TargetType="Button">
                             <Setter Property="Border.CornerRadius" Value="50"/>
@@ -97,11 +98,12 @@
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
-                    </Button.Style>
-                </Button> 
-        </Grid>
+                    </Button.Style> 
+                    </Button>
+                </Border> 
+            </Grid>
         </Border>
-        <Border Background="#FF3D4248" Margin="5,5,10,5" Grid.Row="1" Grid.Column="1" CornerRadius="10,10,0,0">
+        <Border Background="#FF3D4248" Margin="5,5,20,5" Grid.Row="1" Grid.Column="1" CornerRadius="10,10,10,10">
             <Grid Grid.Column="1" Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -146,13 +148,13 @@
 
             </Grid>
         </Border>
-        <Border Background="#FF3D4248"  Grid.ColumnSpan="2" Margin="50,5,10,5" Grid.Row="2" CornerRadius="10,10,0,0">
+        <Border Background="#FF3D4248"  Grid.ColumnSpan="2" Margin="20,5,20,5" Grid.Row="2" CornerRadius="10,10,10,10">
             <Grid Grid.Row="2" Grid.ColumnSpan="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*" MinHeight="25"/>
                 </Grid.RowDefinitions>
-                <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#FFFF5D48" CornerRadius="10">
+                <Border Grid.Row="0" Grid.ColumnSpan="2"  Padding="5,0,5,2" Background="#FFFF5D48" CornerRadius="10">
                     <!-- CornerRadius für abgerundete Ecken -->
                     <Label Content="Bestellung" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
                 </Border>
@@ -228,7 +230,7 @@
             </Grid>
         </Border>
 
-        <Border Background="#FF3D4248" Margin="50,5,5,20" Grid.Row="3" CornerRadius="10,10,0,0">
+        <Border Background="#FF3D4248" Margin="20,5,5,20" Grid.Row="3" CornerRadius="10,10,10,10">
             <Grid Grid.Row="4" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -244,7 +246,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Grid.ColumnSpan="4" Background="#FFFF5D48" CornerRadius="10" Padding="2,2,2,2" Height="42" VerticalAlignment="Center">
+                <Border Grid.Row="0" Grid.ColumnSpan="4" Background="#FFFF5D48" CornerRadius="10"  Padding="5,0,5,2" Height="42" VerticalAlignment="Center">
                     <Label Content="Offene Bestellung" Foreground="White" FontSize="18" FontWeight="Bold" VerticalContentAlignment="Center"/>
                 </Border>
 
@@ -258,7 +260,7 @@
                 <Label x:Name="AuslieferungLabel" Grid.Row="3" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Column="1" Padding="5,5,5,5" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="AuslieferungLabel_MouseDown"/>
 
                 <Label Grid.Column="2" Grid.Row="1" Content="Bon" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
-                <ComboBox x:Name="cb_bonNummer" Grid.Column="3" Grid.Row="1" Margin="0,2,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="Black" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.5,0.5"/>
+                <ComboBox x:Name="cb_bonNummer" Grid.Column="3" Grid.Row="1" Margin="0,7,10,7" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="Black" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.5,0.5"/>
 
 
 
@@ -267,19 +269,31 @@
                     <ComboBoxItem Content="Theke" />
                     <ComboBoxItem Content="Kasse1" />
                 </ComboBox>
-                <Button x:Name="btn_zuordnen" Grid.Row="3" Grid.Column="3" Content="Zuordnen" HorizontalAlignment="Right" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Margin="0,5,10,5" Click="Btn_zuordnen_Click" Padding="10,5" BorderThickness="0">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Border.CornerRadius" Value="50"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#E54B3C"/>
-                                    <!-- Etwas dunklere Farbe bei MouseOver -->
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" Margin="0,5,10,5" Background="#FFFF5D48" CornerRadius="10">
+                    <Button x:Name="btn_zuordnen" Content="Zuordnen" HorizontalAlignment="Right" Foreground="White" FontWeight="Bold" Click="Btn_zuordnen_Click" Padding="10,5" BorderThickness="0" Background="{x:Null}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="CornerRadius" Value="10"/>
+                                                    <Setter TargetName="border" Property="Background" Value="#E54B3C"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Background" Value="{x:Null}"/>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Border>
+
 
             </Grid>
         </Border>
@@ -305,22 +319,30 @@
             <!-- Zahlungsarten-Buttons -->
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,50,0">
                 <!-- Barzahlung-Button -->
-                <Button x:Name="btn_cash" Width="50" Height="50" Background="#FFFF5D48" Foreground="#FFFFFBFB" Click="BarzahlungBtn">
-                    <!-- Icon für Barzahlung (Beispiel) -->
-                    <TextBlock Text="💵" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Button>
+                <Border Background="#FFFF5D48" CornerRadius="10">
+                    <Button x:Name="btn_cash" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" BorderBrush="{x:Null}">
+                        <!-- Icon für Barzahlung (Beispiel) -->
+                        <TextBlock Text="💵" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+
+                </Border>
 
                 <!-- Kartenzahlung-Button -->
-                <Button x:Name="btn_card" Width="50" Height="50" Background="#FFFF5D48" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" Margin="0,10,0,0">
-                    <!-- Icon für Kartenzahlung (Beispiel) -->
-                    <TextBlock Text="💳" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Button>
+                <Border Background="#FFFF5D48" CornerRadius="10" Margin="0,10,0,0">
+                    <Button x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" BorderBrush="{x:Null}" >
+                        <!-- Icon für Kartenzahlung (Beispiel) -->
+                        <TextBlock Text="💳" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                </Border>
 
                 <!-- PayPal-Button -->
-                <Button x:Name="btn_paypal" Width="50" Height="50" Background="#FFFF5D48" Foreground="#FFFFFBFB" Click="PaypalBtn" Margin="0,10,0,0">
+                <Border Background="#FFFF5D48" CornerRadius="10" Margin="0,10,0,0">
+
+                    <Button x:Name="btn_paypal" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" BorderBrush="{x:Null}">
                     <!-- Icon für PayPal (Beispiel) -->
                     <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Button>
+                    </Button>
+                </Border> 
             </StackPanel>
         </Grid>
 

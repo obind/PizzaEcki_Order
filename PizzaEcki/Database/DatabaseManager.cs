@@ -9,6 +9,8 @@ using SharedLibrary;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
+using System.Globalization;
 
 namespace PizzaEcki.Database
 {
@@ -459,8 +461,6 @@ namespace PizzaEcki.Database
             return extras;
         }
 
-
-
         //Driver Methodes
         public void AddDriver(Driver driver)
         {
@@ -570,6 +570,8 @@ namespace PizzaEcki.Database
                 }
             }
         }
+
+     
         public async Task<bool> DeleteOrderAsync(Guid orderId)
         {
             
@@ -643,7 +645,7 @@ namespace PizzaEcki.Database
                         updateCommand.Parameters.AddWithValue("@OrderId", orderId);
                         updateCommand.Parameters.AddWithValue("@DriverId", driverId);
                         updateCommand.Parameters.AddWithValue("@Price", price);
-                        updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                        updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                         updateCommand.ExecuteNonQuery();
                     }
                 }
@@ -656,7 +658,7 @@ namespace PizzaEcki.Database
                         insertCommand.Parameters.AddWithValue("@OrderId", orderId);
                         insertCommand.Parameters.AddWithValue("@DriverId", driverId);
                         insertCommand.Parameters.AddWithValue("@Price", price);
-                        insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd"));
+                        insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                         insertCommand.ExecuteNonQuery();
                     }
                 }
@@ -819,6 +821,88 @@ namespace PizzaEcki.Database
             return unassignedOrders;
         }
 
+        public List<Order> GetAllOrders()
+        {
+            List<Order> orders = new List<Order>();
+            string sql = @"
+                SELECT 
+                    Orders.*,
+                    OrderItems.*
+                FROM 
+                    Orders
+                LEFT JOIN 
+                    OrderItems ON Orders.OrderId = OrderItems.OrderId
+                LEFT JOIN 
+                    OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
+            ";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var orderIdValue = reader["OrderId"].ToString();
+                        if (string.IsNullOrEmpty(orderIdValue))
+                        {
+                            var bonNumber = reader["BonNumber"].ToString();
+                            Console.WriteLine($"Fehler: OrderId ist null oder leer für BonNumber: {bonNumber}");
+                            continue;  // Überspringe diesen Datensatz
+                        }
+                        Guid currentOrderId = Guid.Parse(orderIdValue);
+
+                        Order order;
+                        if (orders.Any(o => o.OrderId == currentOrderId))
+                        {
+                            order = orders.First(o => o.OrderId == currentOrderId);
+                        }
+                        else
+                        {
+                            // Hier nimmst du die Daten für IsDelivery aus der Datenbank
+                            var isDeliveryValue = reader["IsDelivery"];
+                            bool isDelivery = false;
+
+                            // Wenn der Wert aus der Datenbank kommt, musst du ihn entsprechend konvertieren.
+                            if (isDeliveryValue != DBNull.Value)
+                            {
+                                isDelivery = Convert.ToInt32(isDeliveryValue) != 0;
+                            }
+
+                            order = new Order
+                            {
+                                OrderId = currentOrderId,
+                                CustomerPhoneNumber = reader["CustomerPhoneNumber"].ToString(),
+                                // Konvertiere DateTime? zu String, wenn es nicht null ist, sonst setze String auf null
+                                Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString("o"),
+                                DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader["DeliveryUntil"].ToString(),
+                                PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader["PaymentMethod"].ToString(),
+                                BonNumber = Convert.ToInt32(reader["BonNumber"]),
+                                IsDelivery = isDelivery,
+                            };
+                            orders.Add(order);
+
+                        }
+
+                        OrderItem orderItem = new OrderItem
+                        {
+                            Nr = reader.IsDBNull(reader.GetOrdinal("OrderItemId")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+                            Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+                            Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                            Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
+                            Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+                            Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+                            Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                            Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                            LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                        };
+
+                        order.OrderItems.Add(orderItem);
+
+                    }
+                }
+            }
+            return orders;
+        }
+        
 
         public List<OrderItem> GetOrderItems(Guid orderId)
         {
@@ -854,18 +938,24 @@ namespace PizzaEcki.Database
         public List<OrderAssignment> GetOrderAssignments()
         {
             List<OrderAssignment> assignments = new List<OrderAssignment>();
-            string sql = "SELECT BonNumber, DriverId, Price, Timestamp FROM OrderAssignments";  // Preis hinzugefügt
+            string sql = "SELECT OrderId, DriverId, Price, Timestamp FROM OrderAssignments";  // Preis hinzugefügt
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 using (SqliteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
+                        if (reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2) || reader.IsDBNull(3))
+                        {
+                            // Wenn irgendein Feld null ist, überspringe diesen Datensatz.
+                            continue;
+                        }
+
                         OrderAssignment assignment = new OrderAssignment
                         {
                             BonNumber = reader.GetInt32(0),
                             DriverId = reader.GetInt32(1),
-                            Price = reader.GetDouble(2),  // Preis hinzugefügt
+                            Price = reader.GetDouble(2),
                             Timestamp = reader.GetDateTime(3)
                         };
                         assignments.Add(assignment);
@@ -874,6 +964,7 @@ namespace PizzaEcki.Database
             }
             return assignments;
         }
+
 
 
         public double GetTotalSalesForDate(DateTime date)

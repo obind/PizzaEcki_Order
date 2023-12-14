@@ -11,6 +11,7 @@ namespace SharedLibrary
    public class Customer
    {
         [Key]
+        [JsonPropertyName("phoneNumber")]
         public string PhoneNumber { get; set; }
      
         [JsonPropertyName("name")]
@@ -21,7 +22,8 @@ namespace SharedLibrary
         
         [JsonPropertyName("city")]
         public string City { get; set; }
-
+        
+        [JsonPropertyName("additionalInfo")]
         public string AdditionalInfo { get; set; }
     }
 

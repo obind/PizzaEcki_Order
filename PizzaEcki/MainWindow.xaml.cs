@@ -35,7 +35,7 @@ namespace PizzaEcki
 
         public string SelectedPaymentMethod { get; private set; }
 
-        public string _customerNr;
+       public string _customerNr;
 
         private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
         private int Lieferung = 0;
@@ -56,8 +56,8 @@ namespace PizzaEcki
         {
             InitializeComponent();
 
-            signalRService = new SignalRService();
-            signalRService.StartConnectionAsync();
+            //signalRService = new SignalRService();
+            //signalRService.StartConnectionAsync();
 
             // Erstellt eine neue Instanz von DatabaseManager, um die Verbindung zur Datenbank zu verwalten
             // und alle erforderlichen Tabellen und Initialdaten zu initialisieren.
@@ -144,6 +144,7 @@ namespace PizzaEcki
                             if (result == MessageBoxResult.Yes)
                             {
                                 SaveButton.Visibility = Visibility.Visible;
+                                SaveButtonBorder.Visibility = Visibility.Visible;
                                 NameTextBox.Focus();
                                 Lieferung++;
                                 isDelivery = true;
@@ -685,7 +686,7 @@ namespace PizzaEcki
         }
         private void SendOrderItems(Order order)
         {
-            signalRService.SendOrderItemsAsync(order);
+            //signalRService.SendOrderItemsAsync(order);
         }
         private void EinstellungenBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -765,11 +766,11 @@ namespace PizzaEcki
 
                 if (isDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
                 {
-                    string addressStr = customer.Name+ "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
+                    string addressStr ="Tel: " + customer.PhoneNumber + "\r\n" + customer.Name+ "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
                     graphics.DrawString(addressStr, boldFont, Brushes.Black, 0, yOffset);
 
                     // Hier ändern wir den yOffset, um zwei Zeilenhöhen hinzuzufügen, eine für jede Zeile der Adresse.
-                    yOffset += boldFont.GetHeight() * 5;  // Anpassen für den Zeilenumbruch in der Adresse
+                    yOffset += boldFont.GetHeight() * 6;  // Anpassen für den Zeilenumbruch in der Adresse
                 }
 
                 string bonNumberStr = $"Bon Nummer: {order.BonNumber}";
@@ -1066,8 +1067,10 @@ namespace PizzaEcki
             }
         }
 
-
-
-
+        private void Auswertung_Btn_Click(object sender, RoutedEventArgs e)
+        {
+            var auswertungWindow = new Auswertung();
+            auswertungWindow.ShowDialog();
+        }
     }
 }
