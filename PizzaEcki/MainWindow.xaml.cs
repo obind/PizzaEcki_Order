@@ -17,6 +17,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics.Eventing.Reader;
 using System.Windows.Threading;
+using System.Diagnostics;
+
+using static PizzaEcki.Pages.SettingsWindow;
+using System.IO;
 
 namespace PizzaEcki
 {
@@ -62,6 +66,7 @@ namespace PizzaEcki
             // Erstellt eine neue Instanz von DatabaseManager, um die Verbindung zur Datenbank zu verwalten
             // und alle erforderlichen Tabellen und Initialdaten zu initialisieren.
             _databaseManager = new DatabaseManager();
+            StartServer();
 
             // Füllen die ComboBox für Gerichte aus der Datenbank
             dishesList = _databaseManager.GetAllDishes();
@@ -87,9 +92,37 @@ namespace PizzaEcki
             _reloadTimer.Tick += ReloadTimer_Tick;     
             _reloadTimer.Start();
         }
-        
 
-     
+        private void StartServer()
+        {
+            try
+            {
+                // Pfad zur Server-EXE relativ zum aktuellen Ausführungsverzeichnis
+                string serverExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PizzaServer.exe");
+
+                // Überprüfen Sie, ob die EXE vorhanden ist
+                if (File.Exists(serverExePath))
+                {
+                    Process serverProcess = new Process();
+                    serverProcess.StartInfo.FileName = serverExePath;
+                    serverProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(serverExePath); // Wichtig: Setzen Sie das Arbeitsverzeichnis
+                    serverProcess.StartInfo.CreateNoWindow = true;
+                    serverProcess.StartInfo.UseShellExecute = false;
+                    serverProcess.Start();
+                }
+                else
+                {
+                    MessageBox.Show("Die Server-EXE wurde nicht gefunden: " + serverExePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Fehlerbehandlung
+                MessageBox.Show("Der Server konnte nicht gestartet werden: " + ex.Message);
+            }
+        }
+
+
         private void ReloadTimer_Tick(object sender, EventArgs e)
         {
             // Rufe deine Methode hier auf
@@ -433,6 +466,14 @@ namespace PizzaEcki
                     return 0;
             }
         }
+
+        private bool IsHappyHour(DateTime currentTime)
+        {
+            var happyHourStart = Properties.Settings.Default.HappyHourStart;
+            var happyHourEnd = Properties.Settings.Default.HappyHourEnd;
+            return currentTime.TimeOfDay >= happyHourStart && currentTime.TimeOfDay <= happyHourEnd;
+        }
+
         private void ProcessOrder()
         {
             if (dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
@@ -457,13 +498,16 @@ namespace PizzaEcki
                 }
             }
 
+            bool isHappyHourNow = IsHappyHour(DateTime.Now);
+
+
             // Setze den Epreis zurück
             tempOrderItem.Epreis = 0;
 
             Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
             string selectedSize = SizeComboBox.SelectedItem.ToString();
             tempOrderItem.Größe = selectedSize;
-            tempOrderItem.Epreis += GetPriceForSelectedSize(selectedDish, selectedSize);
+     
 
             //Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
             //if (selectedDish != null)
@@ -471,6 +515,23 @@ namespace PizzaEcki
             //    string selectedSize = SizeComboBox.SelectedItem.ToString();
             //    
             //}
+        
+                if (selectedDish != null)
+                {
+                   
+                    tempOrderItem.Epreis += GetPriceForSelectedSize(selectedDish, selectedSize);
+                    double rabatt = tempOrderItem.Epreis * 10 / 100;
+                    // Überprüfe, ob das Gericht zum Happy Hour-Menü gehört
+                    if (isHappyHourNow && selectedDish.HappyHour == "1")
+                    {
+                        // Ziehe 10% vom Preis des Gerichts ab
+                         tempOrderItem.Epreis -= rabatt;
+                    }
+    
+                    // Berechne den Gesamtpreis für das Gericht
+                     tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
+                }
+            
 
             if (tempOrderItem.Extras != null)
             {
@@ -554,9 +615,14 @@ namespace PizzaEcki
                 MessageBox.Show("Es wurden keine Order-Items hinzugefügt. Bitte füge mindestens ein Order-Item hinzu, bevor du die Bestellung abschließt.");
                 return; // Verlasse die Methode frühzeitig
             }
-            if (!isDelivery)
-            { 
-            
+
+            string totalPriceString = TotalPriceLabel.Content.ToString();
+            double gesamtPreis = 0;
+            // Extrahiere den numerischen Wert aus dem Content-String
+            if (double.TryParse(totalPriceString.Split(' ')[0], out gesamtPreis) && gesamtPreis < 10)
+            {
+                MessageBox.Show("Der Mindestbestellwert wert muss über 10 € liegen.");
+                return; // Verlasse die Methode frühzeitig
             }
 
             if (PhoneNumberTextBox.Text != "")

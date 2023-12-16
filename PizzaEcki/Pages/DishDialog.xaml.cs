@@ -103,6 +103,7 @@ namespace PizzaEcki.Pages
                 Dish.Steuersatz = steuersatz;
             }
 
+            _dbManager.AddOrUpdateDish(Dish);
             DialogResult = true;
         }
 

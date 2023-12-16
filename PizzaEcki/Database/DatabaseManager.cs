@@ -9,7 +9,6 @@ using SharedLibrary;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
 using System.Globalization;
 using Microsoft.AspNet.SignalR.Client;
 
@@ -348,17 +347,17 @@ namespace PizzaEcki.Database
             _connection.Close();
             return dishes;
         }
-        public bool IsIdExists(int id)
+        public bool IsIdExists(int Id)
         {
             _connection.Open();
             string sql = "SELECT COUNT(*) FROM Gerichte WHERE Id = @Id";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
-                command.Parameters.AddWithValue("@Id", id);
+                command.Parameters.AddWithValue("@Id", Id);
                 var result = command.ExecuteScalar();
                 return Convert.ToInt32(result) > 0;
             }
-            _connection.Close();
+            
         }
 
 
@@ -538,6 +537,23 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+        public void UnassignDriverFromOrders(int driverId)
+        {
+            string updateSql = @"
+                UPDATE OrderAssignments
+                SET DriverId = -500
+                WHERE DriverId = @DriverId;";
+
+            _connection.Open();
+
+            using (var command = new SqliteCommand(updateSql, _connection))
+            {
+                command.Parameters.AddWithValue("@DriverId", driverId);
+                command.ExecuteNonQuery();
+            }
+            
+        }
+
 
         public List<Driver> GetDrivers()
         {
