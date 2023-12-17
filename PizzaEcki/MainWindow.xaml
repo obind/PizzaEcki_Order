@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="OrderMate" KeyDown="MainWindowEcki_KeyDown"
+        Title="Order Mate" KeyDown="MainWindowEcki_KeyDown"
        MinWidth="1000" MinHeight="580" >
 
 

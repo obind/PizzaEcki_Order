@@ -143,11 +143,20 @@
                 </Grid>
             </TabItem>
 
-
-
-            <TabItem Header="Andere Einstellungen" Background="#FFFF5D48"  Foreground="White">
-                <!-- Weitere Einstellungen -->
+            <TabItem Header="Über" Background="#FFFF5D48" Foreground="White">
+                <Grid Background="#FF1D1E20">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="Order Mate" FontSize="20" FontWeight="Bold" Foreground="#FFFF5D48" TextAlignment="Center"/>
+                        <TextBlock Text="Entwickelt von Kenneth Ballen" Foreground="White" TextAlignment="Center"/>
+                        <TextBlock Text="Design von Kenneth Ballen" Foreground="White" TextAlignment="Center"/>
+                        <TextBlock Text="© 2023 Kenneth Ballen" Foreground="White" TextAlignment="Center"/>
+                        <TextBlock Text="Alle Rechte vorbehalten." Foreground="White" TextAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
             </TabItem>
+
+
+            
         </TabControl>
     </Grid>
 </Window>

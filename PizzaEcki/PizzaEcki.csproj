@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>pizzzzzzaaaa.ico</ApplicationIcon>
+    <AssemblyName>Order Mate</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
