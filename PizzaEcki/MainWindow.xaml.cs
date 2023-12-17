@@ -477,9 +477,6 @@ namespace PizzaEcki
                 case "S":
                     return selectedDish.Preis_S;
                 case "L":
-                    
-                    
-                    
                     return selectedDish.Preis_L;
                 case "XL":
                     return selectedDish.Preis_XL;
@@ -487,6 +484,22 @@ namespace PizzaEcki
                     return 0;
             }
         }
+
+        public double GetPriceForSelectedExtraSize(Extra selectedExtra, string selectedSize)
+        {
+            switch (selectedSize)
+            {
+                case "S":
+                    return selectedExtra.ExtraPreis_S;
+                case "L":
+                    return selectedExtra.ExtraPreis_L;
+                case "XL":
+                    return selectedExtra.ExtraPreis_XL;
+                default:
+                    return 0; // Oder einen Standardpreis, wenn keine Größe übereinstimmt
+            }
+        }
+
         private bool IsHappyHour(DateTime currentTime)
         {
             var happyHourStart = Properties.Settings.Default.HappyHourStart;
@@ -550,20 +563,22 @@ namespace PizzaEcki
                     // Berechne den Gesamtpreis für das Gericht
                      tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
                 }
-            
+
 
             if (tempOrderItem.Extras != null)
             {
-                var extras = tempOrderItem.Extras.Split(',').Select(extra => extra.Trim());  // Konvertieren Sie den Extras-String in ein Array
-                foreach (var extra in extras)
+                var extras = tempOrderItem.Extras.Split(',').Select(extra => extra.Trim()); // Konvertieren Sie den Extras-String in ein Array
+                foreach (var extraName in extras)
                 {
-                    Extra selectedExtra = extrasList.FirstOrDefault(x => x.Name == extra);
+                    Extra selectedExtra = extrasList.FirstOrDefault(x => x.Name == extraName);
                     if (selectedExtra != null)
                     {
-                        tempOrderItem.Epreis += selectedExtra.Price;
+                        // Füge den Preis für das ausgewählte Extra basierend auf der Größe des Gerichts hinzu
+                        tempOrderItem.Epreis += GetPriceForSelectedExtraSize(selectedExtra, tempOrderItem.Größe);
                     }
                 }
             }
+
 
 
             // Berechnen Sie den Gesamtpreis eines Gerichtes mit Berücksichtigung der Anzahl

@@ -11,7 +11,9 @@ namespace PizzaEcki.Models
 
         public int Id { get; set; }
         public string Name { get; set; }
-        public double Price { get; set; }
+        public double ExtraPreis_S { get; set; }
+        public double ExtraPreis_L { get; set; }
+        public double ExtraPreis_XL { get; set; }
 
         public override string ToString()
         {

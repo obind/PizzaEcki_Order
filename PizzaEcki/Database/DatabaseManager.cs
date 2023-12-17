@@ -69,7 +69,7 @@ namespace PizzaEcki.Database
             }
 
             //Extras Table
-            sql = "CREATE TABLE IF NOT EXISTS Extras (Id INTEGER PRIMARY KEY, Name TEXT, Price REAL)";
+            sql = "CREATE TABLE IF NOT EXISTS Extras (Id INTEGER PRIMARY KEY, Name TEXT, Preis_S REAL, Preis_L REAL, Preis_XL REAL)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
@@ -434,20 +434,24 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+
         public void AddOrUpdateExtra(Extra extra)
         {
             _connection.Open();
-            string sql = "INSERT OR REPLACE INTO Extras (Id, Name, Price) VALUES (@Id, @Name, @Price)";
+            string sql = "INSERT OR REPLACE INTO Extras (Id, Name, Preis_S, Preis_L, Preis_XL) VALUES (@Id, @Name, @Preis_S, @Preis_L, @Preis_XL)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.Parameters.AddWithValue("@Id", extra.Id);
                 command.Parameters.AddWithValue("@Name", extra.Name);
-                command.Parameters.AddWithValue("@Price", extra.Price);
+                command.Parameters.AddWithValue("@Preis_S", extra.ExtraPreis_S);
+                command.Parameters.AddWithValue("@Preis_L", extra.ExtraPreis_L);
+                command.Parameters.AddWithValue("@Preis_XL", extra.ExtraPreis_XL);
 
                 command.ExecuteNonQuery();
             }
             _connection.Close();
         }
+
         public List<Extra> GetExtras()
         {
             _connection.Open();
@@ -463,7 +467,10 @@ namespace PizzaEcki.Database
                         {
                             Id = reader.GetInt32(0),
                             Name = reader.GetString(1),
-                            Price = reader.GetDouble(2)
+                            ExtraPreis_S = reader.GetDouble(2),
+                            ExtraPreis_L = reader.GetDouble(3), 
+                             ExtraPreis_XL = reader.GetDouble(4)
+
                         });
                     }
                 }
@@ -1262,31 +1269,31 @@ namespace PizzaEcki.Database
             AddDishes(dishes);
 
 
-            List<Extra> extras = new List<Extra>
-            {
-                new Extra { Id = 1, Name = "Käse", Price = 1.50 },
-                new Extra { Id = 2, Name = "Tomatensauce", Price = 1.00 },
-                new Extra { Id = 3, Name = "Salami", Price = 1.50 },
-                new Extra { Id = 4, Name = "Schinken", Price = 1.50 },
-                new Extra { Id = 5, Name = "Pilze", Price = 1.00 },
-                new Extra { Id = 6, Name = "Oliven", Price = 1.00 },
-                new Extra { Id = 7, Name = "Zwiebeln", Price = 1.00 },
-                new Extra { Id = 8, Name = "Paprika", Price = 1.00 },
-                new Extra { Id = 9, Name = "Pepperoni", Price = 1.50 },
-                new Extra { Id = 10, Name = "Hähnchen", Price = 2.00 },
-                new Extra { Id = 11, Name = "Rindfleisch", Price = 2.00 },
-                new Extra { Id = 12, Name = "Thunfisch", Price = 2.00 },
-                new Extra { Id = 13, Name = "Ananas", Price = 1.00 },
-                new Extra { Id = 14, Name = "Spinat", Price = 1.00 },
-                new Extra { Id = 15, Name = "Pesto", Price = 1.50 },
-                new Extra { Id = 16, Name = "Parmesan", Price = 1.50 },
-                new Extra { Id = 17, Name = "Sardellen", Price = 2.00 },
-                new Extra { Id = 18, Name = "Knoblauch", Price = 1.00 },
-                new Extra { Id = 19, Name = "Rucola", Price = 1.00 },
-                new Extra { Id = 20, Name = "Mais", Price = 1.00 }
-            };
+            //List<Extra> extras = new List<Extra>
+            //{
+            //    new Extra { Id = 1, Name = "Käse", Price = 1.50 },
+            //    new Extra { Id = 2, Name = "Tomatensauce", Price = 1.00 },
+            //    new Extra { Id = 3, Name = "Salami", Price = 1.50 },
+            //    new Extra { Id = 4, Name = "Schinken", Price = 1.50 },
+            //    new Extra { Id = 5, Name = "Pilze", Price = 1.00 },
+            //    new Extra { Id = 6, Name = "Oliven", Price = 1.00 },
+            //    new Extra { Id = 7, Name = "Zwiebeln", Price = 1.00 },
+            //    new Extra { Id = 8, Name = "Paprika", Price = 1.00 },
+            //    new Extra { Id = 9, Name = "Pepperoni", Price = 1.50 },
+            //    new Extra { Id = 10, Name = "Hähnchen", Price = 2.00 },
+            //    new Extra { Id = 11, Name = "Rindfleisch", Price = 2.00 },
+            //    new Extra { Id = 12, Name = "Thunfisch", Price = 2.00 },
+            //    new Extra { Id = 13, Name = "Ananas", Price = 1.00 },
+            //    new Extra { Id = 14, Name = "Spinat", Price = 1.00 },
+            //    new Extra { Id = 15, Name = "Pesto", Price = 1.50 },
+            //    new Extra { Id = 16, Name = "Parmesan", Price = 1.50 },
+            //    new Extra { Id = 17, Name = "Sardellen", Price = 2.00 },
+            //    new Extra { Id = 18, Name = "Knoblauch", Price = 1.00 },
+            //    new Extra { Id = 19, Name = "Rucola", Price = 1.00 },
+            //    new Extra { Id = 20, Name = "Mais", Price = 1.00 }
+            //};
 
-            AddExtras(extras);
+            //AddExtras(extras);
         }
 
     }
