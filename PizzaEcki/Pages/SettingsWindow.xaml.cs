@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing.Printing;
 using System.Windows;
 using System.Windows.Input;
 using PizzaEcki.Database;
@@ -12,6 +14,8 @@ namespace PizzaEcki.Pages
     {
         private DatabaseManager _dbManager;
         public ObservableCollection<Dish> Dishes { get; set; }
+        public TimeSpan HappyHourStartTime { get; private set; }
+        public TimeSpan HappyHourEndTime { get; private set; }
 
 
         public SettingsWindow()
@@ -19,7 +23,12 @@ namespace PizzaEcki.Pages
             InitializeComponent();
             _dbManager = new DatabaseManager();
             LoadDrivers();
-            LoadDishes(); 
+            LoadDishes();
+            PopulatePrinterComboBox();
+
+            HappyHourStartTimePicker.Value = DateTime.Today.Add(Properties.Settings.Default.HappyHourStart);
+            HappyHourEndTimePicker.Value = DateTime.Today.Add(Properties.Settings.Default.HappyHourEnd);
+
         }
 
         private void LoadDrivers()
@@ -50,8 +59,12 @@ namespace PizzaEcki.Pages
             }
         }
 
+        private void DriversList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            EditDriverButton_Click();
+        }
 
-        private void EditDriverButton_Click(object sender, RoutedEventArgs e)
+        private void EditDriverButton_Click()
         {
             Driver selectedDriver = DriversList.SelectedItem as Driver;
             if (selectedDriver != null)
@@ -71,11 +84,13 @@ namespace PizzaEcki.Pages
         private void AddDishButton_Click(object sender, RoutedEventArgs e)
         {
             DishDialog dialog = new DishDialog();
-            if (dialog.ShowDialog() == true)
-            {
-                _dbManager.AddOrUpdateDish(dialog.Dish);
-                Dishes.Add(dialog.Dish);  // Fügt das neue Gericht zur ObservableCollection hinzu
-            }
+            dialog.Closed += Dialog_Closed; // Abonnieren des Closed-Events
+            dialog.ShowDialog();
+
+        }
+        private void Dialog_Closed(object sender, EventArgs e)
+        {
+            LoadDishes(); // Aufrufen von LoadDishes, wenn das Dialogfenster geschlossen wird
         }
 
 
@@ -115,6 +130,68 @@ namespace PizzaEcki.Pages
                 MessageBox.Show("Bitte wählen Sie ein Gericht aus, das Sie löschen möchten.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+        private void SaveHappyHourTimesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.HappyHourStart = HappyHourStartTimePicker.Value?.TimeOfDay ?? TimeSpan.Zero;
+            Properties.Settings.Default.HappyHourEnd = HappyHourEndTimePicker.Value?.TimeOfDay ?? TimeSpan.Zero;
+            Properties.Settings.Default.Save(); // Sehr wichtig, um die Einstellungen zu speichern
 
+            MessageBox.Show("Happy Hour Zeiten wurden gespeichert.");
+        }
+
+
+
+        public static class ApplicationSettings
+        {
+            public static TimeSpan HappyHourStartTime { get; set; }
+            public static TimeSpan HappyHourEndTime { get; set; }
+        }
+
+        private void DeleteDriverButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedDriver = DriversList.SelectedItem as Driver;
+            if (selectedDriver != null)
+            {
+                MessageBoxResult result = MessageBox.Show("Sind Sie sicher, dass Sie diesen Fahrer löschen möchten?", "Fahrer löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    _dbManager.UnassignDriverFromOrders(selectedDriver.Id);
+                    _dbManager.DeleteDriver(selectedDriver.Id);
+
+                    // Hier müsstest du die Liste der Fahrer aktualisieren, zum Beispiel:
+                    LoadDrivers();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Bitte wählen Sie einen Fahrer zum Löschen aus.");
+            }
+        }
+        private void PopulatePrinterComboBox()
+        {
+            foreach (string printer in PrinterSettings.InstalledPrinters)
+            {
+                PrinterComboBox.Items.Add(printer);
+            }
+
+            // Optional: Wähle den aktuell eingestellten Drucker aus, wenn einer gespeichert ist
+            // PrinterComboBox.SelectedItem = Properties.Settings.Default.SelectedPrinter;
+        }
+        private void SavePrinterSelectionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (PrinterComboBox.SelectedItem != null)
+            {
+                string selectedPrinter = PrinterComboBox.SelectedItem.ToString();
+                PizzaEcki.Properties.Settings.Default.SelectedPrinter = selectedPrinter;
+                PizzaEcki.Properties.Settings.Default.Save();
+
+                MessageBox.Show("Drucker wurde gespeichert: " + selectedPrinter);
+            }
+            else
+            {
+                MessageBox.Show("Bitte wählen Sie einen Drucker aus der Liste.");
+            }
+        }
     }
 }

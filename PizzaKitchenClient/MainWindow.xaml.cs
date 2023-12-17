@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Drawing.Printing;
 using System.Drawing;
+using System.Windows.Input;
 
 namespace PizzaKitchenClient
 {
@@ -23,22 +24,26 @@ namespace PizzaKitchenClient
         private Order order;
         private bool isErrorMessageDisplayed = false;
         private bool isDelivery = false;
+
         public MainWindow()
         {
             InitializeComponent();
+            this.WindowState = WindowState.Maximized;
             Loaded += MainWindow_Loaded;
             OrdersList.ItemsSource = UnassignedOrders;
             OrdersList.SelectionChanged += OrdersList_SelectionChanged_1;
-
-            refreshTimer.Interval = TimeSpan.FromSeconds(1); // Aktualisiere alle 30 Sekunden
+            AssignButton.IsEnabled = false;
+            refreshTimer.Interval = TimeSpan.FromSeconds(5); // Aktualisiere alle 30 Sekunden
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
+            this.KeyDown += Window_KeyDown;
             CheckServerConnection();
             
         }
         private async void RefreshTimer_Tick(object sender, EventArgs e)
         {
             await LoadUnassignedOrdersAsync();
+            CheckServerConnection();
         }
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -72,6 +77,16 @@ namespace PizzaKitchenClient
                             {
                                 order.Customer = customer;
                             }
+
+                            // Hier wird die Logik hinzugefügt, um den OrderType zu ändern
+                            if (order.CustomerPhoneNumber == "1")
+                            {
+                                order.CustomerPhoneNumber = "Selbstabholer";
+                            }
+                            else if (order.CustomerPhoneNumber == "2")
+                            {
+                                order.CustomerPhoneNumber = "Mitnehmer";
+                            }
                         }
                         UnassignedOrders.Add(order);
                     }
@@ -82,12 +97,11 @@ namespace PizzaKitchenClient
             {
                 if (!isErrorMessageDisplayed)
                 {
-                
-                    isErrorMessageDisplayed = true; 
+                    // Fehlerbehandlung hier
+                    isErrorMessageDisplayed = true;
                 }
             }
         }
-
 
         private async Task<Customer> GetCustomerByPhoneNumberAsync(string phoneNumber)
         {
@@ -110,28 +124,38 @@ namespace PizzaKitchenClient
             }
         }
 
-
-
-
         private async void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                List<Driver> driversFromApi = await _apiService.GetAllDriversAsync();
-                DriversComboBox.ItemsSource = driversFromApi;
-            }
-            catch (Exception ex)
-            {
-                // Fehlerbehandlung hier
-                MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
-            }
-        }
+           
+                try
+                {
+                    List<Driver> driversFromApi = await _apiService.GetAllDriversAsync();
 
+                    // Filtere die Liste, um nur Fahrer mit positiver ID zu behalten
+                    var filteredDrivers = driversFromApi.Where(driver => driver.Id >= 0).ToList();
+
+                    DriversComboBox.ItemsSource = filteredDrivers;
+                }
+                catch (Exception ex)
+                {
+                    // Fehlerbehandlung hier
+                    MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
+                
+                }
+
+        }
 
         private async void OnAssignButtonClicked(object sender, RoutedEventArgs e)
         {
             if (OrdersList.SelectedItem is Order selectedOrder && DriversComboBox.SelectedItem is Driver selectedDriver)
             {
+                // Deaktiviere den Button, wenn CustomerPhoneNumber 1 oder 2 ist
+                if (selectedOrder.CustomerPhoneNumber == "1" || selectedOrder.CustomerPhoneNumber == "2")
+                {
+                    MessageBox.Show("Diese Bestellung kann nicht zugewiesen werden.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return; // Verlasse die Methode frühzeitig
+                }
+
                 if (!selectedOrder.IsDelivery)
                 {
                     MessageBox.Show("Fahrer können keine Abholungen übernehmen.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -139,7 +163,6 @@ namespace PizzaKitchenClient
                 }
 
                 double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
-
 
                 try
                 {
@@ -155,9 +178,10 @@ namespace PizzaKitchenClient
             }
             else
             {
-                MessageBox.Show("Bitte wählen Sie eine Bestellung und einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Bitte wählen Sie einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+
         private async void CheckServerConnection()
         {
             try
@@ -187,6 +211,15 @@ namespace PizzaKitchenClient
             // Aktualisiere das ausgewählte Item
             _selectedOrder = OrdersList.SelectedItem as Order;
             HighlightSelectedItem();
+            if (OrdersList.SelectedItem is Order selectedOrder)
+            {
+                // Deaktiviere den Zuordnen-Button, wenn die PhoneNumber 1 oder 2 ist
+                AssignButton.IsEnabled = !(selectedOrder.CustomerPhoneNumber == "Mitnehmer" || selectedOrder.CustomerPhoneNumber == "Selbstabholer");
+            }
+            else
+            {
+                AssignButton.IsEnabled = false; // Deaktiviere den Button, wenn nichts ausgewählt ist
+            }
         }
 
 
@@ -210,7 +243,7 @@ namespace PizzaKitchenClient
             {
                 Customer customer = null;
                 // Hier könntest du die Kundeninformationen abrufen, falls notwendig
-                PrintReceipt(_selectedOrder, customer);
+                PrintReceipt(_selectedOrder);
             }
             else
             {
@@ -218,8 +251,10 @@ namespace PizzaKitchenClient
             }
         }
 
-        private void PrintReceipt(Order order, Customer customer)
+        private async void PrintReceipt(Order order)
         {
+            Customer customer1 = await GetCustomerByPhoneNumberAsync(order.CustomerPhoneNumber);
+
             PrintDocument printDoc = new PrintDocument();
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
             printDoc.PrintPage += (sender, e) =>
@@ -264,13 +299,13 @@ namespace PizzaKitchenClient
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += regularFont.GetHeight() + 10;
 
-                if (_selectedOrder.IsDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
+                if (_selectedOrder.IsDelivery && customer1 != null)  // Überprüfen, ob es sich um eine Lieferung handelt
                 {
-                    string addressStr = customer.Name + "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
+                    string addressStr = "Tel: " + customer1.PhoneNumber+ "\r\n" + customer1.Name + "\r\n" + customer1.Street + "\r\n" + customer1.City + "\r\n" + customer1.AdditionalInfo;
                     graphics.DrawString(addressStr, boldFont, Brushes.Black, 0, yOffset);
 
                     // Hier ändern wir den yOffset, um zwei Zeilenhöhen hinzuzufügen, eine für jede Zeile der Adresse.
-                    yOffset += boldFont.GetHeight() * 5;  // Anpassen für den Zeilenumbruch in der Adresse
+                    yOffset += boldFont.GetHeight() * 6;  // Anpassen für den Zeilenumbruch in der Adresse
                 }
 
                 string bonNumberStr = $"Bon Nummer: {order.BonNumber}";
@@ -290,27 +325,15 @@ namespace PizzaKitchenClient
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += 5;
 
-                // Verschoben innerhalb des Ereignishandlers
-
-
-                // Bestellte Gerichte
-
-                // Definiere einen Stift zum Zeichnen der Linien
-
-
-                // Tabellenüberschrift
                 string headerAnz = "Anz";
                 string headerNr = "Nr";
                 string headerGericht = "Gericht";
                 string headerGr = "Gr.";
                 string headerPreis = "Preis";
-
-                // Definiere die Positionen der Spaltenköpfe
                 float headerAnzPosition = 0;
-                float headerNrPosition = 30;  // 
-                float headerGerichtPosition = 50;  // Angenommene Position, anpassen nach Bedarf
-                float headerGrPosition = 200;  // Angenommene Position, anpassen nach Bedarf
-                                               // Preis rechtsbündig, Abstand vom rechten Rand
+                float headerNrPosition = 30; 
+                float headerGerichtPosition = 50; 
+                float headerGrPosition = 200; 
                 float headerPreisPosition = e.PageBounds.Width - graphics.MeasureString(headerPreis, regularFont).Width - 15;
 
                 // Zeichne die Tabellenüberschrift#
@@ -323,7 +346,7 @@ namespace PizzaKitchenClient
                 // Zeichne eine Trennlinie nach der Überschrift
                 yOffset += regularFont.GetHeight();
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
-                yOffset += 3; // Füge einen kleinen Abstand nach der Linie hinzu
+                yOffset += 3;
 
                 // Vorhandener Code für Bestellzeilen ...
                 Font extraFont = new Font("Segoe UI", 10);
@@ -399,6 +422,26 @@ namespace PizzaKitchenClient
 
             printDoc.Print();
 
+        }
+
+        private async void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F4 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                if (_selectedOrder != null)
+                {
+                    bool success = await _apiService.DeleteOrderAsync(_selectedOrder.OrderId);
+                    if (success)
+                    {
+                        // Entferne die Bestellung aus der Liste, wenn erfolgreich gelöscht
+                        UnassignedOrders.Remove(_selectedOrder);  
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Keine Bestellung ausgewählt.");
+                }
+            }
         }
     }
 }

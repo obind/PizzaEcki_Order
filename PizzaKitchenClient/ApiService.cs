@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Windows;
 using System;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Mvc;
 
 public class ApiService
 {
@@ -35,6 +36,7 @@ public class ApiService
     {
         return await _httpClient.GetAsync($"{_apiBaseUrl}/healthcheck"); // Ein einfacher Endpunkt auf dem Server, der eine schnelle Antwort gibt
     }
+
     public async Task<List<Order>> GetUnassignedOrdersAsync()
     {
         var response = await _httpClient.GetAsync($"{_apiBaseUrl}/unassignedOrders");
@@ -52,6 +54,30 @@ public class ApiService
         return orders;
     }
 
+    [HttpDelete("deleteOrder")]
+    public async Task<bool> DeleteOrderAsync(Guid orderId)
+    {
+        try
+        {
+           //http://localhost:5062/deleteOrder/{6cd0145c-c47a-4844-8613-d3a01c9d7c40}
+            var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/deleteOrder/{orderId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                string errorMessage = await response.Content.ReadAsStringAsync();
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ausnahme aufgetreten: {ex.Message}");
+            return false;
+        }
+    }
     // In deinem ApiService
     public async Task<List<Driver>> GetAllDriversAsync()
     {
@@ -87,6 +113,12 @@ public class ApiService
             return null;
         }
 
+        // Überspringe die HTTP-Anfrage, wenn die Telefonnummer "1" oder "2" ist
+        if (phoneNumber == "1" || phoneNumber == "2")
+        {
+            return null;
+        }
+
         try
         {
             // Erstellen der URL mit dem Query-Parameter für die Telefonnummer
@@ -113,6 +145,7 @@ public class ApiService
             return null;
         }
     }
+
 
 
 

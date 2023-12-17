@@ -33,7 +33,7 @@
 
 
         <DataGrid x:Name="dataGrid" 
-                  Margin="10,50,10,10" Background="#FF474747">
+                  Margin="10,50,10,10" Background="#FF474747" IsReadOnly="True">
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="Background" Value="#3d4248"/>

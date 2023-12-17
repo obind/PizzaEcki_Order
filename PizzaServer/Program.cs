@@ -8,13 +8,16 @@ builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<PizzaDbContext>();
 builder.Services.AddScoped<PizzaDataService>();
+
+var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
         builder
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .WithOrigins("https://localhost:7166", "http://localhost:5062")
+        .WithOrigins(allowedOrigins) // Verwende die konfigurierten URLs
         .AllowCredentials());
 });
 
@@ -72,6 +75,45 @@ app.MapGet("/unassignedOrders", async (PizzaDataService service) =>
     }
     catch (Exception ex)
     {
+        return Results.Problem(ex.Message);
+    }
+});
+
+//app.MapGet("/allOrders", async (PizzaDataService service) =>
+//{
+//    try
+//    {
+//        var orders = await service.GetAllOrdersAsync();
+//        return Results.Ok(orders);
+//    }
+//    catch (Exception ex)
+//    {
+//        return Results.Problem(ex.Message);
+//    }
+//});
+
+
+app.MapDelete("/deleteOrder/{orderId}", async (PizzaDataService service, Guid orderId) =>
+{
+    try
+    {
+        // Rufen Sie eine Methode in Ihrem Service auf, um die Bestellung zu löschen
+        bool deleteResult = await service.DeleteOrderAsync(orderId);
+
+        // Wenn das Löschen erfolgreich war, senden Sie eine Erfolgsmeldung
+        if (deleteResult)
+        {
+            return Results.Ok();
+        }
+        else
+        {
+            // Wenn das Löschen nicht erfolgreich war (z.B. OrderId nicht gefunden), senden Sie eine Nicht-Gefunden-Meldung
+            return Results.NotFound();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Wenn es einen Fehler gibt, senden Sie eine Fehlermeldung
         return Results.Problem(ex.Message);
     }
 });
