@@ -59,12 +59,17 @@ namespace PizzaEcki
         public MainWindow()
         {
             InitializeComponent();
-
+            InitializeApplication();
             //signalRService = new SignalRService();
             //signalRService.StartConnectionAsync();
 
             // Erstellt eine neue Instanz von DatabaseManager, um die Verbindung zur Datenbank zu verwalten
             // und alle erforderlichen Tabellen und Initialdaten zu initialisieren.
+
+        }
+
+        private void InitializeApplication()
+        {
             _databaseManager = new DatabaseManager();
             StartServer();
 
@@ -77,7 +82,7 @@ namespace PizzaEcki
             ExtrasComboBox.ItemsSource = extrasList;
 
             //Den Time Picker Vorbereiten zum Programm start 
-            TimePickermein.Value = null;      
+            TimePickermein.Value = null;
             TimePickermein.TimeInterval = new TimeSpan(0, 30, 0);
 
             LoadDrivers();
@@ -89,7 +94,7 @@ namespace PizzaEcki
             {
                 Interval = TimeSpan.FromSeconds(2)
             };
-            _reloadTimer.Tick += ReloadTimer_Tick;     
+            _reloadTimer.Tick += ReloadTimer_Tick;
             _reloadTimer.Start();
         }
 
@@ -122,6 +127,19 @@ namespace PizzaEcki
             }
         }
 
+        public void RefreshDishesAndExtras()
+        {
+            dishesList = _databaseManager.GetAllDishes();
+            DishComboBox.ItemsSource = dishesList;
+
+            extrasList = _databaseManager.GetExtras();
+            ExtrasComboBox.ItemsSource = extrasList;
+        }
+
+        private void SettingsWindow_Closed(object sender, EventArgs e)
+        {
+            RefreshDishesAndExtras();
+        }
 
         private void ReloadTimer_Tick(object sender, EventArgs e)
         {
@@ -804,6 +822,7 @@ namespace PizzaEcki
         private void EinstellungenBtn_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow settingsWindow = new SettingsWindow();
+            settingsWindow.Closed += SettingsWindow_Closed;
             settingsWindow.ShowDialog();
         }
         private void LoadDrivers()

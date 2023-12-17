@@ -193,10 +193,5 @@ namespace PizzaEcki.Pages
                 MessageBox.Show("Bitte wählen Sie einen Drucker aus der Liste.");
             }
         }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-
-        }
     }
 }
