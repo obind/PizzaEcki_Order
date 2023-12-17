@@ -41,8 +41,6 @@ namespace PizzaEcki.Database
             CreateTable();
             InitializeDishes();
         }
-
-
         //Customers
         private void CreateTable()
         {
@@ -160,7 +158,6 @@ namespace PizzaEcki.Database
 
             _connection.Close();
         }
-
         //Tabellen
         public List<string> GetTableNames()
         {
@@ -181,7 +178,6 @@ namespace PizzaEcki.Database
             _connection.Close();
             return tableNames;
         }
-
         public DataTable GetTableData(string tableName)
         {
             _connection.Open();
@@ -198,8 +194,6 @@ namespace PizzaEcki.Database
             _connection.Close();
             return tableData;
         }
-
-
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
         {
             _connection.Open();
@@ -221,16 +215,16 @@ namespace PizzaEcki.Database
                             PhoneNumber = reader.GetString(0),
                             Name = reader.GetString(1),
                             Street = reader.GetString(2),
-                            City = reader.GetString(3),
+                            City = reader.IsDBNull(3) ? null : reader.GetString(3), // Überprüfe auf NULL
                             AdditionalInfo = reader.IsDBNull(4) ? null : reader.GetString(4)
                         };
                     }
                 }
             }
+
             _connection.Close();
             return null;
         }
-
         public void AddOrUpdateCustomer(Customer customer)
         {
             long addressId;
@@ -257,7 +251,6 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-
         //Dishes
         public void AddDishes(List<Dish> dishes)
         {
@@ -287,8 +280,6 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-
-
         public List<Dish> GetAllDishes()
         {
             _connection.Open();
@@ -357,11 +348,9 @@ namespace PizzaEcki.Database
                 var result = command.ExecuteScalar();
                 return Convert.ToInt32(result) > 0;
             }
-            
+
+            _connection.Close();
         }
-
-
-
         public void DeleteDish(int id)
         {
             _connection.Open();
@@ -373,27 +362,23 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+        //public List<string> GetAllStreets()
+        //{
 
-
-
-        public List<string> GetAllStreets()
-        {
-
-            List<string> streets = new List<string>();
-            string sql = "SELECT DISTINCT Street FROM Addresses";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        streets.Add(reader.GetString(0));
-                    }
-                }
-            }
-            return streets;
-        }
-
+        //    List<string> streets = new List<string>();
+        //    string sql = "SELECT DISTINCT Street FROM Addresses";
+        //    using (SqliteCommand command = new SqliteCommand(sql, _connection))
+        //    {
+        //        using (SqliteDataReader reader = command.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                streets.Add(reader.GetString(0));
+        //            }
+        //        }
+        //    }
+        //    return streets;
+        //}
         public List<string> GetAllCities()
         {
             _connection.Open();
@@ -412,8 +397,6 @@ namespace PizzaEcki.Database
             _connection.Close();
             return cities;
         }
-
-
         //public List<Dish> GetDishes()
         //{
         //    List<Dish> dishes = new List<Dish>();
@@ -491,7 +474,7 @@ namespace PizzaEcki.Database
 
         //Driver Methodes
         public void AddDriver(Driver driver)
-            {
+        {
             _connection.Open();
             string sql = "INSERT INTO Drivers (Name, PhoneNumber) VALUES (@Name, @PhoneNumber)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -502,7 +485,6 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-
         public void UpdateDriver(Driver driver)
         {
             _connection.Open();
@@ -551,9 +533,8 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@DriverId", driverId);
                 command.ExecuteNonQuery();
             }
-            
+            _connection.Close();
         }
-
 
         public List<Driver> GetDrivers()
         {
@@ -606,10 +587,10 @@ namespace PizzaEcki.Database
             return drivers;
         }
 
-        //Settings 
         public int GetCurrentBonNumber()
         {
             string sql = "SELECT LastResetDate, CurrentBonNumber FROM Settings";
+            _connection.Open();
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 using (SqliteDataReader reader = command.ExecuteReader())
@@ -625,9 +606,9 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+            _connection.Close();    
         }
 
-     
         public async Task<bool> DeleteOrderAsync(Guid orderId)
         {
             
@@ -665,9 +646,10 @@ namespace PizzaEcki.Database
 
                     transaction.Commit();
 
-                    // Prüfe, ob irgendeine Zeile betroffen war
+                    _connection.Close();
                     return result > 0;
                 }
+               
             }
             catch (Exception ex)
             {
@@ -687,6 +669,7 @@ namespace PizzaEcki.Database
 
         public void SaveOrderAssignment(string orderId, int driverId, double price)
         {
+            _connection.Open();
             string checkSql = "SELECT COUNT(*) FROM OrderAssignments WHERE OrderId = @OrderId";
             using (SqliteCommand checkCommand = new SqliteCommand(checkSql, _connection))
             {
@@ -719,6 +702,7 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+            _connection.Close();
         }
 
         public void SaveOrder(Order order)
@@ -793,7 +777,6 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-
 
         public List<Order> GetUnassignedOrders()
         {
@@ -963,11 +946,10 @@ namespace PizzaEcki.Database
             _connection.Close();    
             return orders;
         }
-        
-
+       
         public List<OrderItem> GetOrderItems(Guid orderId)
         {
-       
+            _connection.Open();
             List<OrderItem> orderItems = new List<OrderItem>();
             string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -997,7 +979,6 @@ namespace PizzaEcki.Database
             return orderItems;
         }
 
-
         public List<OrderAssignment> GetOrderAssignments()
         {
             _connection.Open();
@@ -1026,11 +1007,10 @@ namespace PizzaEcki.Database
                     }
                 }
             }
-            return assignments;
             _connection.Close();
+            return assignments;
+            
         }
-
-
 
         public double GetTotalSalesForDate(DateTime date)
         {
@@ -1041,8 +1021,9 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
                 object result = command.ExecuteScalar();
                 return result != DBNull.Value ? Convert.ToDouble(result) : 0;
+               
             }
-            _connection.Close();
+            
         }
 
         public List<DailySalesInfo> GetDailySales(DateTime date)
@@ -1087,33 +1068,63 @@ namespace PizzaEcki.Database
         }
         public int CheckAndResetBonNumberIfNecessary()
         {
+            _connection.Open();
             string getSettingsSql = "SELECT LastResetDate, CurrentBonNumber FROM Settings LIMIT 1";
             string updateSettingsSql = "UPDATE Settings SET CurrentBonNumber = 1, LastResetDate = @LastResetDate";
             int currentBonNumber = 0;
 
             using (SqliteCommand getSettingsCommand = new SqliteCommand(getSettingsSql, _connection))
             {
-                _connection.Open();
                 using (SqliteDataReader reader = getSettingsCommand.ExecuteReader())
                 {
                     if (reader.Read())
                     {
-                        var lastResetDate = DateTime.Parse(reader["LastResetDate"].ToString());
-                        currentBonNumber = int.Parse(reader["CurrentBonNumber"].ToString());
-                        var currentDate = DateTime.Now.Date;
+                        var lastResetDateValue = reader["LastResetDate"].ToString();
+                        DateTime lastResetDate;
 
-                        if (currentDate > lastResetDate)
+                        // Prüfe, ob der Wert nicht leer ist, und versuche ihn zu parsen
+                        if (!string.IsNullOrEmpty(lastResetDateValue) && DateTime.TryParse(lastResetDateValue, out lastResetDate))
                         {
-                            // Zurücksetzen der Bonnummer und Aktualisieren des Reset-Datums
-                            using (SqliteCommand updateSettingsCommand = new SqliteCommand(updateSettingsSql, _connection))
+                            currentBonNumber = int.Parse(reader["CurrentBonNumber"].ToString());
+                            var currentDate = DateTime.Now.Date;
+
+                            if (currentDate > lastResetDate)
                             {
-                                updateSettingsCommand.Parameters.AddWithValue("@LastResetDate", currentDate.ToString("yyyy-MM-dd"));
-                                updateSettingsCommand.ExecuteNonQuery();
+                                // Zurücksetzen der Bonnummer und Aktualisieren des Reset-Datums
+                                using (SqliteCommand updateSettingsCommand = new SqliteCommand(updateSettingsSql, _connection))
+                                {
+                                    updateSettingsCommand.Parameters.AddWithValue("@LastResetDate", currentDate.ToString("yyyy-MM-dd"));
+                                    updateSettingsCommand.ExecuteNonQuery();
+                                }
+
+                                // Setze die Bonnummer auf den Anfangswert zurück
+                                currentBonNumber = 0;
+                            }
+                        }
+                        else
+                        {
+                            // Der Wert ist leer oder null, setze LastResetDate auf das heutige Datum
+                            lastResetDate = DateTime.Now.Date;
+
+                            // Erstelle eine SQL-Anweisung, um das LastResetDate auf das heutige Datum zu setzen
+                            string updateLastResetDateSql = "UPDATE Settings SET LastResetDate = @LastResetDate WHERE CurrentBonNumber = @CurrentBonNumber";
+
+                            using (SqliteCommand updateCommand = new SqliteCommand(updateLastResetDateSql, _connection))
+                            {
+                                // Setze die Parameter für das SQL-Statement
+                                updateCommand.Parameters.AddWithValue("@LastResetDate", lastResetDate.ToString("yyyy-MM-dd"));
+                                updateCommand.Parameters.AddWithValue("@CurrentBonNumber", reader["CurrentBonNumber"]);
+
+                                // Führe das SQL-Statement aus
+                                updateCommand.ExecuteNonQuery();
                             }
 
-                            // Setze die Bonnummer auf den Anfangswert zurück
-                            currentBonNumber = 0;
+                            // Optional: Setze hier die Bonnummer zurück, falls erforderlich
+                            // currentBonNumber = 1; // Oder ein anderer Startwert
                         }
+
+
+
                     }
                     else
                     {
@@ -1126,8 +1137,6 @@ namespace PizzaEcki.Database
 
             return currentBonNumber; // Rückgabe der aktuellen oder zurückgesetzten Bonnummer
         }
-
-
 
         public void ResetBonNumberForTesting()
         {
@@ -1149,8 +1158,6 @@ namespace PizzaEcki.Database
             _connection.Close();
         }
 
-
-
         public void UpdateCurrentBonNumber(int newNumber)
         {
             string sql = "UPDATE Settings SET CurrentBonNumber = @number";
@@ -1163,8 +1170,6 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-
-
 
         public void Dispose()
         {

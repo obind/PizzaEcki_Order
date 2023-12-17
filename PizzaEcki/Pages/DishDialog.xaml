@@ -5,8 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="DishDialog" Height="800" Width="800">
-    <Grid>
+        Title="Gericht" Height="500" Width="500">
+
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#FFFF5D48"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10,5"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="#FF1D1E20" >
         <Grid.RowDefinitions >
             <RowDefinition Height = "Auto" />
             <RowDefinition Height = "Auto" />
@@ -21,43 +31,43 @@
         </Grid.RowDefinitions >
         
         <Grid.ColumnDefinitions >
-            <ColumnDefinition Width = "Auto" />
+            <ColumnDefinition Width = "*" />
             <ColumnDefinition Width = "*" />
         </Grid.ColumnDefinitions >
-        <Label Content = "ID des Gerichts:" Grid.Row = "0" Grid.Column = "0" Margin = "10" />
-        <TextBox Name = "IdTextBox" Grid.Row = "0" Grid.Column = "1" Margin = "10" Width = "200" />
+        <Label Content = "ID des Gerichts:" Grid.Row = "0" Grid.Column = "0" Margin = "10" Foreground="White" HorizontalAlignment="Center" />
+        <TextBox Name = "IdTextBox" Grid.Row = "0" Grid.Column = "1" Margin = "10" Width = "200" HorizontalAlignment="Left" />
         <!--Name des Gerichts -->
-            <Label Content="Name des Gerichts:" Grid.Row="1" Grid.Column="0" Margin="10"/>
-            <TextBox Name="NameTextBox" Grid.Row="1" Grid.Column="1" Margin="10" Width="200"/>
+            <Label Content="Name des Gerichts:" Grid.Row="1" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center"/>
+            <TextBox Name="NameTextBox" Grid.Row="1" Grid.Column="1" Margin="10" Width="200" HorizontalAlignment="Left"/>
 
             <!-- Preis -->
             <!-- Preis S -->
-            <Label Content="Preis S:" Grid.Row="2" Grid.Column="0" Margin="10"/>
-            <TextBox Name="PriceSTextBox" Grid.Row="2" Grid.Column="1" Margin="10" Width="200"/>
+            <Label Content="Preis S:" Grid.Row="2" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center"/>
+             <TextBox Name="PriceSTextBox" Grid.Row="2" Grid.Column="1" Margin="10" Width="200" HorizontalAlignment="Left" LostFocus="PriceTextBox_LostFocus"/>
 
-            <!-- Preis L -->
-            <Label Content="Preis L:" Grid.Row="3" Grid.Column="0" Margin="10"/>
-            <TextBox Name="PriceLTextBox" Grid.Row="3" Grid.Column="1" Margin="10" Width="200"/>
+        <!-- Preis L -->
+            <Label Content="Preis L:" Grid.Row="3" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center"/>
+        <TextBox Name="PriceLTextBox" Grid.Row="3" Grid.Column="1" Margin="10" Width="200" HorizontalAlignment="Left" LostFocus="PriceTextBox_LostFocus"/>
 
-            <!-- Preis XL -->
-            <Label Content="Preis XL:" Grid.Row="4" Grid.Column="0" Margin="10"/>
-            <TextBox Name="PriceXLTextBox" Grid.Row="4" Grid.Column="1" Margin="10" Width="200"/>
+        <!-- Preis XL -->
+            <Label Content="Preis XL:" Grid.Row="4" Grid.Column="0" Margin="10" Foreground="#FFEAEAEA" HorizontalAlignment="Center"/>
+        <TextBox Name="PriceXLTextBox" Grid.Row="4" Grid.Column="1" Margin="10" Width="200" HorizontalAlignment="Left" LostFocus="PriceTextBox_LostFocus"/>
 
-            <!-- Kategorie -->
-            <Label Content="Kategorie:" Grid.Row="5" Grid.Column="0" Margin="10"/>
-            <ComboBox Name="CategoryComboBox" Grid.Row="5" Grid.Column="1" Margin="10" Width="200" Loaded="CategoryComboBox_Loaded"/>
+        <!-- Kategorie -->
+            <Label Content="Kategorie:" Grid.Row="5" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center"/>
+            <ComboBox Name="CategoryComboBox" Grid.Row="5" Grid.Column="1" Margin="10" Width="200" Loaded="CategoryComboBox_Loaded" Background="#FF6082D0" HorizontalAlignment="Left"/>
 
             <!-- HappyHour -->
-            <Label Content="HappyHour:" Grid.Row="6" Grid.Column="0" Margin="10"/>
+            <Label Content="HappyHour:" Grid.Row="6" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center"/>
             <CheckBox Name="HappyHourCheckBox" Grid.Row="6" Grid.Column="1" Margin="10" VerticalAlignment="Center"/>
 
             <!-- Steuersatz -->
-            <Label Content="Steuersatz:" Grid.Row="7" Grid.Column="0" Margin="10"/>
-            <TextBox Name="TaxRateTextBox" Grid.Row="7" Grid.Column="1" Margin="10" Width="200"/>
+            <Label Content="Steuersatz:" Grid.Row="7" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center"/>
+            <TextBox Name="TaxRateTextBox" Grid.Row="7" Grid.Column="1" Margin="10" Width="200" HorizontalAlignment="Left"/>
 
 
             <!-- Gratis Beilage -->
-            <Label Content="Gratis Beilage:" Grid.Row="8" Grid.Column="0" Margin="10"/>
+            <Label Content="Gratis Beilage:" Grid.Row="8" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center"/>
             <CheckBox Name="FreeSideCheckBox" Grid.Row="8" Grid.Column="1" Margin="10" VerticalAlignment="Center"/>
 
 

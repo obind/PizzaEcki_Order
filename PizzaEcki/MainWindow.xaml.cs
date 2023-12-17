@@ -282,7 +282,6 @@ namespace PizzaEcki
             // Leere die ausgewählten Extras, da sich das ausgewählte Gericht geändert hat
             tempOrderItem.Extras = "";
         }
-
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -382,9 +381,10 @@ namespace PizzaEcki
             }
             else if (e.Key == Key.Enter)
             {
-
-                await Task.Delay(50); 
                 tempOrderItem.Extras = textBox.Text;
+                await Task.Delay(50); 
+                
+               
                 amountComboBox.Focus();  // Verschiebe den Fokus zur amountComboBox
             }
         }
@@ -407,12 +407,12 @@ namespace PizzaEcki
                 e.Handled = true;  // Verhindere, dass die Leertaste ein Leerzeichen einfügt
             }
              if (e.Key == Key.Enter)
-            {
+             {
                 tempOrderItem.Extras = textBox.Text;
                 await Task.Delay(10);
                 amountComboBox.Focus();
                 e.Handled = true;
-            }
+             }
         }
         private bool ShouldProcessOrder()
         {
@@ -459,6 +459,9 @@ namespace PizzaEcki
                 case "S":
                     return selectedDish.Preis_S;
                 case "L":
+                    
+                    
+                    
                     return selectedDish.Preis_L;
                 case "XL":
                     return selectedDish.Preis_XL;
@@ -466,14 +469,12 @@ namespace PizzaEcki
                     return 0;
             }
         }
-
         private bool IsHappyHour(DateTime currentTime)
         {
             var happyHourStart = Properties.Settings.Default.HappyHourStart;
             var happyHourEnd = Properties.Settings.Default.HappyHourEnd;
             return currentTime.TimeOfDay >= happyHourStart && currentTime.TimeOfDay <= happyHourEnd;
         }
-
         private void ProcessOrder()
         {
             if (dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
@@ -658,7 +659,6 @@ namespace PizzaEcki
                     ReloadeUnassignedOrders();
 
                     if (PhoneNumberTextBox.Text != "1" && PhoneNumberTextBox.Text != "2")
-
                     {
                         Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
                         PrintReceipt(order, customer);
@@ -671,6 +671,13 @@ namespace PizzaEcki
                     // Leeren Sie die Bestellliste
                     orderItems.Clear();
 
+                    PhoneNumberTextBox.Text = string.Empty;
+                    NameTextBox.Text = string.Empty;
+                    StreetTextBox.Text = string.Empty;
+                    CityTextBox.Text = string.Empty;
+                    AdditionalInfoTextBox.Text = string.Empty;
+                    SaveButton.Visibility = Visibility.Collapsed;
+                    TimePickermein.Value = null;
                     TotalPriceLabel.Content = $"0.00 €";
 
                     // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
@@ -684,20 +691,18 @@ namespace PizzaEcki
             else
             {
                 MessageBox.Show("Bitte eine Kundenummer Eingeben");
-               
-        
             }
         }
         private int GetNextReceiptNumber()
         {
             return ++currentReceiptNumber;
         }
-
         //Zeigt das Vertecke Menü für Admins
         private void MainWindowEcki_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.F1)
+            if (e.Key == Key.F2 && Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
+                // Hier kommt deine Logik zur Umschaltung der Sichtbarkeit von F1Grid
                 if (F1Grid.Visibility == Visibility.Visible)
                 {
                     F1Grid.Visibility = Visibility.Collapsed;
@@ -708,6 +713,18 @@ namespace PizzaEcki
                 }
             }
 
+            if (e.Key == Key.F1)
+            {
+                ShowHelpDialog();
+            }
+
+            if (e.Key == Key.F2)
+            {
+                if (SaveButton.Visibility == Visibility.Visible)
+                {                 
+                    OnSaveButtonClicked(this, new RoutedEventArgs());
+                }
+            }
             //Zeige die Tagesübersicht
 
             if (e.Key == Key.F4)
@@ -717,11 +734,69 @@ namespace PizzaEcki
 
             }
 
+            //Gratis gericht 
+            //if (e.Key == Key.F5)
+            //{
+            //    // Setze den Preis des aktuell ausgewählten Gerichts auf 0
+            //    if (tempOrderItem != null)
+            //    {
+            //        tempOrderItem.Epreis = 0;
+
+
+            //    }
+            //}
+
+
+            if (e.Key == Key.F7)
+            {
+                // Stelle sicher, dass die Liste nicht leer ist
+                if (orderItems.Any())
+                {
+                    // Entferne das letzte Gericht aus der Liste
+                    orderItems.RemoveAt(orderItems.Count - 1);
+
+                    // Aktualisiere das DataGrid
+                    myDataGrid.ItemsSource = null;
+                    myDataGrid.ItemsSource = orderItems;
+
+                    // Aktualisiere den Gesamtpreis
+                    CalculateTotal(orderItems);
+
+                    // Weitere UI-Updates, falls erforderlich
+                }
+            }
+
+
+            //F8 Löschen der Bestellung
+            //Ist im anderen Fenster
+
+
+            if (e.Key == Key.F11)
+            {
+                BestellungenAnzeigen("alle");
+            }
+
             if (e.Key == Key.F12)
             {
                 BarzahlungBtn(null, null); // Du kannst null für sender und RoutedEventArgs übergeben, da sie in deiner Methode nicht verwendet werden
             }
+            
         }
+
+        private void ShowHelpDialog()
+        {
+            string helpText = "F1: Zeige Hotkeys.\n" +
+                              "F2: Kunde speichern.\n" +
+                              "F4: Bestellung löschen.\n" +
+                              "F5: Markiert das aktuelle Gericht als gratis.\n" +
+                              "F7: Letztes Gericht löschen.\n" +
+                              "F8: Bestellung löschen.\n" +
+                              "F11: Alle Bestellungen anzeigen.\n" +
+                              "F12: Bestellung abschließen und drucken.";
+
+            MessageBox.Show(helpText, "Hilfe zu Tastenkürzeln");
+        }
+
         private void SendOrderItems(Order order)
         {
             //signalRService.SendOrderItemsAsync(order);
@@ -742,8 +817,6 @@ namespace PizzaEcki
             cb_cashRegister.Items.Clear();
             cb_cashRegister.ItemsSource = driversForCounter;
         }
-
-
         private void SizeComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -938,13 +1011,11 @@ namespace PizzaEcki
             printDoc.Print();
 
         }
-
         private void btn_tables_Click(object sender, RoutedEventArgs e)
         {
             TableView tableView = new TableView();
             tableView.ShowDialog();
         }
-
         private void Btn_zuordnen_Click(object sender, RoutedEventArgs e)
         {
             if (cb_bonNummer.SelectedItem != null && cb_cashRegister.SelectedItem != null)
@@ -983,21 +1054,41 @@ namespace PizzaEcki
                 // Fehlerbehandlung, falls nichts ausgewählt wurde
             }
         }
+        private bool HaveBonNumbersChanged(List<Order> oldOrders, List<Order> newOrders)
+        {
+            if (oldOrders == null || newOrders == null)
+            {
+                return true; // Gibt true zurück, wenn eine der Listen null ist
+            }
 
+            var oldBonNumbers = new HashSet<int>(oldOrders.Select(o => o.BonNumber));
+            var newBonNumbers = new HashSet<int>(newOrders.Select(o => o.BonNumber));
+
+            return !oldBonNumbers.SetEquals(newBonNumbers);
+        }
         private async Task ReloadeUnassignedOrders()
         {
-            orders = _databaseManager.GetUnassignedOrders();
-            cb_bonNummer.Items.Clear();
-            foreach (Order order in orders)
-            {
-                if (order.IsDelivery == false)
-                {
-                    cb_bonNummer.Items.Add(order.BonNumber);
-                }
-            }
-            UpdateOrderCounts();
-        }
+            var newOrders = _databaseManager.GetUnassignedOrders();
 
+            if (HaveBonNumbersChanged(orders, newOrders))
+            {
+                var selectedValue = cb_bonNummer.SelectedItem;
+
+                orders = newOrders;
+                cb_bonNummer.Items.Clear();
+                foreach (Order order in orders)
+                {
+                    if (order.IsDelivery == false)
+                    {
+                        cb_bonNummer.Items.Add(order.BonNumber);
+                    }
+                }
+
+                cb_bonNummer.SelectedItem = selectedValue;
+            }
+
+            UpdateOrderCounts(); // Wird unabhängig von der Bedingung aufgerufen
+        }
         private void UpdateOrderCounts()
         {
             var orders = _databaseManager.GetUnassignedOrders();
@@ -1026,19 +1117,16 @@ namespace PizzaEcki
             MitnehmerLabel.Content = mitnehmerCount.ToString();
             SelbstabholerLabel.Content = selbstabholerCount.ToString();
         }
-
         private void AuslieferungLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
            
             BestellungenAnzeigen("");
 
         }
-
         private void SelbstabholerLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
             BestellungenAnzeigen("1");
         }
-
         private void MitnehmerLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
             BestellungenAnzeigen("2");
@@ -1048,22 +1136,35 @@ namespace PizzaEcki
             var unassignedOrders = _databaseManager.GetUnassignedOrders();
             List<Order> filteredOrders;
 
-            if (bestellungsTyp == "1" || bestellungsTyp == "2")
+            if (bestellungsTyp == "1")
             {
-                // Filtere Bestellungen für Selbstabholer und Mitnehmer
+                // Filtere Bestellungen für Selbstabholer
                 filteredOrders = unassignedOrders
                     .Where(order => order.CustomerPhoneNumber == bestellungsTyp)
                     .ToList();
             }
+            else if (bestellungsTyp == "2")
+            {
+                // Filtere Bestellungen für Mitnehmer
+                filteredOrders = unassignedOrders
+                    .Where(order => order.CustomerPhoneNumber == bestellungsTyp)
+                    .ToList();
+            }
+            else if (bestellungsTyp == "alle")
+            {
+                // Zeige alle Bestellungen ohne Filterung
+                filteredOrders = unassignedOrders;
+            }
             else
             {
-                // Filtere Bestellungen für Auslieferung
+                // Standard: Filtere Bestellungen für Auslieferung
                 filteredOrders = unassignedOrders
                     .Where(order => !string.IsNullOrEmpty(order.CustomerPhoneNumber) &&
                                     order.CustomerPhoneNumber != "1" &&
                                     order.CustomerPhoneNumber != "2")
                     .ToList();
             }
+
 
             // Überprüfe, ob das Fenster für einen anderen Bestellungstyp geöffnet werden soll
             if (_bestellungenFenster != null && _currentBestellungsTyp != bestellungsTyp)
@@ -1089,6 +1190,9 @@ namespace PizzaEcki
                     default:
                         _bestellungenFenster.Title = "Bestellungen - Auslieferung";
                         break;
+                    case "alle":
+                        _bestellungenFenster.Title = "Alle Bestellungen";
+                        break;
                 }
                 _currentBestellungsTyp = bestellungsTyp; // Speichere den aktuellen Bestellungstyp
                 _bestellungenFenster.Closed += (s, e) =>
@@ -1104,7 +1208,6 @@ namespace PizzaEcki
                 _bestellungenFenster.Focus();
             }
         }
-
         private void Auswertung_Btn_Click(object sender, RoutedEventArgs e)
         {
             var auswertungWindow = new Auswertung();

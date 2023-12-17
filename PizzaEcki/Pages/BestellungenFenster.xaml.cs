@@ -46,7 +46,7 @@ namespace PizzaEcki.Pages
 
         private async void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.F4 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            if (e.Key == Key.F8)
             {
                 var selectedOrder = BestellungenListView.SelectedItem as SharedLibrary.Order;
                 if (selectedOrder != null)

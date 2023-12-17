@@ -214,7 +214,7 @@ namespace PizzaKitchenClient
             if (OrdersList.SelectedItem is Order selectedOrder)
             {
                 // Deaktiviere den Zuordnen-Button, wenn die PhoneNumber 1 oder 2 ist
-                AssignButton.IsEnabled = !(selectedOrder.CustomerPhoneNumber == "1" || selectedOrder.CustomerPhoneNumber == "2");
+                AssignButton.IsEnabled = !(selectedOrder.CustomerPhoneNumber == "Mitnehmer" || selectedOrder.CustomerPhoneNumber == "Selbstabholer");
             }
             else
             {

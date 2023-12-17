@@ -112,5 +112,22 @@ namespace PizzaEcki.Pages
         {
             CategoryComboBox.ItemsSource = Enum.GetValues(typeof(DishCategory)).Cast<DishCategory>();
         }
+
+        private void PriceTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                if (decimal.TryParse(textBox.Text, out decimal price))
+                {
+                    textBox.Text = price.ToString("0.00 €");
+                }
+                else
+                {
+                    // Optionale Fehlerbehandlung, wenn die Eingabe kein gültiger Preis ist
+                    textBox.Text = "0.00 €";
+                }
+            }
+        }
+
     }
 }
