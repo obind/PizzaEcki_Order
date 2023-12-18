@@ -263,8 +263,7 @@ namespace PizzaEcki
             // Prüfe, ob ein Gericht ausgewählt ist
             if (DishComboBox.SelectedItem == null)
             {
-                SizeComboBox.ItemsSource = null; // Leere die SizeComboBox, wenn kein Gericht ausgewählt ist
-                
+                SizeComboBox.ItemsSource = null; 
                 tempOrderItem.Gericht = "";
                 tempOrderItem.Nr = 0;
                 return;
@@ -274,30 +273,18 @@ namespace PizzaEcki
 
             // Umwandeln des ausgewählten Items in ein Dish-Objekt, um auf dessen Eigenschaften zugreifen zu können
             Dish selectedDish = (Dish)DishComboBox.SelectedItem;
-
-            // Aktualisiere das temporäre OrderItem mit den Details des ausgewählten Gerichts
             tempOrderItem.Gericht = selectedDish.Name.ToString();
             tempOrderItem.OrderItemId = selectedDish.Id;
 
-            //tempOrderItem.Epreis = selectedDish.Preis;
-
-            // Ermittle die verfügbaren Größen für die Kategorie des ausgewählten Gerichts
-
             var sizes = DishSizeManager.CategorySizes[selectedDish.Kategorie];
 
-            // Fülle die SizeComboBox mit den verfügbaren Größen für das ausgewählte Gericht
             SizeComboBox.ItemsSource = sizes;
 
-
-            // Wenn nur eine Größe verfügbar ist, wähle sie automatisch aus
             if (sizes.Count == 1)
             {
                 SizeComboBox.SelectedIndex = 0;
             }
-
-
-            //tempOrderItem.Epreis = GetPriceForSelectedSize(selectedDish, selectedSize);
-            // Leere die ausgewählten Extras, da sich das ausgewählte Gericht geändert hat
+            
             tempOrderItem.Extras = "";
         }
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)
@@ -306,21 +293,18 @@ namespace PizzaEcki
             {
                 if (DishComboBox.IsDropDownOpen)
                 {
-                    // Ändere den Text der Combobox auf das aktuell hervorgehobene Element (ausgewählte Dish)
-                    // Wenn kein Gericht ausgewählt ist, bleibt der aktuelle Text erhalten
                     DishComboBox.Text = (DishComboBox.SelectedItem as Dish)?.Name ?? DishComboBox.Text;
-
-                    // Schließe das Dropdown-Menü der Combobox
                     DishComboBox.IsDropDownOpen = false;
                 }
 
                 // Erstelle eine Anforderung, um den Fokus auf das nächste Steuerelement in der Tab-Reihenfolge zu setzen
-                SizeComboBox.Focus();
+                ExtrasComboBox.Focus();
 
                 // Markiere das Ereignis als behandelt, um zu verhindern, dass andere Handler darauf reagieren
                 e.Handled = true;
             }
         }
+
         //Extras
         private void ExtrasTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -652,12 +636,13 @@ namespace PizzaEcki
 
             string totalPriceString = TotalPriceLabel.Content.ToString();
             double gesamtPreis = 0;
-            // Extrahiere den numerischen Wert aus dem Content-String
-            if (double.TryParse(totalPriceString.Split(' ')[0], out gesamtPreis) && gesamtPreis < 10)
-            {
-                MessageBox.Show("Der Mindestbestellwert wert muss über 10 € liegen.");
-                return; // Verlasse die Methode frühzeitig
-            }
+            
+            //Möglichkeit für einen Mindestbestellwert
+            //if (double.TryParse(totalPriceString.Split(' ')[0], out gesamtPreis) && gesamtPreis < 10)
+            //{
+            //    MessageBox.Show("Der Mindestbestellwert wert muss über 10 € liegen.");
+            //    return; // Verlasse die Methode frühzeitig
+            //}
 
             if (PhoneNumberTextBox.Text != "")
             {

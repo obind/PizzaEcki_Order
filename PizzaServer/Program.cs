@@ -1,7 +1,15 @@
 using Microsoft.AspNetCore.SignalR;
 using PizzaServer;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Configure(builder.Configuration.GetSection("Kestrel"));
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
