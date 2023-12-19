@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
 using System.Globalization;
+using Microsoft.AspNet.SignalR.Client;
 
 namespace PizzaEcki.Database
 {
@@ -46,6 +47,8 @@ namespace PizzaEcki.Database
         //Customers
         private void CreateTable()
         {
+            _connection.Open();
+
             //Customer Table
             string sql = "CREATE TABLE IF NOT EXISTS Customers (PhoneNumber TEXT PRIMARY KEY, Name TEXT, AddressId INTEGER, AdditionalInfo TEXT, FOREIGN KEY(AddressId) REFERENCES Addresses(Id))";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -85,12 +88,15 @@ namespace PizzaEcki.Database
 
 
             //Settings
-
+            _connection.Open();
             sql = "CREATE TABLE IF NOT EXISTS Settings (LastResetDate TEXT, CurrentBonNumber INTEGER)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
+               
                 command.ExecuteNonQuery();
+             
             }
+ 
 
             // Initialer Eintrag, falls die Tabelle gerade erstellt wurde
             sql = "INSERT INTO Settings (LastResetDate, CurrentBonNumber) SELECT @date, @number WHERE NOT EXISTS (SELECT 1 FROM Settings)";
@@ -153,11 +159,13 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
 
+            _connection.Close();
         }
 
         //Tabellen
         public List<string> GetTableNames()
         {
+            _connection.Open();
             List<string> tableNames = new List<string>();
             string sql = "SELECT name FROM sqlite_master WHERE type='table';";
 
@@ -171,12 +179,13 @@ namespace PizzaEcki.Database
                     }
                 }
             }
-
+            _connection.Close();
             return tableNames;
         }
 
         public DataTable GetTableData(string tableName)
         {
+            _connection.Open();
             DataTable tableData = new DataTable();
             string sql = $"SELECT * FROM {tableName};";
 
@@ -187,13 +196,14 @@ namespace PizzaEcki.Database
                     tableData.Load(reader);
                 }
             }
-
+            _connection.Close();
             return tableData;
         }
 
 
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
         {
+            _connection.Open();
             string sql = @"SELECT c.PhoneNumber, c.Name, a.Street, a.City, c.AdditionalInfo 
                    FROM Customers c
                    INNER JOIN Addresses a ON c.AddressId = a.Id
@@ -218,7 +228,7 @@ namespace PizzaEcki.Database
                     }
                 }
             }
-
+            _connection.Close();
             return null;
         }
 
@@ -226,6 +236,7 @@ namespace PizzaEcki.Database
         {
             long addressId;
 
+            _connection.Open();
             // Insert or Update Address
             string addressSql = "INSERT OR REPLACE INTO Addresses (Street, City) VALUES (@Street, @City); SELECT last_insert_rowid();";
             using (SqliteCommand addressCommand = new SqliteCommand(addressSql, _connection))
@@ -245,18 +256,22 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@AdditionalInfo", (object)customer.AdditionalInfo ?? DBNull.Value);
                 command.ExecuteNonQuery();
             }
+            _connection.Close();
         }
 
         //Dishes
         public void AddDishes(List<Dish> dishes)
         {
+            _connection.Open();
             foreach (var dish in dishes)
             {
                 AddOrUpdateDish(dish);
             }
+            _connection.Close();
         }
         public void AddOrUpdateDish(Dish dish)
         {
+            _connection.Open();
             string sql = "INSERT OR REPLACE INTO Gerichte (Id, Name, Preis_S, Preis_L, Preis_XL, Kategorie, HappyHour, Steuersatz, GratisBeilage) VALUES (@Id, @Name, @Preis_S, @Preis_L, @Preis_XL, @Kategorie, @HappyHour, @Steuersatz, @GratisBeilage)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -271,11 +286,13 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@GratisBeilage", dish.GratisBeilage);
                 command.ExecuteNonQuery();
             }
+            _connection.Close();
         }
 
 
         public List<Dish> GetAllDishes()
         {
+            _connection.Open();
             List<Dish> dishes = new List<Dish>();
             string sql = "SELECT * FROM Gerichte";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -328,10 +345,12 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+            _connection.Close();
             return dishes;
         }
         public bool IsIdExists(int id)
         {
+            _connection.Open();
             string sql = "SELECT COUNT(*) FROM Gerichte WHERE Id = @Id";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -339,24 +358,28 @@ namespace PizzaEcki.Database
                 var result = command.ExecuteScalar();
                 return Convert.ToInt32(result) > 0;
             }
+            _connection.Close();
         }
 
 
 
         public void DeleteDish(int id)
         {
+            _connection.Open();
             string sql = "DELETE FROM Gerichte WHERE Id = @Id";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.Parameters.AddWithValue("@Id", id);
                 command.ExecuteNonQuery();
             }
+            _connection.Close();
         }
 
 
 
         public List<string> GetAllStreets()
         {
+
             List<string> streets = new List<string>();
             string sql = "SELECT DISTINCT Street FROM Addresses";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -374,6 +397,7 @@ namespace PizzaEcki.Database
 
         public List<string> GetAllCities()
         {
+            _connection.Open();
             List<string> cities = new List<string>();
             string sql = "SELECT DISTINCT City FROM Addresses";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -386,6 +410,7 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+            _connection.Close();
             return cities;
         }
 
@@ -420,13 +445,16 @@ namespace PizzaEcki.Database
         //Extras
         public void AddExtras(List<Extra> extras)
         {
+            _connection.Open();
             foreach (var extra in extras)
             {
                 AddOrUpdateExtra(extra);
             }
+            _connection.Close();
         }
         public void AddOrUpdateExtra(Extra extra)
         {
+            _connection.Open();
             string sql = "INSERT OR REPLACE INTO Extras (Id, Name, Price) VALUES (@Id, @Name, @Price)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -436,10 +464,11 @@ namespace PizzaEcki.Database
 
                 command.ExecuteNonQuery();
             }
-
+            _connection.Close();
         }
         public List<Extra> GetExtras()
         {
+            _connection.Open();
             List<Extra> extras = new List<Extra>();
             string sql = "SELECT * FROM Extras";  // Sie müssen die Tabelle Extras erstellen
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -457,13 +486,14 @@ namespace PizzaEcki.Database
                     }
                 }
             }
-
+             _connection.Close();
             return extras;
         }
 
         //Driver Methodes
         public void AddDriver(Driver driver)
-        {
+            {
+            _connection.Open();
             string sql = "INSERT INTO Drivers (Name, PhoneNumber) VALUES (@Name, @PhoneNumber)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -471,10 +501,12 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@PhoneNumber", driver.PhoneNumber);
                 command.ExecuteNonQuery();
             }
+            _connection.Close();
         }
 
         public void UpdateDriver(Driver driver)
         {
+            _connection.Open();
             string sql = "UPDATE Drivers SET Name = @Name, PhoneNumber = @PhoneNumber WHERE Id = @Id";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -483,27 +515,33 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@PhoneNumber", driver.PhoneNumber);
                 command.ExecuteNonQuery();
             }
+            _connection.Close();
         }
         public void InitializeStaticDrivers()
         {
+            _connection.Open();
             string sql = "INSERT OR IGNORE INTO Drivers (Id, Name, PhoneNumber) VALUES (-1, 'Theke', ''), (-2, 'Kasse1', '')";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
             }
+            _connection.Close();
         }
         public void DeleteDriver(int id)
         {
+            _connection.Open();
             string sql = "DELETE FROM Drivers WHERE Id = @Id";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.Parameters.AddWithValue("@Id", id);
                 command.ExecuteNonQuery();
             }
+            _connection.Close();
         }
 
         public List<Driver> GetDrivers()
         {
+            _connection.Open();
             List<Driver> drivers = new List<Driver>();
             string sql = "SELECT Id, Name, PhoneNumber FROM Drivers";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -520,10 +558,12 @@ namespace PizzaEcki.Database
                 }
             }
             return drivers;
+            _connection.Close();
         }
 
         public List<Driver> GetAllDrivers()
         {
+            _connection.Open();
             List<Driver> drivers = new List<Driver>();
 
             // SQL-Abfrage, um alle Fahrer abzurufen
@@ -546,7 +586,7 @@ namespace PizzaEcki.Database
                     }
                 }
             }
-
+            _connection.Close();
             return drivers;
         }
 
@@ -667,6 +707,7 @@ namespace PizzaEcki.Database
 
         public void SaveOrder(Order order)
         {
+            _connection.Open();
             // Speichern der Bestellung in der Orders Tabelle
             string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod,CustomerPhoneNumber, Timestamp, DeliveryUntil) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber, @Timestamp, @DeliveryUntil)";
             using (SqliteCommand commandOrder = new SqliteCommand(sqlOrder, _connection))
@@ -734,12 +775,13 @@ namespace PizzaEcki.Database
                 commandAssignment.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
                 commandAssignment.ExecuteNonQuery();
             }
-
+            _connection.Close();
         }
 
 
         public List<Order> GetUnassignedOrders()
         {
+            _connection.Open();
             List<Order> unassignedOrders = new List<Order>();
             string sql = @"
                 SELECT 
@@ -818,11 +860,13 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+            _connection.Close();
             return unassignedOrders;
         }
 
         public List<Order> GetAllOrders()
         {
+            _connection.Open();
             List<Order> orders = new List<Order>();
             string sql = @"
                 SELECT 
@@ -900,12 +944,14 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+            _connection.Close();    
             return orders;
         }
         
 
         public List<OrderItem> GetOrderItems(Guid orderId)
         {
+       
             List<OrderItem> orderItems = new List<OrderItem>();
             string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -931,12 +977,14 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+            _connection.Close();
             return orderItems;
         }
 
 
         public List<OrderAssignment> GetOrderAssignments()
         {
+            _connection.Open();
             List<OrderAssignment> assignments = new List<OrderAssignment>();
             string sql = "SELECT OrderId, DriverId, Price, Timestamp FROM OrderAssignments";  // Preis hinzugefügt
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -963,12 +1011,14 @@ namespace PizzaEcki.Database
                 }
             }
             return assignments;
+            _connection.Close();
         }
 
 
 
         public double GetTotalSalesForDate(DateTime date)
         {
+            _connection.Open();
             string sql = "SELECT SUM(Price) FROM OrderAssignments WHERE AssignmentDate = @Date";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -976,10 +1026,12 @@ namespace PizzaEcki.Database
                 object result = command.ExecuteScalar();
                 return result != DBNull.Value ? Convert.ToDouble(result) : 0;
             }
+            _connection.Close();
         }
 
         public List<DailySalesInfo> GetDailySales(DateTime date)
         {
+            _connection.Open();
             List<DailySalesInfo> dailySalesInfoList = new List<DailySalesInfo>();
 
             // SQL-Query, um die täglichen Umsätze abzurufen
@@ -1014,7 +1066,7 @@ namespace PizzaEcki.Database
                     }
                 }
             }
-
+            _connection.Close();
             return dailySalesInfoList;
         }
         public int CheckAndResetBonNumberIfNecessary()
@@ -1044,7 +1096,7 @@ namespace PizzaEcki.Database
                             }
 
                             // Setze die Bonnummer auf den Anfangswert zurück
-                            currentBonNumber = 1;
+                            currentBonNumber = 0;
                         }
                     }
                     else
@@ -1086,11 +1138,14 @@ namespace PizzaEcki.Database
         public void UpdateCurrentBonNumber(int newNumber)
         {
             string sql = "UPDATE Settings SET CurrentBonNumber = @number";
+            _connection.Open();
+
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.Parameters.AddWithValue("@number", newNumber);
                 command.ExecuteNonQuery();
             }
+            _connection.Close();
         }
 
 

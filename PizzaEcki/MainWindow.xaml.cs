@@ -77,8 +77,8 @@ namespace PizzaEcki
 
             LoadDrivers();
             DataContext = this;
+            currentBonNumber = _databaseManager.CheckAndResetBonNumberIfNecessary();
 
-            currentBonNumber = _databaseManager.GetCurrentBonNumber();
 
             _reloadTimer = new DispatcherTimer
             {
@@ -87,14 +87,9 @@ namespace PizzaEcki
             _reloadTimer.Tick += ReloadTimer_Tick;     
             _reloadTimer.Start();
         }
-        private void ResetBonNumberButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Ersetze "YourDatabaseManagerInstance" mit einer Instanz deiner Datenbankmanagerklasse
-            _databaseManager.ResetBonNumberForTesting();
+        
 
-            MessageBox.Show("Bonnummer wurde erfolgreich zurückgesetzt.");
-        }
-
+     
         private void ReloadTimer_Tick(object sender, EventArgs e)
         {
             // Rufe deine Methode hier auf
@@ -169,7 +164,6 @@ namespace PizzaEcki
                 SaveButton.Visibility = Visibility.Collapsed;
             }
         }
-
         private void OnTextChanged(object sender, TextChangedEventArgs e)
         {
             if (!isProgrammaticChange) // prüft, ob die Änderung durch den Benutzer und nicht durch den Code gemacht wurde
@@ -177,7 +171,6 @@ namespace PizzaEcki
                 SaveButton.Visibility = Visibility.Visible; // Zeigt den "Speichern"-Button an
             }
         }
-
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
         {
             // Erstelle ein neues Customer-Objekt mit den Werten aus den Eingabefeldern
@@ -196,7 +189,6 @@ namespace PizzaEcki
             // Nach dem Speichern den "SaveButton" wieder ausblenden
             SaveButton.Visibility = Visibility.Collapsed;
         }
-
         //Methode um die Textfelder automatisch zu füllen
         private void SetCustomerDataToFields(Customer customer)
         {
@@ -214,9 +206,7 @@ namespace PizzaEcki
                 SaveButton.Visibility = Visibility.Visible;
             }
         }
-
-
-        //Gerichte
+       //Gerichte
         private void DishComboBox_TextChanged(object sender, SelectionChangedEventArgs e)
         {
             // Prüfe, ob ein Gericht ausgewählt ist
@@ -260,8 +250,6 @@ namespace PizzaEcki
             tempOrderItem.Extras = "";
         }
 
-        //Das ist gnaz nice aber ich weiß nicht genau ob das so notwendig ist oder ob es eine bessere Lösung gibt
-        //Es ist dafür da das wenn die autovervollständigung etwas vorschlägt man es mit Enter bestätigen kann und zur nächten Eingabe springt
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -332,7 +320,6 @@ namespace PizzaEcki
                 textBox.SelectionLength = textBox.Text.Length - textStart;
             }
         }
-
         private void ExtrasComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             var textBox = (TextBox)ExtrasComboBox.Template.FindName("PART_EditableTextBox", ExtrasComboBox);
@@ -342,7 +329,6 @@ namespace PizzaEcki
                 textBox.PreviewKeyDown += ExtrasComboBox_PreviewKeyDown;
             }
         }
-
         private async void ExtrasComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -369,7 +355,6 @@ namespace PizzaEcki
                 amountComboBox.Focus();  // Verschiebe den Fokus zur amountComboBox
             }
         }
-
         private async void ExtrasComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -400,7 +385,6 @@ namespace PizzaEcki
         {
             return !string.IsNullOrWhiteSpace(tempOrderItem.Extras) && tempOrderItem.Menge > 0;
         }
-
         //Anzahl in das tempOrderItem Schreiben 
         private void amountComboBox_KeyDown(object sender, KeyEventArgs e)
         {
@@ -412,7 +396,6 @@ namespace PizzaEcki
                 
             }
         }
-
         private void UpdateTempOrderItemAmount()
         {
             int amount;
@@ -426,7 +409,6 @@ namespace PizzaEcki
                 amountComboBox.Focus();
             }
         }
-
         private void TimePicker_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -437,7 +419,6 @@ namespace PizzaEcki
                
             }
         }
-
         private double GetPriceForSelectedSize(Dish selectedDish, string selectedSize)
         {
             switch (selectedSize)
@@ -452,7 +433,6 @@ namespace PizzaEcki
                     return 0;
             }
         }
-
         private void ProcessOrder()
         {
             if (dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
@@ -528,7 +508,6 @@ namespace PizzaEcki
 
             DishComboBox.Focus();
         }
-
         public void CalculateTotal(List<OrderItem> orderItem)
         {
             double gesamtPreis = 0;
@@ -538,18 +517,14 @@ namespace PizzaEcki
             }
             TotalPriceLabel.Content = $"{gesamtPreis:F2} €";
         }
-
-
         private void BarzahlungBtn(object sender, RoutedEventArgs e)
         {
             CompleteOrder("Barzahlung");
         }
-
         private void KartenzahlungBtn(object sender, RoutedEventArgs e)
         {
             CompleteOrder("Kartenzahlung");
         }
-
         private void PaypalBtn(object sender, RoutedEventArgs e)
         {
             CompleteOrder("PayPal");
@@ -572,7 +547,6 @@ namespace PizzaEcki
                 }
             }
         }
-
         private void CompleteOrder(string paymentMethod)
         {
             if (!orderItems.Any())
@@ -647,9 +621,7 @@ namespace PizzaEcki
                
         
             }
-    }
-
-
+        }
         private int GetNextReceiptNumber()
         {
             return ++currentReceiptNumber;
