@@ -749,7 +749,7 @@ namespace PizzaEcki
 
                     // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
                     myDataGrid.Items.Refresh();
-
+                PhoneNumberTextBox.Focus();
                     //Aktualisiere Lieferungsart
                     //AuslieferungLabel.Content = Lieferung;
                     //MitnehmerLabel.Content = Mitnehmer;
@@ -899,15 +899,30 @@ namespace PizzaEcki
         }
         private void PrintReceipt(Order order, Customer customer)
         {
+          
             PrintDocument printDoc = new PrintDocument();
+
+            // Setze den Drucker, der in den Einstellungen ausgewählt wurde
+            string selectedPrinter = PizzaEcki.Properties.Settings.Default.SelectedPrinter;
+            if (!string.IsNullOrEmpty(selectedPrinter))
+            {
+                printDoc.PrinterSettings.PrinterName = selectedPrinter;
+            }
+
+            // Überprüfe, ob der angegebene Drucker vorhanden und verfügbar ist
+            if (!printDoc.PrinterSettings.IsValid)
+            {
+                MessageBox.Show("Der ausgewählte Drucker ist nicht verfügbar.");
+                return;
+            }
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
             printDoc.PrintPage += (sender, e) =>
             {
                 Graphics graphics = e.Graphics;
 
                 // Fonts
-                Font regularFont = new Font("Segoe UI", 12);
-                Font boldFont = new Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
+                Font regularFont = new Font("Segoe UI", 16, System.Drawing.FontStyle.Bold);
+                Font boldFont = new Font("Segoe UI", 14, System.Drawing.FontStyle.Bold);
                 Font titleFont = new Font("Segoe UI", 24, System.Drawing.FontStyle.Bold);
 
                 float yOffset = 10;  // Initial offset
@@ -969,28 +984,21 @@ namespace PizzaEcki
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += 5;
 
-                // Verschoben innerhalb des Ereignishandlers
-               
-
-                // Bestellte Gerichte
-
-                // Definiere einen Stift zum Zeichnen der Linien
-
 
                 // Tabellenüberschrift
-                string headerAnz = "Anz";
-                string headerNr = "Nr";
-                string headerGericht = "Gericht";
-                string headerGr = "Gr.";
+                string headerAnz = "Anz  ";
+                string headerNr = "Nr  ";
+                string headerGericht = "Gericht  ";
+                string headerGr = "Gr.  ";
                 string headerPreis = "Preis";
 
                 // Definiere die Positionen der Spaltenköpfe
                 float headerAnzPosition = 0;
-                float headerNrPosition = 30;  // 
-                float headerGerichtPosition = 50;  // Angenommene Position, anpassen nach Bedarf
-                float headerGrPosition = 200;  // Angenommene Position, anpassen nach Bedarf
+                float headerNrPosition = 45;  // 
+                float headerGerichtPosition = 80;  // Angenommene Position, anpassen nach Bedarf
+                float headerGrPosition = 185;  // Angenommene Position, anpassen nach Bedarf
                                                // Preis rechtsbündig, Abstand vom rechten Rand
-                float headerPreisPosition = e.PageBounds.Width - graphics.MeasureString(headerPreis, regularFont).Width - 15;
+                float headerPreisPosition = e.PageBounds.Width - graphics.MeasureString(headerPreis, regularFont).Width;
 
                 // Zeichne die Tabellenüberschrift#
                 graphics.DrawString(headerAnz, regularFont, Brushes.Black, headerAnzPosition, yOffset);
@@ -1008,15 +1016,15 @@ namespace PizzaEcki
                 Font extraFont = new Font("Segoe UI", 10);
                 foreach (var item in order.OrderItems)
                 {
-                    string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht}";
-                    string itemSizeStr = $"{item.Größe}";
+                    string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht} ";
+                    string itemSizeStr = $" {item.Größe}";
                     string itemPriceStr = $"{item.Gesamt:C}";
 
                     // Zeichne die Bestellzeile
                     graphics.DrawString(itemNameStr, regularFont, Brushes.Black, headerAnzPosition, yOffset);
                     graphics.DrawString(itemSizeStr, regularFont, Brushes.Black, headerGrPosition, yOffset);
                     SizeF itemPriceSize = graphics.MeasureString(itemPriceStr, regularFont);
-                    graphics.DrawString(itemPriceStr, regularFont, Brushes.Black, e.PageBounds.Width - itemPriceSize.Width - 15, yOffset);
+                    graphics.DrawString(itemPriceStr, regularFont, Brushes.Black, e.PageBounds.Width - itemPriceSize.Width, yOffset);
 
                     // Aktualisiere yOffset für die nächste Zeile
                     yOffset += regularFont.GetHeight();
@@ -1039,10 +1047,7 @@ namespace PizzaEcki
                         yOffset += extraFont.GetHeight();
                     }
 
-
-                // Zeichne eine Trennlinie nach den Extras (oder nach dem Gericht, falls keine Extras vorhanden sind)
-                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
-                    yOffset += 3; // Füge einen kleinen Abstand nach der Linie hinzu
+                    yOffset += 10; // Füge einen kleinen Abstand nach der Linie hinzu
                 }
 
                 // Zeichne eine abschließende Trennlinie am Ende der
@@ -1281,5 +1286,8 @@ namespace PizzaEcki
             var auswertungWindow = new Auswertung();
             auswertungWindow.ShowDialog();
         }
+
+
+
     }
 }

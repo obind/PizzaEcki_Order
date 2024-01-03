@@ -18,6 +18,44 @@
                     </DrawingGroup>
                 </DrawingImage.Drawing>
             </DrawingImage>
+
+            <Style TargetType="TextBox">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TextBox}">
+                            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Opacity" TargetName="border" Value="1"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="BorderBrush" TargetName="border" Value="#FF7EB4EA"/>
+                                </Trigger>
+                                <Trigger Property="IsFocused" Value="true">
+                                    <Setter Property="BorderBrush" TargetName="border" Value="#FF602C"/>
+                                    <Setter Property="BorderThickness" TargetName="border" Value="3"/>
+                                    <!-- Erhöhte BorderThickness -->
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="FocusVisualStyleForComboBox" TargetType="ComboBox">
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Style.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="BorderBrush" Value="Red"/>
+                        <Setter Property="BorderThickness" Value="3"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+
         </ResourceDictionary>
 
     </Window.Resources>
@@ -46,13 +84,13 @@
             <!--<Button Name="TestButton" Grid.Column="3" Content="Reset Bon Number Test" Click="ResetBonNumberButton_Click" />-->
                 <!--<Button Grid.Column="2" Content="Logbuch" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FF602C" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
             <Border Grid.Column="0" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="btn_tables" Content="Tabellen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}" Click="btn_tables_Click"/>
+                <Button x:Name="btn_tables" Content="Tabellen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Click="btn_tables_Click"/>
             </Border>
             <Border Grid.Column="1" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="Auswertung_Btn" Content="Auswertung" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}" Click="Auswertung_Btn_Click"/>
+                <Button x:Name="Auswertung_Btn" Content="Auswertung" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Click="Auswertung_Btn_Click"/>
             </Border>
             <Border Grid.Column="2" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}" Click="EinstellungenBtn_Click"/>
+                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Click="EinstellungenBtn_Click"/>
             </Border>
 
 
@@ -80,17 +118,17 @@
                 </Border>
 
                 <Label Content="KundenNR." VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Row="1" MinHeight="20" Padding="5,0,5,0" Margin="0,0,0,2" />
-                <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="16" VerticalContentAlignment="Center" KeyDown="PhoneNumberTextBox_KeyDown" TabIndex="0" Padding="5,0,5,0" Background="White" Foreground="Black" BorderBrush="{x:Null}"/>
+                <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="16" VerticalContentAlignment="Center" KeyDown="PhoneNumberTextBox_KeyDown" TabIndex="0" Padding="5,0,5,0" Background="White" Foreground="Black"/>
                 <Label Content="Name" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Grid.Row="2" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
                 <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="16" TabIndex="1" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
                 <Label Grid.Row="3" Content="Straße" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-                <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="2" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
+                <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,10,0" TabIndex="2" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
                 <Label Grid.Row="4" Content="Ort" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-                <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
+                <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
                 <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-                <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
+                <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,10,0" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
                 <Border x:Name="SaveButtonBorder"  Grid.Row="6" Grid.Column="1" Background="#FF602C" CornerRadius="10" HorizontalAlignment="Right"  Margin="0,0,10,2" Visibility="Collapsed">
-                    <Button x:Name="SaveButton" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}"        >
+                    <Button x:Name="SaveButton" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}"         >
                     <Button.Style>
                         <Style TargetType="Button">
                             <Setter Property="Border.CornerRadius" Value="50"/>
@@ -167,7 +205,7 @@
                     <Label Content="Bestellung" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
                 </Border>
 
-                <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top" BorderBrush="{x:Null}" FontWeight="Bold">
+                <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top"  FontWeight="Bold">
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#3d4248"/>
@@ -328,7 +366,7 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,50,0">
                 <!-- Barzahlung-Button -->
                 <Border Background="#FF602C" CornerRadius="10">
-                    <Button x:Name="btn_cash" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" BorderBrush="{x:Null}">
+                    <Button x:Name="btn_cash" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" >
                         <!-- Icon für Barzahlung (Beispiel) -->
                         <TextBlock Text="💵" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
@@ -337,7 +375,7 @@
 
                 <!-- Kartenzahlung-Button -->
                 <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
-                    <Button x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" BorderBrush="{x:Null}" >
+                    <Button x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn"  >
                         <!-- Icon für Kartenzahlung (Beispiel) -->
                         <TextBlock Text="💳" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
@@ -346,7 +384,7 @@
                 <!-- PayPal-Button -->
                 <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
 
-                    <Button x:Name="btn_paypal" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" BorderBrush="{x:Null}">
+                    <Button x:Name="btn_paypal" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" >
                     <!-- Icon für PayPal (Beispiel) -->
                     <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
