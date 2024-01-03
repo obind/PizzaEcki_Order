@@ -41,6 +41,7 @@ namespace PizzaEcki
         public string SelectedPaymentMethod { get; private set; }
 
        public string _customerNr;
+        private string _pickupType = "";
 
         private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
         private int Lieferung = 0;
@@ -154,21 +155,20 @@ namespace PizzaEcki
             {
                 _customerNr = PhoneNumberTextBox.Text;
 
-                // Überprüfung, ob die Telefonnummer eingegeben wurde
                 if (_customerNr != null && _customerNr != "")
                 {
-                    // Behandlung von speziellen Telefonnummern "1" und "2"
                     if (_customerNr == "1")
                     {
-                        
                         isDelivery = false;
                         Selbstabholer++;
+                        _pickupType = "Selbstabholer";
                         DishComboBox.Focus();
                     }
                     else if (_customerNr == "2")
                     {
                         isDelivery = false;
                         Mitnehmer++;
+                        _pickupType = "Mitnehmer";
                         DishComboBox.Focus();
                     }
                     else // Suche nach einem Kunden mit der eingegebenen Telefonnummer
@@ -472,13 +472,7 @@ namespace PizzaEcki
         }
         private void TimePicker_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
 
-                //tempOrderItem.Uhrzeit = TimePicker.Value.Value.ToString("HH:mm");
-                ProcessOrder();
-               
-            }
         }
         private double GetPriceForSelectedSize(Dish selectedDish, string selectedSize)
         {
@@ -703,8 +697,9 @@ namespace PizzaEcki
                 };
 
                 var deliveryUntilStr = TimePickermein.Value.HasValue
-                    ? TimePickermein.Value.Value.ToString("HH:mm")
-                    : "00:00";
+                     ? TimePickermein.Value.Value.ToString("HH:mm")
+                     : string.Empty; // Leer, wenn kein Wert vorhanden
+
 
                 var order = new Order
                 {
@@ -958,6 +953,7 @@ namespace PizzaEcki
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += regularFont.GetHeight() + 10;
 
+
                 if (isDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
                 {
                     string addressStr ="Tel: " + customer.PhoneNumber + "\r\n" + customer.Name+ "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
@@ -971,15 +967,32 @@ namespace PizzaEcki
                 SizeF bonNumberSize = graphics.MeasureString(bonNumberStr, boldFont);
                 float bonNumberX = (e.PageBounds.Width - bonNumberSize.Width) / 2;
                 graphics.DrawString(bonNumberStr, boldFont, Brushes.Black, bonNumberX, yOffset);
-                yOffset += bonNumberSize.Height + 10;
+                yOffset += bonNumberSize.Height +5;
 
-
-                if (isDelivery)
+                if (!string.IsNullOrEmpty(_pickupType))
                 {
-                    string deliveryTimeStr = "Lieferung bis: " + order.DeliveryUntil;
+                    string pickupTypeStr = _pickupType; // "Selbstabholer" oder "Mitnehmer"
+                    graphics.DrawString(pickupTypeStr, boldFont, Brushes.Black, 0, yOffset);
+                    yOffset += boldFont.GetHeight() + 10;
+                }
+
+                var deliveryUntilStr = TimePickermein.Value.HasValue
+                    ? TimePickermein.Value.Value.ToString("HH:mm")
+                    : string.Empty; // Leer, wenn kein Wert vorhanden
+
+                if (isDelivery && !string.IsNullOrEmpty(deliveryUntilStr))
+                {
+                    string deliveryTimeStr = "Lieferung bis: " + deliveryUntilStr;
                     graphics.DrawString(deliveryTimeStr, boldFont, Brushes.Black, 0, yOffset);
                     yOffset += regularFont.GetHeight() + 5;
                 }
+                else if (!string.IsNullOrEmpty(deliveryUntilStr))
+                {
+                    string deliveryTimeStr = "Abholung bis: " + deliveryUntilStr;
+                    graphics.DrawString(deliveryTimeStr, boldFont, Brushes.Black, 0, yOffset);
+                    yOffset += regularFont.GetHeight() + 5;
+                }
+
 
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += 5;
