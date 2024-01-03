@@ -25,6 +25,8 @@ namespace PizzaEcki.Pages
             LoadDrivers();
             LoadDishes();
             PopulatePrinterComboBox();
+            PopulateDayComboBoxes();
+            LoadHappyHourDaySettings();
 
             HappyHourStartTimePicker.Value = DateTime.Today.Add(Properties.Settings.Default.HappyHourStart);
             HappyHourEndTimePicker.Value = DateTime.Today.Add(Properties.Settings.Default.HappyHourEnd);
@@ -130,15 +132,33 @@ namespace PizzaEcki.Pages
                 MessageBox.Show("Bitte wählen Sie ein Gericht aus, das Sie löschen möchten.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+        private void PopulateDayComboBoxes()
+        {
+            string[] days = { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" };
+            foreach (var day in days)
+            {
+                HappyHourStartDayComboBox.Items.Add(day);
+                HappyHourEndDayComboBox.Items.Add(day);
+            }
+        }
+
+        private void LoadHappyHourDaySettings()
+        {
+            // Laden der gespeicherten Wochentage
+            HappyHourStartDayComboBox.SelectedItem = Properties.Settings.Default.HappyHourStartDay;
+            HappyHourEndDayComboBox.SelectedItem = Properties.Settings.Default.HappyHourEndDay;
+        }
+
         private void SaveHappyHourTimesButton_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.HappyHourStart = HappyHourStartTimePicker.Value?.TimeOfDay ?? TimeSpan.Zero;
             Properties.Settings.Default.HappyHourEnd = HappyHourEndTimePicker.Value?.TimeOfDay ?? TimeSpan.Zero;
-            Properties.Settings.Default.Save(); // Sehr wichtig, um die Einstellungen zu speichern
+            Properties.Settings.Default.HappyHourStartDay = HappyHourStartDayComboBox.SelectedItem.ToString();
+            Properties.Settings.Default.HappyHourEndDay = HappyHourEndDayComboBox.SelectedItem.ToString();
+            Properties.Settings.Default.Save();
 
-            MessageBox.Show("Happy Hour Zeiten wurden gespeichert.");
+            MessageBox.Show("Happy Hour Zeiten und Tage wurden gespeichert.");
         }
-
 
 
         public static class ApplicationSettings

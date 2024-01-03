@@ -36,6 +36,7 @@ namespace PizzaEcki
         private SignalRService signalRService;
         private List<SharedLibrary.OrderItem> orderItems = new List<SharedLibrary.OrderItem>();
         private OrderItem tempOrderItem = new OrderItem();
+        private List<string> selectedExtras = new List<string>();
 
         public string SelectedPaymentMethod { get; private set; }
 
@@ -293,17 +294,27 @@ namespace PizzaEcki
             {
                 if (DishComboBox.IsDropDownOpen)
                 {
-                    DishComboBox.Text = (DishComboBox.SelectedItem as Dish)?.Name ?? DishComboBox.Text;
-                    DishComboBox.IsDropDownOpen = false;
+                    // Stelle sicher, dass ein Element ausgewählt ist oder der Text nicht leer ist
+                    var selectedItem = DishComboBox.SelectedItem as Dish;
+                    if (selectedItem != null || !string.IsNullOrWhiteSpace(DishComboBox.Text))
+                    {
+                        DishComboBox.Text = selectedItem?.Name ?? DishComboBox.Text;
+                        DishComboBox.IsDropDownOpen = false;
+                        // Fokus nur dann verschieben, wenn ein Element ausgewählt ist oder der Text nicht leer ist
+                        ExtrasComboBox.Focus();
+                    }
                 }
-
-                // Erstelle eine Anforderung, um den Fokus auf das nächste Steuerelement in der Tab-Reihenfolge zu setzen
-                ExtrasComboBox.Focus();
+                else if (!string.IsNullOrWhiteSpace(DishComboBox.Text))
+                {
+                    // Fokus verschieben, wenn der Dropdown nicht offen ist, aber Text vorhanden ist
+                    ExtrasComboBox.Focus();
+                }
 
                 // Markiere das Ereignis als behandelt, um zu verhindern, dass andere Handler darauf reagieren
                 e.Handled = true;
             }
         }
+
 
         //Extras
         private void ExtrasTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -359,11 +370,16 @@ namespace PizzaEcki
             var textBox = (TextBox)ExtrasComboBox.Template.FindName("PART_EditableTextBox", ExtrasComboBox);
             if (textBox != null)
             {
+                textBox.Text = "OK";
+                textBox.SelectAll();
+                textBox.Focus();
                 textBox.TextChanged += ExtrasTextBox_TextChanged;
                 textBox.PreviewKeyDown += ExtrasComboBox_PreviewKeyDown;
             }
         }
-        private async void ExtrasComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+
+
+        private void ExtrasComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
             if (textBox == null)
@@ -371,25 +387,40 @@ namespace PizzaEcki
                 return;
             }
 
-            if (e.Key == Key.Space)
+            if (e.Key == Key.Enter)
             {
-                string text = textBox.Text;
-                if (!text.EndsWith(", "))
+                if (textBox.Text.Equals("OK", StringComparison.OrdinalIgnoreCase))
                 {
-                    textBox.Text += ", ";  // Füge ein Komma und ein Leerzeichen hinzu, wenn die Leertaste gedrückt wird
-                    textBox.SelectionStart = textBox.Text.Length;  // Setze den Cursor ans Ende des Texts
+                    // Der Benutzer hat die Eingabe der Extras abgeschlossen
+                    tempOrderItem.Extras = string.Join(", ", selectedExtras);
+                    extraShowLabel.Text = tempOrderItem.Extras; // Zeige alle ausgewählten Extras im Label an
+                    selectedExtras.Clear(); // Liste leeren für die nächste Bestellung
+                    textBox.Text = string.Empty; // Textbox leeren
+                    ProcessOrder(); // Weiter mit der Bestellung
                 }
-                e.Handled = true;  // Verhindere, dass die Leertaste ein Leerzeichen einfügt
-            }
-            else if (e.Key == Key.Enter)
-            {
-                tempOrderItem.Extras = textBox.Text;
-                await Task.Delay(50); 
-                
-               
-                amountComboBox.Focus();  // Verschiebe den Fokus zur amountComboBox
+                else if (string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    // Wenn das Textfeld leer ist und Enter gedrückt wird, "OK" anzeigen
+                    textBox.Text = "OK";
+                    textBox.SelectAll();
+                }
+                else
+                {
+                    // Ein Extra wurde eingegeben, also suchen wir es und fügen es hinzu
+                    var matchingExtra = extrasList.FirstOrDefault(extra => extra.Name.Equals(textBox.Text, StringComparison.OrdinalIgnoreCase));
+                    if (matchingExtra != null)
+                    {
+                        selectedExtras.Add(matchingExtra.Name); // Füge das Extra zur Liste hinzu
+                        extraShowLabel.Text += string.IsNullOrEmpty(extraShowLabel.Text) ? matchingExtra.Name : ", " + matchingExtra.Name; // Update das TextBlock
+                    }
+                    textBox.Text = string.Empty; // Textbox leeren für die nächste Eingabe
+                }
+                e.Handled = true; // Verhindert, dass weitere Handler das Ereignis verarbeiten
             }
         }
+
+
+
         private async void ExtrasComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -411,15 +442,10 @@ namespace PizzaEcki
              if (e.Key == Key.Enter)
              {
                 tempOrderItem.Extras = textBox.Text;
-                await Task.Delay(10);
-                amountComboBox.Focus();
                 e.Handled = true;
              }
         }
-        private bool ShouldProcessOrder()
-        {
-            return !string.IsNullOrWhiteSpace(tempOrderItem.Extras) && tempOrderItem.Menge > 0;
-        }
+
         //Anzahl in das tempOrderItem Schreiben 
         private void amountComboBox_KeyDown(object sender, KeyEventArgs e)
         {
@@ -484,12 +510,15 @@ namespace PizzaEcki
             }
         }
 
-        private bool IsHappyHour(DateTime currentTime)
+        private bool IsHappyHour()
         {
+            var currentTime = DateTime.Now.TimeOfDay;
             var happyHourStart = Properties.Settings.Default.HappyHourStart;
             var happyHourEnd = Properties.Settings.Default.HappyHourEnd;
-            return currentTime.TimeOfDay >= happyHourStart && currentTime.TimeOfDay <= happyHourEnd;
+
+            return currentTime >= happyHourStart && currentTime <= happyHourEnd;
         }
+
         private void ProcessOrder()
         {
             if (dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
@@ -498,11 +527,11 @@ namespace PizzaEcki
                 return;
             }
 
-            if (string.IsNullOrEmpty(tempOrderItem.Gericht) || tempOrderItem.Menge == 0)
-            {
-                MessageBox.Show("Bitte füllen Sie alle erforderlichen Felder aus.");
-                return;
-            }
+            //if (string.IsNullOrEmpty(tempOrderItem.Gericht))
+            //{
+            //    MessageBox.Show("Bitte füllen Sie alle erforderlichen Felder aus.");
+            //    return;
+            //}
 
             if (TimePickermein.Value != null)
             {
@@ -514,7 +543,7 @@ namespace PizzaEcki
                 }
             }
 
-            bool isHappyHourNow = IsHappyHour(DateTime.Now);
+            bool isHappyHourNow = IsHappyHour();
 
 
             // Setze den Epreis zurück
@@ -523,7 +552,8 @@ namespace PizzaEcki
             Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
             string selectedSize = SizeComboBox.SelectedItem.ToString();
             tempOrderItem.Größe = selectedSize;
-     
+            tempOrderItem.Menge = 1;
+
 
             //Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
             //if (selectedDish != null)
@@ -531,23 +561,22 @@ namespace PizzaEcki
             //    string selectedSize = SizeComboBox.SelectedItem.ToString();
             //    
             //}
-        
-                if (selectedDish != null)
+            bool isHappyHour = IsHappyHour();
+
+            if (selectedDish != null)
+            {
+                // Standardpreis basierend auf der ausgewählten Größe berechnen
+                tempOrderItem.Epreis += GetPriceForSelectedSize(selectedDish, selectedSize);
+
+                // Überprüfe, ob Mittagsangebot anwendbar ist
+                if (isHappyHourNow && IsEligibleForLunchOffer(selectedDish, selectedSize))
                 {
-                   
-                    tempOrderItem.Epreis += GetPriceForSelectedSize(selectedDish, selectedSize);
-                    double rabatt = tempOrderItem.Epreis * 10 / 100;
-                    // Überprüfe, ob das Gericht zum Happy Hour-Menü gehört
-                    if (isHappyHourNow && selectedDish.HappyHour == "1")
-                    {
-                        // Ziehe 10% vom Preis des Gerichts ab
-                         tempOrderItem.Epreis -= rabatt;
-                    }
-    
-                    // Berechne den Gesamtpreis für das Gericht
-                     tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
+                    tempOrderItem.Epreis = 7; // Preis für das Mittagsangebot setzen
                 }
 
+                // Berechne den Gesamtpreis für das Gericht
+                tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
+            }
 
             if (tempOrderItem.Extras != null)
             {
@@ -587,6 +616,26 @@ namespace PizzaEcki
 
             DishComboBox.Focus();
         }
+        private bool IsEligibleForLunchOffer(Dish selectedDish, string selectedSize)
+        {
+            return (selectedDish.Kategorie == DishCategory.Pizza && selectedSize == "L") ||
+                   (selectedDish.Kategorie == DishCategory.Nudeln) ||
+                   (selectedDish.Kategorie == DishCategory.Pasta);
+
+        }
+
+
+        private bool IsLunchOfferApplicable(DateTime time)
+        {
+            var startLunchTime = new TimeSpan(11, 0, 0); // 11:00 AM
+            var endLunchTime = new TimeSpan(14, 0, 0);   // 2:00 PM
+            bool isWithinTime = time.TimeOfDay >= startLunchTime && time.TimeOfDay <= endLunchTime;
+            bool isWithinDay = time.DayOfWeek >= DayOfWeek.Tuesday && time.DayOfWeek <= DayOfWeek.Friday;
+
+            
+            return isWithinTime && isWithinDay;
+        }
+
         public void CalculateTotal(List<OrderItem> orderItem)
         {
             double gesamtPreis = 0;
