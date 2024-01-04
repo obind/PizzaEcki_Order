@@ -161,15 +161,20 @@
                     </Grid>
 
             </TabItem>
-            <TabItem Header="Druckereinstellungen" Background="#FFFF5D48" Foreground="White">
+            <TabItem Header="Druckereinstellungen" Background="#FFFF5D48" Foreground="White" Loaded="TabItem_Loaded">
                 <Grid Background="#FF1D1E20">
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Label Content="Wählen Sie einen Drucker:" Foreground="White"/>
-                        <ComboBox Name="PrinterComboBox" Width="200" Margin="10"/>
-                        <Button Content="Speichern" Click="SavePrinterSelectionButton_Click" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="10,5"/>
+                        <Label Content="Wählen Sie einen lokalen Drucker:" Foreground="White"/>
+                        <ComboBox x:Name="LocalPrinterComboBox" Width="200" Margin="10"/>
+
+                        <Label Content="Wählen Sie einen Netzwerkdrucker:" Foreground="White" Margin="0,10,0,0"/>
+                        <ComboBox Name="NetworkPrinterComboBox" Width="200" Margin="10"/>
+
+                        <Button Content="Speichern" Click="SavePrinterSelectionButton_Click" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="10,5" Margin="0,10,0,0"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
+
 
             <TabItem Header="Über" Background="#FFFF5D48" Foreground="White">
                 <Grid Background="#FF1D1E20">

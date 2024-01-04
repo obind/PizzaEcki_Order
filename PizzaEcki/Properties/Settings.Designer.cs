@@ -82,5 +82,17 @@ namespace PizzaEcki.Properties {
                 this["HappyHourEndDay"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NetworkPrinter {
+            get {
+                return ((string)(this["NetworkPrinter"]));
+            }
+            set {
+                this["NetworkPrinter"] = value;
+            }
+        }
     }
 }

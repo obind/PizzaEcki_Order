@@ -204,10 +204,10 @@
                 </Style>
             </ComboBox.ItemContainerStyle>
         </ComboBox>
-        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Margin="10,0,10,0" Click="OnAssignButtonClicked" Style="{StaticResource CustomButtonStyle}"/>       <!-- MainWindow.xaml -->
-        <Button Name="PrintButton" Grid.Column="2" Grid.Row="1" Content="Drucken" Margin="10,0,10,0"  Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Click="PrintButton_Click"/>
+        <Button Name="AssignButton" Grid.Column="1" Grid.Row="1" Content="Zuordnen" Grid.ColumnSpan="2" Margin="10,0,10,0" Click="OnAssignButtonClicked" Style="{StaticResource CustomButtonStyle}"/>       <!-- MainWindow.xaml -->
+        <!--<Button Name="PrintButton" Grid.Column="2" Grid.Row="1" Content="Drucken" Margin="10,0,10,0"  Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Click="PrintButton_Click"/>-->
 
-        <Label x:Name="ConnectionStatusLabel" Grid.Row="2" Grid.Column="2" Content="Nicht verbunden" HorizontalAlignment="Center" Foreground="White"/>
+        <Label x:Name="ConnectionStatusLabel" Grid.Row="2" Grid.Column="2"  Content="Nicht verbunden" HorizontalAlignment="Center" Foreground="White"/>
 
     </Grid>
 </Window>

@@ -368,7 +368,7 @@
                 <Border Background="#FF602C" CornerRadius="10">
                     <Button x:Name="btn_cash" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" >
                         <!-- Icon für Barzahlung (Beispiel) -->
-                        <TextBlock Text="💵" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="Bar" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
 
                 </Border>
@@ -377,7 +377,7 @@
                 <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
                     <Button x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn"  >
                         <!-- Icon für Kartenzahlung (Beispiel) -->
-                        <TextBlock Text="💳" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="Karte" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                 </Border>
 
