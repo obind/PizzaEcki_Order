@@ -857,7 +857,7 @@ namespace PizzaEcki
                               "F4: Bestellung löschen.\n" +
                               "F5: Markiert das aktuelle Gericht als gratis.\n" +
                               "F7: Letztes Gericht löschen.\n" +
-                              "F8: Bestellung löschen.\n" +
+                              "F8: Küchen Druck.\n" +
                               "F11: Alle Bestellungen anzeigen.\n" +
                               "F12: Bestellung abschließen und drucken.";
 

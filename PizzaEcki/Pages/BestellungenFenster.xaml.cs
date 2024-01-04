@@ -32,6 +32,25 @@ namespace PizzaEcki.Pages
             _databaseManager = new DatabaseManager(); // Stelle sicher, dass DatabaseManager initialisiert wird
             _orders = new ObservableCollection<SharedLibrary.Order>(orders);
             BestellungenListView.ItemsSource = _orders;
+            foreach (var order in _orders)
+            {
+                // Prüfe den Wert der CustomerPhoneNumber
+                if (order.CustomerPhoneNumber == "1" || order.CustomerPhoneNumber == "2")
+                {
+                    // Für Selbstabholer und Mitnehmer - setze ein leeres Customer-Objekt oder handle es anders
+                    order.Customer = new SharedLibrary.Customer();
+                }
+                else
+                {
+                    // Für normale Bestellungen mit einer gültigen Telefonnummer
+                    order.Customer = _databaseManager.GetCustomerByPhoneNumber(order.CustomerPhoneNumber);
+                }
+            }
+
+
+            BestellungenListView.ItemsSource = _orders;
+
+
         }
 
         private void LoadOrders(string bestellungsTyp)

@@ -366,7 +366,7 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,50,0">
                 <!-- Barzahlung-Button -->
                 <Border Background="#FF602C" CornerRadius="10">
-                    <Button x:Name="btn_cash" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" >
+                    <Button x:Name="btn_cash" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" BorderBrush="{x:Null}" >
                         <!-- Icon für Barzahlung (Beispiel) -->
                         <TextBlock Text="Bar" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
@@ -375,7 +375,7 @@
 
                 <!-- Kartenzahlung-Button -->
                 <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
-                    <Button x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn"  >
+                    <Button x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" BorderBrush="{x:Null}"  >
                         <!-- Icon für Kartenzahlung (Beispiel) -->
                         <TextBlock Text="Karte" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
@@ -384,7 +384,7 @@
                 <!-- PayPal-Button -->
                 <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
 
-                    <Button x:Name="btn_paypal" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" >
+                    <Button x:Name="btn_paypal" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" BorderBrush="{x:Null}" >
                     <!-- Icon für PayPal (Beispiel) -->
                     <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
