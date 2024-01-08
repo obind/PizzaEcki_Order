@@ -1,11 +1,18 @@
 ﻿<Window x:Class="PizzaEcki.Pages.BestellungenFenster"
        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:services="clr-namespace:PizzaEcki.Services" 
+
         Title="Bestellungen anzeigen" Height="450" Width="1240"
         MinWidth="1240"  MinHeight="300" KeyDown="Window_KeyDown"
+        
 >
 
     <Window.Resources>
+
+        <services:PhoneNumberToTextConverter x:Key="PhoneNumberToTextConverter"/>
+        <services:PhoneNumberToVisibilityConverter x:Key="PhoneNumberToVisibilityConverter"/>
+
         <!-- Button-Style für orange Hintergrund -->
         <Style x:Key="OrangeButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#FF602C"/>
@@ -68,17 +75,19 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Kunde" Width="150">
+                    <GridViewColumn Header="Kunde" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Customer.Name}" Foreground="White" FontSize="14" HorizontalAlignment="Center" />
+                                <TextBlock Text="{Binding Customer.Name}" Foreground="White" FontSize="14" HorizontalAlignment="Center"
+                       Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
                     <GridViewColumn Header="Adresse" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel>
+                                <StackPanel Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}">
                                     <TextBlock Text="{Binding Customer.Street}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding Customer.City}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
                                 </StackPanel>
@@ -89,10 +98,11 @@
                     <GridViewColumn Header="Telefonnummer" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding CustomerPhoneNumber}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
 
                     <GridViewColumn Header="Lieferung Bis" Width="100">
                         <GridViewColumn.CellTemplate>

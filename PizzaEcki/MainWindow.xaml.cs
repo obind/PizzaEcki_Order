@@ -926,8 +926,7 @@ namespace PizzaEcki
 
             // Überprüfe, ob der angegebene Drucker vorhanden und verfügbar ist
             if (!printDoc.PrinterSettings.IsValid)
-            {
-                MessageBox.Show("Ausgewählter Drucker ist nicht verfügbar. Verwende Standarddrucker.");
+            {      
                 printDoc.PrinterSettings.PrinterName = defaultPrinter;
             }
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
