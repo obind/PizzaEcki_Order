@@ -25,7 +25,7 @@ namespace PizzaEcki
 
             if (!isNewInstance)
             {
-                MessageBox.Show("Es läuft bereits eine Instanz dieser Anwendung.");
+                MessageBox.Show("Die Software läuft bereits.");
                 Environment.Exit(0);
             }
 
