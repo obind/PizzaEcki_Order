@@ -302,13 +302,13 @@ namespace PizzaEcki
                         DishComboBox.Text = selectedItem?.Name ?? DishComboBox.Text;
                         DishComboBox.IsDropDownOpen = false;
                         // Fokus nur dann verschieben, wenn ein Element ausgewählt ist oder der Text nicht leer ist
-                        ExtrasComboBox.Focus();
+                        SizeComboBox.Focus();
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(DishComboBox.Text))
                 {
                     // Fokus verschieben, wenn der Dropdown nicht offen ist, aber Text vorhanden ist
-                    ExtrasComboBox.Focus();
+                    SizeComboBox.Focus();
                 }
 
                 // Markiere das Ereignis als behandelt, um zu verhindern, dass andere Handler darauf reagieren
@@ -608,7 +608,7 @@ namespace PizzaEcki
             ExtrasComboBox.SelectedItem = null;
             ExtrasComboBox.Text = "";
             amountComboBox.Text = "1";
-
+            extraShowLabel.Text = "";
             DishComboBox.Focus();
         }
         private bool IsEligibleForLunchOffer(Dish selectedDish, string selectedSize)
