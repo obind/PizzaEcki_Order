@@ -258,11 +258,7 @@ namespace PizzaEcki.Pages
                 string selectedNetworkPrinter = NetworkPrinterComboBox.SelectedItem.ToString();
                 PizzaEcki.Properties.Settings.Default.NetworkPrinter = selectedNetworkPrinter;
             }
-            else
-            {
-                MessageBox.Show("Bitte wählen Sie einen Netzwerkdrucker aus der Liste.");
-                saveSuccessful = false;
-            }
+
 
             if (saveSuccessful)
             {

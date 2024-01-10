@@ -329,43 +329,56 @@ namespace PizzaEcki
             bool isDeleting = e.Changes.Any(change => change.RemovedLength > 0);
             if (isDeleting)
             {
-                return;  // Wenn der Benutzer löscht, tun wir nichts
+                return; // Wenn der Benutzer löscht, tun wir nichts
             }
 
             string text = textBox.Text;
             if (string.IsNullOrEmpty(text))
             {
-                return;  // Wenn der Text leer ist, tun wir nichts
+                return; // Wenn der Text leer ist, tun wir nichts
             }
 
             var segments = text.Split(',');
             var lastSegment = segments.Last().Trim();
 
-            bool isRemoving = lastSegment.StartsWith("-");
-            string lookupText = isRemoving ? lastSegment.Substring(1) : lastSegment;
-
-            // Stellen Sie sicher, dass lookupText mindestens einen Buchstaben hat,
-            // bevor die Autovervollständigung ausgeführt wird
-            if (lookupText.Length < 1)
+            // Überprüfe, ob das letzte Segment ein Minuszeichen und mindestens ein weiteres Zeichen enthält
+            if (lastSegment.StartsWith("-") && lastSegment.Length <= 1)
             {
-                return;
+                return; // Warte auf weitere Eingaben nach dem Minuszeichen
             }
 
-            var matchingExtra = extrasList
-                .FirstOrDefault(extra => extra.Name.StartsWith(lookupText, StringComparison.OrdinalIgnoreCase));
+            string lookupText = lastSegment.StartsWith("-") ? lastSegment.Substring(1).Trim() : lastSegment;
 
-            if (matchingExtra != null)
+            if (lookupText.Length < 1)
             {
-                // Ermittle den Index des letzten Segments im Text
-                int lastSegmentIndex = text.LastIndexOf(lastSegment);
-                // Ersetze den letzten Segmenttext durch den Autovervollständigungstext
-                string newText = text.Substring(0, lastSegmentIndex) + (isRemoving ? "-" : "") + matchingExtra.Name;
+                return; // Kein ausreichender Text für die Autovervollständigung
+            }
+
+            var matchingExtras = extrasList
+                .Where(extra => extra.Name.StartsWith(lookupText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (matchingExtras.Any())
+            {
+                var selectedExtra = matchingExtras.First(); // Wähle das erste passende Extra
+
+                string newText = text.Substring(0, text.LastIndexOf(lastSegment));
+                newText += lastSegment.StartsWith("-") ? "-" : ""; // Füge das Minuszeichen wieder hinzu, wenn vorhanden
+                newText += selectedExtra.Name;
+
                 int textStart = textBox.SelectionStart;
                 textBox.Text = newText;
                 textBox.SelectionStart = textStart;
                 textBox.SelectionLength = textBox.Text.Length - textStart;
             }
         }
+
+
+
+
+
+
+
         private void ExtrasComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             var textBox = (TextBox)ExtrasComboBox.Template.FindName("PART_EditableTextBox", ExtrasComboBox);
@@ -407,16 +420,30 @@ namespace PizzaEcki
                 }
                 else
                 {
-                    // Ein Extra wurde eingegeben, also suchen wir es und fügen es hinzu
-                    var matchingExtra = extrasList.FirstOrDefault(extra => extra.Name.Equals(textBox.Text, StringComparison.OrdinalIgnoreCase));
-                    if (matchingExtra != null)
+                    string searchText = textBox.Text;
+                    // Ignoriere das Minuszeichen bei der Suche
+                    if (searchText.StartsWith("-"))
                     {
-                        selectedExtras.Add(matchingExtra.Name); // Füge das Extra zur Liste hinzu
-                        extraShowLabel.Text += string.IsNullOrEmpty(extraShowLabel.Text) ? matchingExtra.Name : ", " + matchingExtra.Name; // Update das TextBlock
+                        searchText = searchText.Substring(1);
                     }
+
+                 var matchingExtra = extrasList.FirstOrDefault(extra => extra.Name.Equals(searchText, StringComparison.OrdinalIgnoreCase));
+if (matchingExtra != null && !textBox.Text.StartsWith("-"))
+{
+    selectedExtras.Add(matchingExtra.Name); // Füge das Extra zur Liste hinzu
+    extraShowLabel.Text += string.IsNullOrEmpty(extraShowLabel.Text) ? matchingExtra.Name : ", " + matchingExtra.Name; // Update das TextBlock
+}
+else if (textBox.Text.StartsWith("-"))
+{
+    // Wenn kein passendes Extra gefunden wurde, aber das Minuszeichen vorhanden ist, füge den Text so hinzu, wie er ist
+    selectedExtras.Add(textBox.Text);
+    extraShowLabel.Text += string.IsNullOrEmpty(extraShowLabel.Text) ? textBox.Text : ", " + textBox.Text;
+}
+
+
                     textBox.Text = string.Empty; // Textbox leeren für die nächste Eingabe
                 }
-                e.Handled = true; // Verhindert, dass weitere Handler das Ereignis verarbeiten
+                e.Handled = true;
             }
         }
 
@@ -560,33 +587,49 @@ namespace PizzaEcki
 
             if (selectedDish != null)
             {
-                // Standardpreis basierend auf der ausgewählten Größe berechnen
-                tempOrderItem.Epreis += GetPriceForSelectedSize(selectedDish, selectedSize);
+                // Grundpreis des Gerichts basierend auf der ausgewählten Größe berechnen
+                double basePrice = GetPriceForSelectedSize(selectedDish, selectedSize);
 
                 // Überprüfe, ob Mittagsangebot anwendbar ist
                 if (isHappyHourNow && IsEligibleForLunchOffer(selectedDish, selectedSize))
                 {
-                    tempOrderItem.Epreis = 7; // Preis für das Mittagsangebot setzen
+                    basePrice = 7; // Preis für das Mittagsangebot setzen
+                }
+
+                // Setze den Grundpreis für das Gericht
+                tempOrderItem.Epreis = basePrice;
+
+                // Verarbeite alle ausgewählten Extras
+                if (tempOrderItem.Extras != null)
+                {
+                    var extras = tempOrderItem.Extras.Split(',').Select(extra => extra.Trim());
+                    foreach (var extraName in extras)
+                    {
+                        bool isRemovingExtra = extraName.StartsWith("-");
+                        string cleanExtraName = isRemovingExtra ? extraName.Substring(1) : extraName;
+
+                        var selectedExtra = extrasList.FirstOrDefault(extra => extra.Name.Equals(cleanExtraName, StringComparison.OrdinalIgnoreCase));
+                        if (selectedExtra != null)
+                        {
+                            double extraPrice = GetPriceForSelectedExtraSize(selectedExtra, tempOrderItem.Größe);
+
+                            if (isRemovingExtra)
+                            {
+                                // Ziehe den Preis für das entfernte Extra ab, aber nicht unter den Grundpreis
+                                tempOrderItem.Epreis = Math.Max(tempOrderItem.Epreis - extraPrice, basePrice);
+                            }
+                            else
+                            {
+                                // Füge den Preis für das hinzugefügte Extra hinzu
+                                tempOrderItem.Epreis += extraPrice;
+                            }
+                        }
+                    }
                 }
 
                 // Berechne den Gesamtpreis für das Gericht
                 tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
             }
-
-            if (tempOrderItem.Extras != null)
-            {
-                var extras = tempOrderItem.Extras.Split(',').Select(extra => extra.Trim()); // Konvertieren Sie den Extras-String in ein Array
-                foreach (var extraName in extras)
-                {
-                    Extra selectedExtra = extrasList.FirstOrDefault(x => x.Name == extraName);
-                    if (selectedExtra != null)
-                    {
-                        // Füge den Preis für das ausgewählte Extra basierend auf der Größe des Gerichts hinzu
-                        tempOrderItem.Epreis += GetPriceForSelectedExtraSize(selectedExtra, tempOrderItem.Größe);
-                    }
-                }
-            }
-
 
 
             // Berechnen Sie den Gesamtpreis eines Gerichtes mit Berücksichtigung der Anzahl
@@ -930,13 +973,15 @@ namespace PizzaEcki
                 printDoc.PrinterSettings.PrinterName = defaultPrinter;
             }
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
+            printDoc.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
             printDoc.PrintPage += (sender, e) =>
             {
                 Graphics graphics = e.Graphics;
 
                 // Fonts
-                Font regularFont = new Font("Segoe UI", 16, System.Drawing.FontStyle.Bold);
-                Font boldFont = new Font("Segoe UI", 14, System.Drawing.FontStyle.Bold);
+                Font smallFont = new Font("Segoe UI", 10, System.Drawing.FontStyle.Regular);
+                Font regularFont = new Font("Segoe UI Semibold", 14, System.Drawing.FontStyle.Bold);
+                Font boldFont = new Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
                 Font titleFont = new Font("Segoe UI", 24, System.Drawing.FontStyle.Bold);
 
                 float yOffset = 10;  // Initial offset
@@ -953,9 +998,9 @@ namespace PizzaEcki
                 yOffset += titleFont.GetHeight();
 
                 // Adresse
-                SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", regularFont);
-                float addressX = (e.PageBounds.Width - addressSize.Width) / 2;
-                graphics.DrawString("Woerdener Str. 4 · 33803 Steinhagen", regularFont, Brushes.Black, addressX, yOffset);
+                SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", smallFont);
+                float addressX = (e.PageBounds.Width - addressSize.Width ) / 2;
+                graphics.DrawString("Woerdener Str. 4 · 33803 Steinhagen", smallFont, Brushes.Black, addressX, yOffset);
                 yOffset += addressSize.Height ;  // 10 pixels Abstand
 
                 // Datum und Uhrzeit
@@ -963,7 +1008,7 @@ namespace PizzaEcki
                 string timeStr = DateTime.Now.ToString("HH:mm");
                 graphics.DrawString(dateStr, regularFont, Brushes.Black, 0, yOffset);
                 SizeF timeSize = graphics.MeasureString(timeStr, regularFont);
-                graphics.DrawString(timeStr, regularFont, Brushes.Black, e.PageBounds.Width - timeSize.Width - 15, yOffset);
+                graphics.DrawString(timeStr, regularFont, Brushes.Black, e.PageBounds.Width - timeSize.Width - 20, yOffset);
                // 10 pixels Abstand
 
                 Pen blackPen = new Pen(Color.Black, 1);
@@ -1021,16 +1066,16 @@ namespace PizzaEcki
                 string headerAnz = "Anz  ";
                 string headerNr = "Nr  ";
                 string headerGericht = "Gericht  ";
-                string headerGr = "Gr.  ";
+                string headerGr = " Gr.  ";
                 string headerPreis = "Preis";
 
                 // Definiere die Positionen der Spaltenköpfe
                 float headerAnzPosition = 0;
-                float headerNrPosition = 45;  // 
-                float headerGerichtPosition = 80;  // Angenommene Position, anpassen nach Bedarf
-                float headerGrPosition = 185;  // Angenommene Position, anpassen nach Bedarf
+                float headerNrPosition = 37;  // 
+                float headerGerichtPosition = 65;  // Angenommene Position, anpassen nach Bedarf
+                float headerGrPosition = 200;  // Angenommene Position, anpassen nach Bedarf
                                                // Preis rechtsbündig, Abstand vom rechten Rand
-                float headerPreisPosition = e.PageBounds.Width - graphics.MeasureString(headerPreis, regularFont).Width;
+                float headerPreisPosition = e.MarginBounds.Right - graphics.MeasureString(headerPreis, regularFont).Width - 15;
 
                 // Zeichne die Tabellenüberschrift#
                 graphics.DrawString(headerAnz, regularFont, Brushes.Black, headerAnzPosition, yOffset);
@@ -1045,11 +1090,11 @@ namespace PizzaEcki
                 yOffset += 3; // Füge einen kleinen Abstand nach der Linie hinzu
 
                 // Vorhandener Code für Bestellzeilen ...
-                Font extraFont = new Font("Segoe UI", 10);
+                Font extraFont = new Font("Segoe UI Semibold", 10);
                 foreach (var item in order.OrderItems)
                 {
                     string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht} ";
-                    string itemSizeStr = $" {item.Größe}";
+                    string itemSizeStr = $"   {item.Größe}";
                     string itemPriceStr = $"{item.Gesamt:C}";
 
                     // Zeichne die Bestellzeile
@@ -1073,7 +1118,7 @@ namespace PizzaEcki
                         }
 
                         // Zeichne die Extras
-                        graphics.DrawString(extrasStr, extraFont, Brushes.Black, headerGerichtPosition + 10, yOffset);
+                        graphics.DrawString(extrasStr, extraFont, Brushes.Black, headerGerichtPosition -8, yOffset);
 
                         // Aktualisiere yOffset für die nächste Zeile
                         yOffset += extraFont.GetHeight();
