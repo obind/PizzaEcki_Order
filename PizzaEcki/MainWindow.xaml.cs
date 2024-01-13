@@ -18,9 +18,9 @@ using System.Threading.Tasks;
 using System.Diagnostics.Eventing.Reader;
 using System.Windows.Threading;
 using System.Diagnostics;
-
 using static PizzaEcki.Pages.SettingsWindow;
 using System.IO;
+
 
 namespace PizzaEcki
 {
@@ -40,11 +40,11 @@ namespace PizzaEcki
 
         public string SelectedPaymentMethod { get; private set; }
 
-       public string _customerNr;
+        public string _customerNr;
         private string _pickupType = "";
-      
+
         private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
-        private int Lieferung = 0;
+        private int Auslieferung = 0;
         private int Selbstabholer = 0;
         private int Mitnehmer = 0;
         private int currentBonNumber;
@@ -180,7 +180,7 @@ namespace PizzaEcki
                             //Rufe die MEthode auf um die Textfelder Automatisch zu füllen
                             SetCustomerDataToFields(customer);
                             DishComboBox.Focus();
-                            Lieferung++;
+                            Auslieferung++;
                             isDelivery = true;
 
 
@@ -194,7 +194,7 @@ namespace PizzaEcki
                                 SaveButton.Visibility = Visibility.Visible;
                                 SaveButtonBorder.Visibility = Visibility.Visible;
                                 NameTextBox.Focus();
-                                Lieferung++;
+                                Auslieferung++;
                                 isDelivery = true;
                             }
                         }
@@ -259,13 +259,13 @@ namespace PizzaEcki
                 SaveButton.Visibility = Visibility.Visible;
             }
         }
-       //Gerichte
+        //Gerichte
         private void DishComboBox_TextChanged(object sender, SelectionChangedEventArgs e)
         {
             // Prüfe, ob ein Gericht ausgewählt ist
             if (DishComboBox.SelectedItem == null)
             {
-                SizeComboBox.ItemsSource = null; 
+                SizeComboBox.ItemsSource = null;
                 tempOrderItem.Gericht = "";
                 tempOrderItem.Nr = 0;
                 return;
@@ -286,7 +286,7 @@ namespace PizzaEcki
             {
                 SizeComboBox.SelectedIndex = 0;
             }
-            
+
             tempOrderItem.Extras = "";
         }
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)
@@ -427,18 +427,18 @@ namespace PizzaEcki
                         searchText = searchText.Substring(1);
                     }
 
-                 var matchingExtra = extrasList.FirstOrDefault(extra => extra.Name.Equals(searchText, StringComparison.OrdinalIgnoreCase));
-if (matchingExtra != null && !textBox.Text.StartsWith("-"))
-{
-    selectedExtras.Add(matchingExtra.Name); // Füge das Extra zur Liste hinzu
-    extraShowLabel.Text += string.IsNullOrEmpty(extraShowLabel.Text) ? matchingExtra.Name : ", " + matchingExtra.Name; // Update das TextBlock
-}
-else if (textBox.Text.StartsWith("-"))
-{
-    // Wenn kein passendes Extra gefunden wurde, aber das Minuszeichen vorhanden ist, füge den Text so hinzu, wie er ist
-    selectedExtras.Add(textBox.Text);
-    extraShowLabel.Text += string.IsNullOrEmpty(extraShowLabel.Text) ? textBox.Text : ", " + textBox.Text;
-}
+                    var matchingExtra = extrasList.FirstOrDefault(extra => extra.Name.Equals(searchText, StringComparison.OrdinalIgnoreCase));
+                    if (matchingExtra != null && !textBox.Text.StartsWith("-"))
+                    {
+                        selectedExtras.Add(matchingExtra.Name); // Füge das Extra zur Liste hinzu
+                        extraShowLabel.Text += string.IsNullOrEmpty(extraShowLabel.Text) ? matchingExtra.Name : ", " + matchingExtra.Name; // Update das TextBlock
+                    }
+                    else if (textBox.Text.StartsWith("-"))
+                    {
+                        // Wenn kein passendes Extra gefunden wurde, aber das Minuszeichen vorhanden ist, füge den Text so hinzu, wie er ist
+                        selectedExtras.Add(textBox.Text);
+                        extraShowLabel.Text += string.IsNullOrEmpty(extraShowLabel.Text) ? textBox.Text : ", " + textBox.Text;
+                    }
 
 
                     textBox.Text = string.Empty; // Textbox leeren für die nächste Eingabe
@@ -467,11 +467,11 @@ else if (textBox.Text.StartsWith("-"))
                 }
                 e.Handled = true;  // Verhindere, dass die Leertaste ein Leerzeichen einfügt
             }
-             if (e.Key == Key.Enter)
-             {
+            if (e.Key == Key.Enter)
+            {
                 tempOrderItem.Extras = textBox.Text;
                 e.Handled = true;
-             }
+            }
         }
 
         //Anzahl in das tempOrderItem Schreiben 
@@ -482,7 +482,7 @@ else if (textBox.Text.StartsWith("-"))
                 UpdateTempOrderItemAmount();
                 TimePickermein.Focus();
                 e.Handled = true;
-                
+
             }
         }
         private void UpdateTempOrderItemAmount()
@@ -634,7 +634,7 @@ else if (textBox.Text.StartsWith("-"))
 
             // Berechnen Sie den Gesamtpreis eines Gerichtes mit Berücksichtigung der Anzahl
             tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
-        
+
             // Fügen Sie das tempOrderItem zur Liste hinzu
             tempOrderItem.Nr = orderItems.Count + 1;
             orderItems.Add(tempOrderItem);
@@ -670,7 +670,7 @@ else if (textBox.Text.StartsWith("-"))
             bool isWithinTime = time.TimeOfDay >= startLunchTime && time.TimeOfDay <= endLunchTime;
             bool isWithinDay = time.DayOfWeek >= DayOfWeek.Tuesday && time.DayOfWeek <= DayOfWeek.Friday;
 
-            
+
             return isWithinTime && isWithinDay;
         }
 
@@ -723,7 +723,7 @@ else if (textBox.Text.StartsWith("-"))
 
             string totalPriceString = TotalPriceLabel.Content.ToString();
             double gesamtPreis = 0;
-            
+
             //Möglichkeit für einen Mindestbestellwert
             //if (double.TryParse(totalPriceString.Split(' ')[0], out gesamtPreis) && gesamtPreis < 10)
             //{
@@ -756,43 +756,43 @@ else if (textBox.Text.StartsWith("-"))
                     Timestamp = DateTime.Now.ToString("HH:mm"),
                     DeliveryUntil = deliveryUntilStr
                 };
-             
+
 
                 _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
 
-                    _databaseManager.SaveOrder(order);
-                    SendOrderItems(order);
-                    ReloadeUnassignedOrders();
+                _databaseManager.SaveOrder(order);
+                SendOrderItems(order);
+                ReloadeUnassignedOrders();
 
-                    if (PhoneNumberTextBox.Text != "1" && PhoneNumberTextBox.Text != "2")
-                    {
-                        Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
-                        PrintReceipt(order, customer);
-                    }
-                    else
-                    {
-                        PrintReceipt(order, null);
-                    }
+                if (PhoneNumberTextBox.Text != "1" && PhoneNumberTextBox.Text != "2")
+                {
+                    Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
+                    PrintReceipt(order, customer);
+                }
+                else
+                {
+                    PrintReceipt(order, null);
+                }
 
-                    // Leeren Sie die Bestellliste
-                    orderItems.Clear();
+                // Leeren Sie die Bestellliste
+                orderItems.Clear();
 
-                    PhoneNumberTextBox.Text = string.Empty;
-                    NameTextBox.Text = string.Empty;
-                    StreetTextBox.Text = string.Empty;
-                    CityTextBox.Text = string.Empty;
-                    AdditionalInfoTextBox.Text = string.Empty;
-                    SaveButton.Visibility = Visibility.Collapsed;
-                    TimePickermein.Value = null;
-                    TotalPriceLabel.Content = $"0.00 €";
+                PhoneNumberTextBox.Text = string.Empty;
+                NameTextBox.Text = string.Empty;
+                StreetTextBox.Text = string.Empty;
+                CityTextBox.Text = string.Empty;
+                AdditionalInfoTextBox.Text = string.Empty;
+                SaveButton.Visibility = Visibility.Collapsed;
+                TimePickermein.Value = null;
+                TotalPriceLabel.Content = $"0.00 €";
 
-                    // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
-                    myDataGrid.Items.Refresh();
+                // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
+                myDataGrid.Items.Refresh();
                 PhoneNumberTextBox.Focus();
-                    //Aktualisiere Lieferungsart
-                    //AuslieferungLabel.Content = Lieferung;
-                    //MitnehmerLabel.Content = Mitnehmer;
-                    //SelbstabholerLabel.Content = Selbstabholer;
+                //Aktualisiere Lieferungsart
+                //AuslieferungLabel.Content = Lieferung;
+                //MitnehmerLabel.Content = Mitnehmer;
+                //SelbstabholerLabel.Content = Selbstabholer;
             }
             else
             {
@@ -827,7 +827,7 @@ else if (textBox.Text.StartsWith("-"))
             if (e.Key == Key.F2)
             {
                 if (SaveButton.Visibility == Visibility.Visible)
-                {                 
+                {
                     OnSaveButtonClicked(this, new RoutedEventArgs());
                 }
             }
@@ -969,7 +969,7 @@ else if (textBox.Text.StartsWith("-"))
 
             // Überprüfe, ob der angegebene Drucker vorhanden und verfügbar ist
             if (!printDoc.PrinterSettings.IsValid)
-            {      
+            {
                 printDoc.PrinterSettings.PrinterName = defaultPrinter;
             }
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
@@ -999,9 +999,9 @@ else if (textBox.Text.StartsWith("-"))
 
                 // Adresse
                 SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", smallFont);
-                float addressX = (e.PageBounds.Width - addressSize.Width ) / 2;
+                float addressX = (e.PageBounds.Width - addressSize.Width) / 2;
                 graphics.DrawString("Woerdener Str. 4 · 33803 Steinhagen", smallFont, Brushes.Black, addressX, yOffset);
-                yOffset += addressSize.Height ;  // 10 pixels Abstand
+                yOffset += addressSize.Height;  // 10 pixels Abstand
 
                 // Datum und Uhrzeit
                 string dateStr = DateTime.Now.ToString("dd.MM.yyyy");
@@ -1009,7 +1009,7 @@ else if (textBox.Text.StartsWith("-"))
                 graphics.DrawString(dateStr, regularFont, Brushes.Black, 0, yOffset);
                 SizeF timeSize = graphics.MeasureString(timeStr, regularFont);
                 graphics.DrawString(timeStr, regularFont, Brushes.Black, e.PageBounds.Width - timeSize.Width - 20, yOffset);
-               // 10 pixels Abstand
+                // 10 pixels Abstand
 
                 Pen blackPen = new Pen(Color.Black, 1);
 
@@ -1020,7 +1020,7 @@ else if (textBox.Text.StartsWith("-"))
 
                 if (isDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
                 {
-                    string addressStr ="Tel: " + customer.PhoneNumber + "\r\n" + customer.Name+ "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
+                    string addressStr = "Tel: " + customer.PhoneNumber + "\r\n" + customer.Name + "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
                     graphics.DrawString(addressStr, boldFont, Brushes.Black, 0, yOffset);
 
                     // Hier ändern wir den yOffset, um zwei Zeilenhöhen hinzuzufügen, eine für jede Zeile der Adresse.
@@ -1031,7 +1031,7 @@ else if (textBox.Text.StartsWith("-"))
                 SizeF bonNumberSize = graphics.MeasureString(bonNumberStr, boldFont);
                 float bonNumberX = (e.PageBounds.Width - bonNumberSize.Width) / 2;
                 graphics.DrawString(bonNumberStr, boldFont, Brushes.Black, bonNumberX, yOffset);
-                yOffset += bonNumberSize.Height +5;
+                yOffset += bonNumberSize.Height + 5;
 
                 if (!string.IsNullOrEmpty(_pickupType))
                 {
@@ -1118,7 +1118,7 @@ else if (textBox.Text.StartsWith("-"))
                         }
 
                         // Zeichne die Extras
-                        graphics.DrawString(extrasStr, extraFont, Brushes.Black, headerGerichtPosition -8, yOffset);
+                        graphics.DrawString(extrasStr, extraFont, Brushes.Black, headerGerichtPosition - 8, yOffset);
 
                         // Aktualisiere yOffset für die nächste Zeile
                         yOffset += extraFont.GetHeight();
@@ -1477,7 +1477,7 @@ else if (textBox.Text.StartsWith("-"))
         }
         private void AuslieferungLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-           
+
             BestellungenAnzeigen("");
 
         }
@@ -1570,6 +1570,24 @@ else if (textBox.Text.StartsWith("-"))
         {
             var auswertungWindow = new Auswertung();
             auswertungWindow.ShowDialog();
+        }
+
+
+
+        private void TextBlock_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is TextBlock textBlock)
+            {
+                textBlock.TextDecorations = TextDecorations.Underline;
+            }
+        }
+
+        private void TextBlock_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is TextBlock textBlock)
+            {
+                textBlock.TextDecorations = null;
+            }
         }
 
 
