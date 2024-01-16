@@ -1280,7 +1280,7 @@ namespace PizzaEcki
                 float headerAnzPosition = 0;
                 float headerNrPosition = 45;  // 
                 float headerGerichtPosition = 80;  // Angenommene Position, anpassen nach Bedarf
-                float headerGrPosition = 185;  // Angenommene Position, anpassen nach Bedarf
+                float headerGrPosition = 15;  // Angenommene Position, anpassen nach Bedarf
                                                // Preis rechtsbündig, Abstand vom rechten Rand
                 float headerPreisPosition = e.PageBounds.Width - graphics.MeasureString(headerPreis, regularFont).Width;
 
@@ -1300,8 +1300,8 @@ namespace PizzaEcki
                 Font extraFont = new Font("Segoe UI", 10);
                 foreach (var item in order.OrderItems)
                 {
-                    string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht} ";
-                    string itemSizeStr = $" {item.Größe}";
+                    string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht}";
+                    string itemSizeStr = $"{item.Größe} h";
                     string itemPriceStr = $"{item.Gesamt:C}";
 
                     // Zeichne die Bestellzeile
@@ -1374,44 +1374,38 @@ namespace PizzaEcki
             TableView tableView = new TableView();
             tableView.ShowDialog();
         }
-        private void Btn_zuordnen_Click(object sender, RoutedEventArgs e)
+        private async void Btn_zuordnen_Click(object sender, RoutedEventArgs e)
         {
             if (cb_bonNummer.SelectedItem != null && cb_cashRegister.SelectedItem != null)
             {
-                // Hier nehmen wir an, dass die 'BonNumber' in 'cb_bonNummer' ausgewählt wird
                 int selectedBonNumber = (int)cb_bonNummer.SelectedItem;
-
-                // Finde die ausgewählte Order basierend auf der Bonnummer
                 Order selectedOrder = orders.FirstOrDefault(o => o.BonNumber == selectedBonNumber);
-
-                // Wir gehen davon aus, dass 'Name' in 'cb_cashRegister' ausgewählt wird
                 Driver selectedDriver = (Driver)cb_cashRegister.SelectedItem;
 
                 if (selectedOrder != null && selectedDriver != null)
                 {
-                    // Berechne den Gesamtpreis der Bestellung
-                    double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt); // Hier 'Price' statt 'Gesamt', falls das das korrekte Property ist.
-
-                    // Speichere die Zuordnung
+                    double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
                     _databaseManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
 
-                    // Setze die ausgewählte Items zurück
                     cb_bonNummer.SelectedItem = null;
                     cb_cashRegister.SelectedItem = null;
-                    cb_bonNummer.Items.Clear();
 
-                    ReloadeUnassignedOrders();
+                    // Falls ReloadeUnassignedOrders eine asynchrone Operation ist
+                    await ReloadeUnassignedOrders(); // Ändere den Namen der Methode entsprechend, wenn sie asynchron ist.
                 }
                 else
                 {
                     // Fehlerbehandlung, falls keine Order oder kein Driver gefunden wurde
+                    MessageBox.Show("Es wurde keine Bestellung oder kein Fahrer gefunden.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             else
             {
                 // Fehlerbehandlung, falls nichts ausgewählt wurde
+                MessageBox.Show("Bitte wählen Sie eine Bonnummer und ein Kassenregister aus.", "Auswahl erforderlich", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
         private bool HaveBonNumbersChanged(List<Order> oldOrders, List<Order> newOrders)
         {
             if (oldOrders == null || newOrders == null)

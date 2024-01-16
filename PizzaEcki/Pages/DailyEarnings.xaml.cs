@@ -23,31 +23,64 @@ namespace PizzaEcki.Pages
     public partial class DailyEarnings : Window
     {
         private readonly DatabaseManager _dbManager;
-        public ObservableCollection<DailySalesInfo> DailySalesInfoList { get; set; }
+
+        public ObservableCollection<OrderSummary> DailySalesInfoList { get; set; }
 
         public DailyEarnings()
         {
             InitializeComponent();
             _dbManager = new DatabaseManager();
-            LoadDailySales(DateTime.Now);  // Laden der täglichen Umsätze für das heutige Datum
+            LoadDailySales(DateTime.Now); // Loading the daily sales for the current date
         }
 
         private void LoadDailySales(DateTime date)
         {
-            var dailySalesInfoList = _dbManager.GetDailySales(date);
-            DailySalesInfoList = new ObservableCollection<DailySalesInfo>(dailySalesInfoList);
-            DailySalesDataGrid.ItemsSource = DailySalesInfoList;
-            TotalSalesTextBlock.Text = $"{CalculateTotalSales(dailySalesInfoList):C}";  // Formatierung als Währung
-        }
+            var orders = _dbManager.GetAllOrders();
+            orders = orders.Where(order => DateTime.Parse(order.Timestamp).Date == date.Date).ToList();
 
-        private double CalculateTotalSales(IEnumerable<DailySalesInfo> dailySalesInfoList)
-        {
-            double totalSales = 0;
-            foreach (var info in dailySalesInfoList)
+
+            var orderSummaries = new List<OrderSummary>
             {
-                totalSales += info.DailySales;
+                new OrderSummary { OrderType = "Auslieferungen", Count = 0, Total = 0.0 },
+                new OrderSummary { OrderType = "Selbstabholer", Count = 0, Total = 0.0 },
+                new OrderSummary { OrderType = "Mitnehmer", Count = 0, Total = 0.0 }
+            };
+
+            foreach (var order in orders)
+            {
+                int index = -1;
+                if (order.CustomerPhoneNumber == "1")
+                {
+                    index = 1; // Selbstabholer
+                }
+                else if (order.CustomerPhoneNumber == "2")
+                {
+                    index = 2; // Mitnehmer
+                }
+                else if (!string.IsNullOrWhiteSpace(order.CustomerPhoneNumber))
+                {
+                    index = 0; // Auslieferungen
+                }
+
+                if (index != -1)
+                {
+                    orderSummaries[index].Count += 1;
+                    orderSummaries[index].Total += order.OrderItems.Sum(item => item.Gesamt);
+                }
             }
-            return totalSales;
+
+            // Add the sum row
+            var sumRow = new OrderSummary
+            {
+                OrderType = "Summe",
+                Count = orderSummaries.Sum(s => s.Count),
+                Total = orderSummaries.Sum(s => s.Total)
+            };
+
+            orderSummaries.Add(sumRow);
+
+            DailySalesInfoList = new ObservableCollection<OrderSummary>(orderSummaries);
+            DailySalesDataGrid.ItemsSource = DailySalesInfoList;
         }
     }
 }
