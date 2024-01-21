@@ -1,19 +1,15 @@
-﻿using PizzaEcki.Database;
-using PizzaEcki.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using PizzaEcki.Database;
+using PizzaEcki.Models;
+using System.Globalization;
+using System.Drawing; // Für das Grafik-Objekt und Schriftarten
+using System.Drawing.Printing; // Für den Druck
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace PizzaEcki.Pages
 {
@@ -23,7 +19,8 @@ namespace PizzaEcki.Pages
     public partial class DailyEarnings : Window
     {
         private readonly DatabaseManager _dbManager;
-
+        public double TotalSum { get; set; }
+        private DateTime date = DateTime.Now;   
         public ObservableCollection<OrderSummary> DailySalesInfoList { get; set; }
 
         public DailyEarnings()
@@ -31,7 +28,10 @@ namespace PizzaEcki.Pages
             InitializeComponent();
             _dbManager = new DatabaseManager();
             LoadDailySales(DateTime.Now); // Loading the daily sales for the current date
+            this.DataContext = this; // Set the DataContext to this class
+           
         }
+
 
         private void LoadDailySales(DateTime date)
         {
@@ -67,20 +67,107 @@ namespace PizzaEcki.Pages
                     orderSummaries[index].Count += 1;
                     orderSummaries[index].Total += order.OrderItems.Sum(item => item.Gesamt);
                 }
+             
             }
+            TotalSum = orderSummaries.Sum(s => s.Total);
 
-            // Add the sum row
-            var sumRow = new OrderSummary
-            {
-                OrderType = "Summe",
-                Count = orderSummaries.Sum(s => s.Count),
-                Total = orderSummaries.Sum(s => s.Total)
-            };
-
-            orderSummaries.Add(sumRow);
 
             DailySalesInfoList = new ObservableCollection<OrderSummary>(orderSummaries);
             DailySalesDataGrid.ItemsSource = DailySalesInfoList;
         }
+
+
+        private void CloseDayButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Möchten Sie den Tag wirklich abschließen und die Tagesstatistik drucken?", "Tag abschließen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                // Drucken der Tagesstatistik
+                CloseDayAndDeleteOrders();
+                
+                // Hier können Sie alle weiteren Schritte hinzufügen, die beim Tagesabschluss durchgeführt werden sollten,
+                // wie z.B. das Speichern des Abschlusses in der Datenbank oder das Zurücksetzen der UI für den nächsten Tag.
+
+                MessageBox.Show("Der Tag wurde erfolgreich abgeschlossen.", "Abschluss bestätigt", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+
+        private void PrintDailyEarningsSummary()
+        {
+            PrintDocument printDoc = new PrintDocument();
+            printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
+            printDoc.PrintPage += (sender, e) =>
+            {
+                Graphics graphics = e.Graphics;
+
+
+                // Schriftarten
+                System.Drawing.Font smallFont = new System.Drawing.Font("Segoe UI", 10,  System.Drawing.FontStyle.Bold);
+                    System.Drawing.Font regularFont = new System.Drawing.Font("Segoe UI", 15,  System.Drawing.FontStyle.Regular);
+                    System.Drawing.Font boldFont = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
+                    System.Drawing.Font titleFont = new System.Drawing.Font("Segoe UI", 14, System.Drawing.FontStyle.Bold);
+
+                    float yOffset = 10;
+
+                // Titel
+                graphics.DrawString("Tagesstatistik", titleFont, Brushes.Black, 10, yOffset);
+                yOffset += titleFont.GetHeight(graphics);
+
+                // Datum
+                graphics.DrawString(date.ToString("dd.MM.yyyy"), boldFont, Brushes.Black, 10, yOffset);
+                yOffset += boldFont.GetHeight(graphics) + 5;
+
+                // Header für Tabelle
+                graphics.DrawString("Bestellung", boldFont, Brushes.Black, 10, yOffset);
+                graphics.DrawString("Anzahl", boldFont, Brushes.Black, 110, yOffset);
+                graphics.DrawString("Gesamt", boldFont, Brushes.Black, 210, yOffset);
+                yOffset += boldFont.GetHeight(graphics) + 5;
+
+                // Tagesverkaufszahlen
+                foreach (var summary in DailySalesInfoList)
+                {
+                    graphics.DrawString(summary.OrderType, smallFont, Brushes.Black, 10, yOffset);
+                    graphics.DrawString(summary.Count.ToString(), smallFont, Brushes.Black, 110, yOffset);
+                    graphics.DrawString(summary.Total.ToString("C"), smallFont, Brushes.Black, 210, yOffset);
+                    yOffset += smallFont.GetHeight(graphics) + 5;
+                }
+
+                // Gesamtsumme
+                graphics.DrawString("Summe", boldFont, Brushes.Black, 10, yOffset);
+                graphics.DrawString(TotalSum.ToString("C"), boldFont, Brushes.Black, 210, yOffset);
+            };
+
+            printDoc.Print();
+        }
+
+        private async void CloseDayAndDeleteOrders()
+        {
+            var result = MessageBox.Show("Möchten Sie den Tag wirklich abschließen, die Tagesstatistik drucken und alle Bestellungen löschen?", "Tag abschließen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                // Drucken der Tagesstatistik
+                PrintDailyEarningsSummary();
+
+                // Löschen aller Bestellungen
+                await _dbManager.DeleteDailyOrdersAsync();
+
+                MessageBox.Show("Der Tag wurde erfolgreich abgeschlossen und alle Bestellungen wurden gelöscht.", "Vorgang abgeschlossen", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        // Hilfsmethode, um zu überprüfen, ob der Drucker existiert
+        private bool PrinterExists(string printerName)
+        {
+            foreach (string printer in PrinterSettings.InstalledPrinters)
+            {
+                if (printerName == printer)
+                    return true;
+            }
+            return false;
+        }
+
+
     }
 }

@@ -44,6 +44,24 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="FocusedComboBoxStyle" TargetType="{x:Type ComboBox}">
+                <Setter Property="FocusVisualStyle">
+                    <Setter.Value>
+                        <Style>
+                            <Setter Property="Control.Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border BorderBrush="#FF602C" BorderThickness="2">
+                                            <AdornedElementPlaceholder />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style x:Key="FocusVisualStyleForComboBox" TargetType="ComboBox">
                 <Setter Property="BorderBrush" Value="Gray"/>
                 <Setter Property="BorderThickness" Value="1"/>
@@ -54,7 +72,17 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-
+            <Style x:Key="FocusedTextBoxStyle">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border BorderBrush="Blue" BorderThickness="2">
+                                <AdornedElementPlaceholder />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
         </ResourceDictionary>
 
@@ -164,12 +192,12 @@
                     <Label Content="Eingabe" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center"/>
                 </Border>
                 <Label Grid.Row="1" Content="Gericht" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" FontStretch="ExtraCondensed" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
-                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" IsEditable="True" SelectionChanged ="DishComboBox_TextChanged"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" Grid.Column="1" Padding="5,0,5,0" Grid.IsSharedSizeScope="True" TabIndex="5" Background="#FF5F6269" BorderBrush="#FF5F6269" VerticalAlignment="Bottom" />
+                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" SelectionChanged ="DishComboBox_TextChanged" IsEditable="True"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" Grid.Column="1" Padding="5,0,5,0" TabIndex="5" Background="#FF5F6269" BorderBrush="#FF5F6269" VerticalAlignment="Bottom" />
 
                 <Label Grid.Row="2" Content="Extras" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
                 <ComboBox x:Name="ExtrasComboBox" Grid.Row="2" Margin="0,0,10,0" Padding="5,0,5,0" IsEditable="True" 
                  VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
-                VerticalAlignment="Center" Grid.Column="1"  TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" />
+                VerticalAlignment="Center" Grid.Column="1"  TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" Style="{StaticResource FocusedComboBoxStyle}" />
 
                 <Label Grid.Row="2" Grid.Column="2" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
                 <ComboBox x:Name="amountComboBox" Grid.Row="2" Grid.Column="3" 
@@ -179,7 +207,7 @@
                     VerticalContentAlignment="Center" 
                     Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
                     IsEditable="True" TabIndex="8" 
-                    Text="1" MinWidth="40">   
+                    Text="1" MinWidth="40" Style="{StaticResource FocusedComboBoxStyle}">   
                     <ComboBoxItem>1</ComboBoxItem>
                     <ComboBoxItem>2</ComboBoxItem>
                     <ComboBoxItem>3</ComboBoxItem>
@@ -196,10 +224,10 @@
 
 
                 <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
-                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" MinWidth="40" />
+                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" MinWidth="40"/>
 
                 <Label Grid.Row="3" Grid.Column="2" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="30,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="5,0,5,0" MinHeight="20" />
-                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100"/>
+                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100" />
 
             </Grid>
         </Border>
@@ -214,7 +242,7 @@
                     <Label Content="Bestellung" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
                 </Border>
 
-                <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top"  FontWeight="Bold">
+                <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top"  FontWeight="Bold" BorderBrush="{x:Null}">
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#3d4248"/>
@@ -314,7 +342,7 @@
                 
                 <Label Grid.Row="2" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
                     
-                    <TextBlock x:Name="SelbstabholerTextBlock" Text="Selbstabholer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="MitnehmerLabel_MouseDown"/>
+                    <TextBlock x:Name="SelbstabholerTextBlock" Text="Selbstabholer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="SelbstabholerLabel_MouseDown"/>
                
                 </Label>
                 
@@ -382,7 +410,7 @@
 
             <!-- Label für den Gesamtpreis -->
             <Label x:Name="TotalPriceLabel" 
-           Content="00.00€" 
+           Content="00.00 €" 
            FontSize="36" 
            Foreground="#FF602C" 
            VerticalAlignment="Top" 

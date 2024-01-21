@@ -191,7 +191,7 @@
                                                 </GridViewColumn.HeaderTemplate>
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <TextBlock Text="{Binding Epreis, StringFormat='{}{0:0.00}€'}" Foreground="White" FontSize="14"  HorizontalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding Epreis, StringFormat='{}{0:0.00} €'}" Foreground="White" FontSize="14"  HorizontalAlignment="Center"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
@@ -203,7 +203,7 @@
                                                 </GridViewColumn.HeaderTemplate>
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <TextBlock Text="{Binding Gesamt, StringFormat='{}{0:0.00}€'}" Foreground="White" FontSize="14"  HorizontalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding Gesamt, StringFormat='{}{0:0.00} €'}" Foreground="White" FontSize="14"  HorizontalAlignment="Center"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>

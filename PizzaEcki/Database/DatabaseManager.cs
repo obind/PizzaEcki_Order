@@ -953,7 +953,49 @@ namespace PizzaEcki.Database
             _connection.Close();    
             return orders;
         }
-       
+
+
+        public async Task DeleteDailyOrdersAsync()
+        {
+            // Öffnen Sie die Verbindung zur Datenbank
+            _connection.Open();
+
+            // Beginnen Sie eine Transaktion
+            using (var transaction = _connection.BeginTransaction())
+            {
+                // Erstellen und Ausführen des SQL-Befehls zum Löschen von OrderAssignments
+                string sqlDeleteOrderAssignments = "DELETE FROM OrderAssignments";
+                using (SqliteCommand commandDeleteOrderAssignments = new SqliteCommand(sqlDeleteOrderAssignments, _connection))
+                {
+                    commandDeleteOrderAssignments.Transaction = transaction; // Verknüpfung mit der Transaktion
+                    commandDeleteOrderAssignments.ExecuteNonQuery();
+                }
+
+                // Erstellen und Ausführen des SQL-Befehls zum Löschen von OrderItems
+                string sqlDeleteOrderItems = "DELETE FROM OrderItems";
+                using (SqliteCommand commandDeleteOrderItems = new SqliteCommand(sqlDeleteOrderItems, _connection))
+                {
+                    commandDeleteOrderItems.Transaction = transaction; // Verknüpfung mit der Transaktion
+                    commandDeleteOrderItems.ExecuteNonQuery();
+                }
+
+                // Erstellen und Ausführen des SQL-Befehls zum Löschen von Orders
+                string sqlDeleteOrders = "DELETE FROM Orders";
+                using (SqliteCommand commandDeleteOrders = new SqliteCommand(sqlDeleteOrders, _connection))
+                {
+                    commandDeleteOrders.Transaction = transaction; // Verknüpfung mit der Transaktion
+                    commandDeleteOrders.ExecuteNonQuery();
+                }
+
+                // Bestätigen Sie die Transaktion
+                transaction.Commit();
+            }
+
+            // Schließen Sie die Verbindung zur Datenbank
+            _connection.Close();
+        }
+
+
         public List<OrderItem> GetOrderItems(Guid orderId)
         {
             _connection.Open();

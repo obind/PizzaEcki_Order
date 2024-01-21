@@ -952,8 +952,8 @@ namespace PizzaEcki
 
             // Entscheiden, welcher Drucker basierend auf der Tastenkombination verwendet werden soll
             string selectedPrinter = secretPrintTriggered
-                                     ? PizzaEcki.Properties.Settings.Default.NetworkPrinter
-                                     : PizzaEcki.Properties.Settings.Default.SelectedPrinter;
+                                     ? Properties.Settings.Default.NetworkPrinter
+                                     : Properties.Settings.Default.SelectedPrinter;
 
             // Überprüfen, ob der Netzwerkdruckername leer ist
             if (secretPrintTriggered && string.IsNullOrEmpty(selectedPrinter))
@@ -970,7 +970,7 @@ namespace PizzaEcki
             // Überprüfe, ob der angegebene Drucker vorhanden und verfügbar ist
             if (!printDoc.PrinterSettings.IsValid)
             {
-                printDoc.PrinterSettings.PrinterName = defaultPrinter;
+                printDoc.PrinterSettings.PrinterName = selectedPrinter;
             }
             printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
             printDoc.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
@@ -1094,7 +1094,7 @@ namespace PizzaEcki
                 foreach (var item in order.OrderItems)
                 {
                     string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht} ";
-                    string itemSizeStr = $"   {item.Größe}";
+                    string itemSizeStr = $" {item.Größe}";
                     string itemPriceStr = $"{item.Gesamt:C}";
 
                     // Zeichne die Bestellzeile

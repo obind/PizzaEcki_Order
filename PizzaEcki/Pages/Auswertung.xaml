@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="Auswertung" Height="450" Width="800">
+        Title="Auswertung" Height="300" Width="400">
 
     <Window.Resources>
-        <!-- Stil für GridViewColumnHeader -->
+        <!-- Stil für DataGridColumnHeader -->
         <Style TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Background" Value="#FFFF5D48"/>
             <Setter Property="Foreground" Value="White"/>
@@ -17,76 +17,28 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="5"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="BorderBrush" Value="Transparent" />
-            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        <!-- Stil für DataGridCell -->
+        <Style TargetType="{x:Type DataGridCell}">
             <Setter Property="BorderThickness" Value="0"/>
-        </Style>
-
-        <!-- Stil für TabItem -->
-        <Style TargetType="TabItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Grid Name="Panel">
-                            <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="Gainsboro" CornerRadius="4,4,0,0" Margin="2,0">
-                                <ContentPresenter x:Name="ContentSite"
-                                              VerticalAlignment="Center"
-                                              HorizontalAlignment="Center"
-                                              ContentSource="Header"
-                                              Margin="10,2"/>
-                            </Border>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="False">
-                                <Setter TargetName="Panel" Property="Background" Value="#3d4248" />
-                                <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="Black"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Panel" Property="Background" Value="#5f6269" />
-                                <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="White"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-        </Style>
-
-        <!-- Stil für Button -->
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#FFFF5D48"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Padding" Value="10,5"/>
-        </Style>
-
-        <!-- Stil für ListView -->
-        <Style TargetType="ListView">
-            <Setter Property="Background" Value="#5f6269"/>
             <Setter Property="Foreground" Value="White"/>
-        </Style>
-
-        <!-- Stil für ListViewItem -->
-        <Style TargetType="ListViewItem">
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF5F6269"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-            </Style.Triggers>
+            <Setter Property="Background" Value="#FF1D1E20"/>
         </Style>
     </Window.Resources>
 
     <Grid>
-        <DataGrid x:Name="DailyDataGrid" AutoGenerateColumns="False" CanUserAddRows="False">
+        <DataGrid x:Name="DailySalesDataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False" Background="#FF1D1E20">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Bestellungen" Binding="{Binding Category}" />
-                <DataGridTextColumn Header="Anzahl" Binding="{Binding Count}" />
-                <DataGridTextColumn Header="Netto" Binding="{Binding Netto, StringFormat=C}" />
-                <DataGridTextColumn Header="Steuer" Binding="{Binding Steuer, StringFormat=C}" />
-                <DataGridTextColumn Header="Gesamt" Binding="{Binding Gesamt, StringFormat=C}" />
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Tagesumsatz" Binding="{Binding DailySales, StringFormat=' {0:F2} €'}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom">
+            <TextBlock Text="Gesamtumsatz: " VerticalAlignment="Center" Foreground="White"/>
+            <TextBlock x:Name="TotalSalesTextBlock" VerticalAlignment="Center" Foreground="White"/>
+        </StackPanel>
     </Grid>
 
 </Window>
