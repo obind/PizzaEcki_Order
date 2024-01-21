@@ -5,13 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="Tagesumsatz" Height="450" Width="800">
+        Title="Tagesstatistik" Height="300" Width="400">
 
     <Window.Resources>
-        <!-- Hier fügen wir den Stil für DataGridColumnHeader ein -->
+        <!-- Stil für DataGridColumnHeader -->
         <Style TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Background" Value="#FFFF5D48"/>
-            <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -19,18 +18,36 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
+        <!-- Stil für DataGridCell -->
+        <Style TargetType="{x:Type DataGridCell}">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#FF1D1E20"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
-        <DataGrid x:Name="DailySalesDataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False" Background="#FF5F6269">
+        <DataGrid x:Name="DailySalesDataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" >
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-                <DataGridTextColumn Header="Tagesumsatz" Binding="{Binding DailySales, StringFormat=' {0:F2}€'}" Width="*" />
+                <DataGridTextColumn Header="Bestellungen" Binding="{Binding OrderType}" Width="*"/>
+                <DataGridTextColumn Header="Anzahl" Binding="{Binding Count}" Width="Auto"/>
+                <DataGridTextColumn Header="Gesamt" Binding="{Binding Total, StringFormat='\{0:C\}'}" Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom">
-            <TextBlock Text="Gesamtumsatz: " VerticalAlignment="Center" Foreground="White"/>
-            <TextBlock x:Name="TotalSalesTextBlock" VerticalAlignment="Center" Foreground="White"/>
+        <!-- Fußzeile für die Summe -->
+        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Height="Auto">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <TextBlock Text="Summe: " FontWeight="Bold" Padding="10,5" HorizontalAlignment="Left" Foreground="White"/>
+                <TextBlock x:Name="TotalAmountTextBlock" 
+                           Text="{Binding TotalSum, StringFormat='\{0:C\}'}" 
+                           Padding="10,5" 
+                           HorizontalAlignment="Right" 
+                           Foreground="White"/>
+            </StackPanel>
+            <Button x:Name="CloseDayButton" Content="Tag abschließen" HorizontalAlignment="Right" Margin="0,5,10,10"
+        Padding="10,3" Click="CloseDayButton_Click"/>
+
         </StackPanel>
     </Grid>
 </Window>
