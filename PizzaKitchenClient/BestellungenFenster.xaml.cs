@@ -27,19 +27,18 @@ namespace PizzaKitchenClient
         public BestellungenFenster(List<SharedLibrary.Order> orders)
         {
             InitializeComponent();
-            _apiSevice = new ApiService(); // Stelle sicher, dass DatabaseManager initialisiert wird
+            _apiSevice = new ApiService();
             _orders = new ObservableCollection<SharedLibrary.Order>(orders);
-            //LoadOrdersWithDrivers();
-
-            //UpdateCustomerInformation(_orders);
             BestellungenListView.ItemsSource = _orders;
+
+            // Asynchron die Kundeninformationen nach dem Laden des Fensters abrufen
+            LoadCustomerDataAsync(_orders);
         }
 
-        private async void UpdateCustomerInformation(ObservableCollection<SharedLibrary.Order> orders)
+        private async Task LoadCustomerDataAsync(ObservableCollection<SharedLibrary.Order> orders)
         {
             foreach (var order in orders)
             {
-                // Prüfe den Wert der CustomerPhoneNumber
                 if (order.CustomerPhoneNumber == "1" || order.CustomerPhoneNumber == "2")
                 {
                     // Für Selbstabholer und Mitnehmer - setze ein leeres Customer-Objekt oder handle es anders
@@ -51,29 +50,19 @@ namespace PizzaKitchenClient
                     order.Customer = await _apiSevice.GetCustomerByPhoneNumberAsync(order.CustomerPhoneNumber);
                 }
             }
+
+            // Dies könnte notwendig sein, um die UI zu aktualisieren, da die Änderungen asynchron erfolgen
+            BestellungenListView.Items.Refresh();
         }
+    
 
-        private async void UpdateDriversContextMenu()
-        {
-            var drivers = await _apiSevice.GetAllDriversAsync();
 
-            // Kontextmenü leeren
-            BestellungenListView.ContextMenu.Items.Clear();
 
-            // Fahrer zum Kontextmenü hinzufügen
-            foreach (var driver in drivers)
-            {
-                var menuItem = new MenuItem
-                {
-                    Header = driver.Name, // Angenommen, jeder Fahrer hat eine Eigenschaft 'Name'
-                    CommandParameter = driver
-                };
-                menuItem.Click += DriverMenuItem_Click; // Event Handler für Klick auf Fahrer
-                BestellungenListView.ContextMenu.Items.Add(menuItem);
-            }
-        }
 
-        private async void DriverMenuItem_Click(object sender, RoutedEventArgs e)
+
+
+
+    private async void DriverMenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem && menuItem.CommandParameter is Driver selectedDriver
                 && BestellungenListView.SelectedItem is Order selectedOrder)

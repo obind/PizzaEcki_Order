@@ -3,13 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:services="clr-namespace:PizzaKitchenClient.Services" 
         xmlns:local="clr-namespace:PizzaKitchenClient"
         mc:Ignorable="d"
         Title="BestellungenFenster" Height="666" Width="1333">
 
+    
     <Window.Resources>
+        
+        <services:PhoneNumberToTextConverter x:Key="PhoneNumberToTextConverter"/>
+        <services:PhoneNumberToVisibilityConverter x:Key="PhoneNumberToVisibilityConverter"/>
 
-       
 
         <!-- Button-Style für orange Hintergrund -->
         <Style x:Key="OrangeButtonStyle" TargetType="Button">
@@ -72,7 +76,16 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
+                    <GridViewColumn Header="Adresse" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}">
+                                    <TextBlock Text="{Binding Customer.Street}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Customer.City}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <!--<GridViewColumn Header="Kunde" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
