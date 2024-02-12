@@ -32,6 +32,7 @@ namespace PizzaEcki.Pages
             _databaseManager = new DatabaseManager(); // Stelle sicher, dass DatabaseManager initialisiert wird
             _orders = new ObservableCollection<SharedLibrary.Order>(orders);
             BestellungenListView.ItemsSource = _orders;
+
             foreach (var order in _orders)
             {
                 // Prüfe den Wert der CustomerPhoneNumber

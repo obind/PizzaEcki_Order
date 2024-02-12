@@ -24,37 +24,34 @@ namespace PizzaKitchenClient
         private ApiService _apiSevice;
         private ObservableCollection<SharedLibrary.Order> _orders;
 
-        public BestellungenFenster(List<SharedLibrary.Order> orders)
+        public BestellungenFenster(List<Order> orders)
         {
             InitializeComponent();
             _apiSevice = new ApiService();
-            _orders = new ObservableCollection<SharedLibrary.Order>(orders);
+            _orders = new ObservableCollection<Order>(orders);
             BestellungenListView.ItemsSource = _orders;
 
-            // Asynchron die Kundeninformationen nach dem Laden des Fensters abrufen
-            LoadCustomerDataAsync(_orders);
+            Dispatcher.BeginInvoke(new Action(async () => await LoadCustomerDataAsync(_orders)));
         }
 
-        private async Task LoadCustomerDataAsync(ObservableCollection<SharedLibrary.Order> orders)
+
+        private async Task LoadCustomerDataAsync(IEnumerable<Order> orders)
         {
             foreach (var order in orders)
             {
                 if (order.CustomerPhoneNumber == "1" || order.CustomerPhoneNumber == "2")
                 {
-                    // Für Selbstabholer und Mitnehmer - setze ein leeres Customer-Objekt oder handle es anders
-                    order.Customer = new SharedLibrary.Customer();
+                    order.Customer = new Customer(); // Für Selbstabholer und Mitnehmer
                 }
                 else
                 {
-                    // Für normale Bestellungen mit einer gültigen Telefonnummer
                     order.Customer = await _apiSevice.GetCustomerByPhoneNumberAsync(order.CustomerPhoneNumber);
                 }
             }
 
-            // Dies könnte notwendig sein, um die UI zu aktualisieren, da die Änderungen asynchron erfolgen
+            // Aktualisiere die UI, um die geladenen Kundendaten anzuzeigen
             BestellungenListView.Items.Refresh();
         }
-    
 
 
 
@@ -62,7 +59,9 @@ namespace PizzaKitchenClient
 
 
 
-    private async void DriverMenuItem_Click(object sender, RoutedEventArgs e)
+
+
+        private async void DriverMenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem && menuItem.CommandParameter is Driver selectedDriver
                 && BestellungenListView.SelectedItem is Order selectedOrder)
@@ -85,8 +84,8 @@ namespace PizzaKitchenClient
                 try
                 {
                     await _apiSevice.SaveOrderAssignmentAsync(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
-                    // Hier Logik zum Entfernen der Bestellung aus der Liste oder zur Aktualisierung der UI
-                    MessageBox.Show($"Fahrer '{selectedDriver.Name}' wurde der Bestellung {selectedOrder.BonNumber} zugewiesen.", "Zuweisung erfolgreich", MessageBoxButton.OK, MessageBoxImage.Information);
+                  
+                    await UpdateOrderListAsync();
                 }
                 catch (Exception ex)
                 {
@@ -95,18 +94,6 @@ namespace PizzaKitchenClient
             }
         }
 
-        public async void LoadOrdersWithDrivers()
-        {
-            try
-            {
-                var ordersWithDrivers = await _apiSevice.GetAllOrders();
-                BestellungenListView.ItemsSource = ordersWithDrivers;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Fehler beim Laden der Bestellungen: {ex.Message}");
-            }
-        }
 
 
         private async void BestellungenListView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -134,6 +121,42 @@ namespace PizzaKitchenClient
             catch (Exception ex)
             {
                 MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
+            }
+        }
+   
+        private async Task UpdateOrderListAsync()
+        {
+            try
+            {
+                var ordersWithAssignedDrivers = await _apiSevice.GetOrdersWithAssignedDriversAsync();
+                var allDrivers = await _apiSevice.GetAllDriversAsync();
+
+                // Aktualisiere die UI direkt, anstatt ein neues Fenster zu öffnen
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _orders.Clear(); // Bestehende Einträge löschen
+
+                    foreach (var order in ordersWithAssignedDrivers)
+                    {
+                        if (order.DriverId.HasValue && order.DriverId > 0)
+                        {
+                            var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
+                            if (driver != null)
+                            {
+                                order.Name = driver.Name; // Dies löst das PropertyChanged-Ereignis aus
+                            }
+                            Dispatcher.BeginInvoke(new Action(async () => await LoadCustomerDataAsync(_orders)));
+
+                            _orders.Add(order);
+
+                        }
+
+                     }
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
             }
         }
 
