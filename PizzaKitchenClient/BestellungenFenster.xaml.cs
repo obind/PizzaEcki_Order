@@ -111,25 +111,32 @@ namespace PizzaKitchenClient
 
         private async void BestellungenListView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            var drivers = await _apiSevice.GetAllDriversAsync();
             var contextMenu = (sender as ListView)?.ContextMenu;
             contextMenu?.Items.Clear();
 
-            foreach (var driver in drivers)
+            try
             {
-                // Überspringe Fahrer mit ID 0 oder -1
-                if (driver.Id == 0 || driver.Id <= -1)
-                    continue;
-
-                var menuItem = new MenuItem
+                var drivers = await _apiSevice.GetAllDriversAsync();
+                foreach (var driver in drivers)
                 {
-                    Header = driver.Name, // Verwende den Namen des Fahrers
-                    CommandParameter = driver
-                };
-                menuItem.Click += DriverMenuItem_Click; // Event Handler für Klick auf Fahrer
-                contextMenu?.Items.Add(menuItem);
+                    // Überspringe bestimmte Fahrer, falls notwendig
+                    if (driver.Id == 0 || driver.Id <= -1) continue;
+
+                    var menuItem = new MenuItem
+                    {
+                        Header = driver.Name, // Verwende den Namen des Fahrers als Menütext
+                        CommandParameter = driver // Setze das Driver-Objekt als CommandParameter, um es später zu verwenden
+                    };
+                    menuItem.Click += DriverMenuItem_Click; // Verknüpfe jedes MenuItem mit einem Event Handler
+                    contextMenu?.Items.Add(menuItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
             }
         }
+
 
     }
 }

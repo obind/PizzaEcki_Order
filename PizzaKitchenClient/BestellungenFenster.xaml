@@ -51,7 +51,12 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}">
+        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" ContextMenuOpening="BestellungenListView_ContextMenuOpening">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <!-- Platzhalter für dynamisch hinzugefügte MenuItems -->
+                </ContextMenu>
+            </ListView.ContextMenu>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -73,6 +78,13 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding BonNumber}" Foreground="White" FontSize="14" HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Fahrername" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -102,13 +114,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>-->
 
-                    <GridViewColumn Header="Fahrername" Width="150">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+
 
                     <!--<GridViewColumn Header="Adresse" Width="200">
                         <GridViewColumn.CellTemplate>
@@ -121,13 +127,13 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>-->
 
-                    <GridViewColumn Header="KundenNR." Width="100">
+                    <!--<GridViewColumn Header="KundenNR." Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding CustomerPhoneNumber}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                    </GridViewColumn>-->
 
 
                     <GridViewColumn Header="Lieferung Bis" Width="100">
