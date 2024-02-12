@@ -28,6 +28,10 @@ namespace SharedLibrary
         [JsonPropertyName("deliveryUntil")]
         public string DeliveryUntil { get; set; }
 
+        [JsonPropertyName("driverId")]
+        public int? DriverId { get; set; }
+
+        public string? Name { get; set; }
         public string LieferStatus
         {
             get { return IsDelivery ? "Lieferung" : "Abholung"; }

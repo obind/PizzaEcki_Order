@@ -53,16 +53,6 @@ namespace PizzaEcki.Pages
 
         }
 
-        private void LoadOrders(string bestellungsTyp)
-        {
-            // Hier würdest du deine Datenquelle abfragen, um die Bestellungen zu erhalten
-            // Die folgende Zeile ist nur ein Platzhalter für die tatsächliche Datenabfrage
-            //var bestellungen = BestellungenDatenService.GetBestellungenNachTyp(bestellungsTyp);
-
-            // Setze die erhaltenen Bestellungen als ItemsSource für deine ListView
-           // BestellungenListView.ItemsSource = bestellungen;
-        }
-
         private async void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F8)

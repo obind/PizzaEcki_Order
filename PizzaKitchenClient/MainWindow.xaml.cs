@@ -24,7 +24,7 @@ namespace PizzaKitchenClient
         private Order order;
         private bool isErrorMessageDisplayed = false;
         private bool isDelivery = false;
-
+        public event Action<List<Order>> OnLetzteZuordnungRequested;
         public MainWindow()
         {
             InitializeComponent();
@@ -237,19 +237,7 @@ namespace PizzaKitchenClient
             }
         }
 
-        private void PrintButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_selectedOrder != null)
-            {
-                Customer customer = null;
-                // Hier könntest du die Kundeninformationen abrufen, falls notwendig
-                PrintReceipt(_selectedOrder);
-            }
-            else
-            {
-                MessageBox.Show("Bitte wähle eine Bestellung zum Drucken aus.");
-            }
-        }
+       
 
         private async void PrintReceipt(Order order)
         {
@@ -443,5 +431,41 @@ namespace PizzaKitchenClient
                 }
             }
         }
+
+        private async void LetzteZuordnung_btn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var ordersWithAssignedDrivers = await _apiService.GetOrdersWithAssignedDriversAsync();
+                var allDrivers = await _apiService.GetAllDriversAsync();
+                var updatedOrders = new List<Order>();
+
+                foreach (var order in ordersWithAssignedDrivers)
+                {
+                    if (order.DriverId.HasValue && order.DriverId > 0)
+                    {
+                        var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
+                        if (driver != null)
+                        {
+                            order.Name = driver.Name;
+                        }
+                        updatedOrders.Add(order);
+                    }
+                }
+
+                BestellungenFenster bestellungenFenster = new BestellungenFenster(updatedOrders);
+                bestellungenFenster.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
     }
 }
