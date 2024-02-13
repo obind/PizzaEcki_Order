@@ -113,18 +113,10 @@
                             <DataTemplate>
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
                                     <TextBlock Text="{Binding Customer.Name}" HorizontalAlignment="Center" />
-                                </Border> 
-                                </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Zugewiesener Fahrer" Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding AssignedDriverName}" HorizontalAlignment="Center" />
+                                </Border>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
                     <GridViewColumn Header="Offen seit" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
