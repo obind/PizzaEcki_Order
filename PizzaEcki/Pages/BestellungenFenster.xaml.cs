@@ -32,6 +32,7 @@ namespace PizzaEcki.Pages
             _databaseManager = new DatabaseManager(); // Stelle sicher, dass DatabaseManager initialisiert wird
             _orders = new ObservableCollection<SharedLibrary.Order>(orders);
             BestellungenListView.ItemsSource = _orders;
+
             foreach (var order in _orders)
             {
                 // Prüfe den Wert der CustomerPhoneNumber
@@ -51,16 +52,6 @@ namespace PizzaEcki.Pages
             BestellungenListView.ItemsSource = _orders;
 
 
-        }
-
-        private void LoadOrders(string bestellungsTyp)
-        {
-            // Hier würdest du deine Datenquelle abfragen, um die Bestellungen zu erhalten
-            // Die folgende Zeile ist nur ein Platzhalter für die tatsächliche Datenabfrage
-            //var bestellungen = BestellungenDatenService.GetBestellungenNachTyp(bestellungsTyp);
-
-            // Setze die erhaltenen Bestellungen als ItemsSource für deine ListView
-           // BestellungenListView.ItemsSource = bestellungen;
         }
 
         private async void Window_KeyDown(object sender, KeyEventArgs e)
