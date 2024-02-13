@@ -39,6 +39,7 @@
             <TextBlock Text="Gesamtumsatz: " VerticalAlignment="Center" Foreground="White"/>
             <TextBlock x:Name="TotalSalesTextBlock" VerticalAlignment="Center" Foreground="White"/>
         </StackPanel>
+        <Button x:Name="DruckButton" Content="Drucken" HorizontalAlignment="left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75" Click="PrintButton_Click"/>
     </Grid>
-
+        
 </Window>
