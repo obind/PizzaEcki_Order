@@ -1,11 +1,13 @@
 ﻿<Window x:Class="PizzaEcki.Pages.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+         xmlns:conv="clr-namespace:PizzaEcki.Services"
         Title="Einstellungen" Height="400" Width="600">
     <Window.Resources>
+        <conv:BoolToJaNeinConverter x:Key="BoolToJaNeinConverter"/>
         <!-- Definiere einen Style für GridViewColumnHeader -->
         <Style TargetType="GridViewColumnHeader">
-            <Setter Property="Background" Value="#FFFF5D48"/>
+            <Setter Property="Background" Value="#ff602c"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontSize" Value="16"/>
@@ -40,10 +42,65 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+
+
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#ff3300   "/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
+            
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true" CornerRadius="5">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true" >
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="Black" Direction="320" ShadowDepth="7" BlurRadius="5" Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        
     </Window.Resources>
     <Grid Background="#FF1D1E20">
         <TabControl Background="#FF1D1E20" Foreground="White">
-            <TabItem Header="Fahrer" Background="#FFFF5D48" Foreground="White" >
+            <TabItem Header="Fahrer" Background="#ff602c" Foreground="White" >
                 <Grid Background="#FF1D1E20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -53,13 +110,13 @@
                         <!-- Fahrer-Liste -->
                     </ListView>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-                        <Button Content="Hinzufügen" Click="AddDriverButton_Click" Margin="5" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
+                        <Button Content="Hinzufügen" Click="AddDriverButton_Click" Margin="5"   Style="{DynamicResource ButtonStyle1}" Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
                         <!--<Button Content="Bearbeiten" Click="EditDriverButton_Click" Margin="5" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"  />-->
                         <!--<Button x:Name="deleteBtn" Content="Löschen" Click="DeleteDriverButton_Click"  Margin="5" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Gerichte" Background="#FFFF5D48"  Foreground="White">
+            <TabItem Header="Gerichte" Background="#ff602c"  Foreground="White">
                 <Grid Background="#FF1D1E20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -106,23 +163,34 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Kategorie" Width="100" DisplayMemberBinding="{Binding Kategorie}"/>
-                                <GridViewColumn Header="Happy Hour" Width="100" DisplayMemberBinding="{Binding HappyHour}"/>
-                                <GridViewColumn Header="Steuersatz" Width="100" DisplayMemberBinding="{Binding Steuersatz}"/>
-                                <GridViewColumn Header="Gratis Beilage" Width="100" DisplayMemberBinding="{Binding GratisBeilage}"/>
+                                <GridViewColumn Header="Happy Hour" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding HappyHour, Converter={StaticResource BoolToJaNeinConverter}}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Gratis Beilage" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding GratisBeilage, Converter={StaticResource BoolToJaNeinConverter}}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                             </GridView>
                         </ListView.View>
                     </ListView>
 
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-                        <Button Content="Hinzufügen" Click="AddDishButton_Click"  Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Margin="5"></Button>
-                        <Button Content="Löschen" Click="DeleteDishButton_Click"  Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Margin="5"></Button>
+                        <Button Content="Hinzufügen" Click="AddDishButton_Click"  Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="5,5,5,5" Margin="5" Style="{DynamicResource ButtonStyle1}"></Button>
+                        <Button Content="Löschen" Click="DeleteDishButton_Click"  Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="5,5,5,5" Margin="5" Style="{DynamicResource ButtonStyle1}" ></Button>
                         <!-- Neuer Button zum Löschen -->
                     </StackPanel>
 
                 </Grid>
             </TabItem>
-            <TabItem Header="Mittagsangebot Einstellungen" Background="#FFFF5D48" Foreground="White">
+            <TabItem Header="Mittagsangebot Einstellungen" Background="#ff602c" Foreground="White">
    
                 
                     <Grid Background="#FF1D1E20" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -157,11 +225,11 @@
                         <ComboBox Name="HappyHourEndDayComboBox" Grid.Row="3" Grid.Column="1" Width="100" Margin="5"/>
 
                         <!-- Speichern-Button -->
-                        <Button Content="Speichern" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Click="SaveHappyHourTimesButton_Click" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="10,5" Margin="5"/>
+                    <Button Content="Speichern" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Click="SaveHappyHourTimesButton_Click" Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="10,5" Margin="5" Style="{DynamicResource ButtonStyle1}"/>
                     </Grid>
 
             </TabItem>
-            <TabItem Header="Druckereinstellungen" Background="#FFFF5D48" Foreground="White" Loaded="TabItem_Loaded">
+            <TabItem Header="Druckereinstellungen" Background="#ff602c" Foreground="White" Loaded="TabItem_Loaded">
                 <Grid Background="#FF1D1E20">
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Label Content="Wählen Sie einen lokalen Drucker:" Foreground="White"/>
@@ -170,16 +238,16 @@
                         <Label Content="Wählen Sie einen Netzwerkdrucker:" Foreground="White" Margin="0,10,0,0"/>
                         <ComboBox Name="NetworkPrinterComboBox" Width="200" Margin="10"/>
 
-                        <Button Content="Speichern" Click="SavePrinterSelectionButton_Click" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="10,5" Margin="0,10,0,0"/>
+                        <Button Content="Speichern" Click="SavePrinterSelectionButton_Click" Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="10,5" Margin="0,10,0,0" Style="{DynamicResource ButtonStyle1}"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
 
 
-            <TabItem Header="Über" Background="#FFFF5D48" Foreground="White">
+            <TabItem Header="Über" Background="#ff602c" Foreground="White">
                 <Grid Background="#FF1D1E20">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock Text="Order Mate" FontSize="20" FontWeight="Bold" Foreground="#FFFF5D48" TextAlignment="Center"/>
+                        <TextBlock Text="Order Mate" FontSize="20" FontWeight="Bold" Foreground="#ff602c" TextAlignment="Center"/>
                         <TextBlock Text="Entwickelt von Kenneth Ballen" Foreground="White" TextAlignment="Center"/>
                         <TextBlock Text="Design von Kenneth Ballen" Foreground="White" TextAlignment="Center"/>
                         <TextBlock Text="© 2023 Kenneth Ballen" Foreground="White" TextAlignment="Center"/>

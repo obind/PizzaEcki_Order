@@ -79,18 +79,9 @@ namespace PizzaEcki.Pages
 
         private void CloseDayButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Möchten Sie den Tag wirklich abschließen und die Tagesstatistik drucken?", "Tag abschließen", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-            if (result == MessageBoxResult.Yes)
-            {
-                // Drucken der Tagesstatistik
-                CloseDayAndDeleteOrders();
-                
-                // Hier können Sie alle weiteren Schritte hinzufügen, die beim Tagesabschluss durchgeführt werden sollten,
-                // wie z.B. das Speichern des Abschlusses in der Datenbank oder das Zurücksetzen der UI für den nächsten Tag.
-
-                MessageBox.Show("Der Tag wurde erfolgreich abgeschlossen.", "Abschluss bestätigt", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+                CloseDayAndDeleteOrders();    
+          
         }
 
 
@@ -152,8 +143,7 @@ namespace PizzaEcki.Pages
 
                 // Löschen aller Bestellungen
                 await _dbManager.DeleteDailyOrdersAsync();
-
-                MessageBox.Show("Der Tag wurde erfolgreich abgeschlossen und alle Bestellungen wurden gelöscht.", "Vorgang abgeschlossen", MessageBoxButton.OK, MessageBoxImage.Information);
+       
             }
         }
 
