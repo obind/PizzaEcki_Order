@@ -19,31 +19,7 @@
                 </DrawingImage.Drawing>
             </DrawingImage>
 
-            <Style TargetType="TextBox">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type TextBox}">
-                            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Opacity" TargetName="border" Value="1"/>
-                                </Trigger>
-                                <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="border" Value="#FF7EB4EA"/>
-                                </Trigger>
-                                <Trigger Property="IsFocused" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="border" Value="#FF602C"/>
-                                    <Setter Property="BorderThickness" TargetName="border" Value="3"/>
-                                    <!-- Erhöhte BorderThickness -->
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
+            
             <Style x:Key="FocusedComboBoxStyle" TargetType="{x:Type ComboBox}">
                 <Setter Property="FocusVisualStyle">
                     <Setter.Value>
@@ -83,6 +59,65 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <Style x:Key="FocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+            <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+            <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#ff3300   "/>
+            <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+            <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+            <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+            <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+            <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+            <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+            <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+                <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="1"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true" CornerRadius="5">
+                                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsDefaulted" Value="true">
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true" >
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                                    <Setter TargetName="border" Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect Color="Black" Direction="320" ShadowDepth="7" BlurRadius="5" Opacity="0.5"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="true">
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                    <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
         </ResourceDictionary>
 
@@ -112,13 +147,13 @@
             <!--<Button Name="TestButton" Grid.Column="3" Content="Reset Bon Number Test" Click="ResetBonNumberButton_Click" />-->
                 <!--<Button Grid.Column="2" Content="Logbuch" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FF602C" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
             <Border Grid.Column="0" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="btn_tables" Content="Tabellen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Click="btn_tables_Click" BorderBrush="{x:Null}"/>
+                <Button x:Name="btn_tables" Content="Tabellen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="btn_tables_Click" BorderBrush="{x:Null}"/>
             </Border>
             <Border Grid.Column="1" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="Auswertung_Btn" Content="Auswertung" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Click="Auswertung_Btn_Click" BorderBrush="{x:Null}"/>
+                <Button x:Name="Auswertung_Btn" Content="Leistungsübersicht" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" Style="{DynamicResource ButtonStyle1}"  Click="Auswertung_Btn_Click" BorderBrush="{x:Null}"/>
             </Border>
             <Border Grid.Column="2" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Click="EinstellungenBtn_Click" BorderBrush="{x:Null}"/>
+                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="EinstellungenBtn_Click" BorderBrush="{x:Null}"/>
             </Border>
 
 
@@ -192,12 +227,12 @@
                     <Label Content="Eingabe" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center"/>
                 </Border>
                 <Label Grid.Row="1" Content="Gericht" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" FontStretch="ExtraCondensed" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
-                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" SelectionChanged ="DishComboBox_TextChanged" IsEditable="True"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" Grid.Column="1" Padding="5,0,5,0" TabIndex="5" Background="#FF5F6269" BorderBrush="#FF5F6269" VerticalAlignment="Bottom" />
+                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" SelectionChanged ="DishComboBox_TextChanged" IsEditable="True"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" Grid.Column="1" Padding="5,0,5,0" TabIndex="5" Background="#FF5F6269" BorderBrush="#FF5F6269" VerticalAlignment="Bottom" Cursor="Hand" />
 
                 <Label Grid.Row="2" Content="Extras" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
                 <ComboBox x:Name="ExtrasComboBox" Grid.Row="2" Margin="0,0,10,0" Padding="5,0,5,0" IsEditable="True" 
                  VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
-                VerticalAlignment="Center" Grid.Column="1"  TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" Style="{StaticResource FocusedComboBoxStyle}" />
+                VerticalAlignment="Center" Grid.Column="1"  TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand" />
 
                 <Label Grid.Row="2" Grid.Column="2" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
                 <ComboBox x:Name="amountComboBox" Grid.Row="2" Grid.Column="3" 
@@ -207,7 +242,7 @@
                     VerticalContentAlignment="Center" 
                     Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
                     IsEditable="True" TabIndex="8" 
-                    Text="1" MinWidth="40" Style="{StaticResource FocusedComboBoxStyle}">   
+                    Text="1" MinWidth="40" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand">   
                     <ComboBoxItem>1</ComboBoxItem>
                     <ComboBoxItem>2</ComboBoxItem>
                     <ComboBoxItem>3</ComboBoxItem>
@@ -224,10 +259,10 @@
 
 
                 <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
-                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" MinWidth="40"/>
+                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" MinWidth="40" Cursor="Hand"/>
 
                 <Label Grid.Row="3" Grid.Column="2" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="30,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="5,0,5,0" MinHeight="20" />
-                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100" />
+                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100" Cursor="Hand" />
 
             </Grid>
         </Border>
@@ -334,7 +369,7 @@
                 </Border>
 
                 <Label Grid.Row="1" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock x:Name="MitnehmerTextBlock" Text="Mitnehmer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="MitnehmerLabel_MouseDown"/>
+                    <TextBlock x:Name="MitnehmerTextBlock" Text="Mitnehmer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="MitnehmerLabel_MouseDown" Cursor="Hand"/>
                 </Label>
                
                 <Label x:Name="MitnehmerLabel" Grid.Row="1" Grid.Column="1" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,10,0" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="MitnehmerLabel_MouseDown"/>
@@ -342,7 +377,7 @@
                 
                 <Label Grid.Row="2" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
                     
-                    <TextBlock x:Name="SelbstabholerTextBlock" Text="Selbstabholer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="SelbstabholerLabel_MouseDown"/>
+                    <TextBlock x:Name="SelbstabholerTextBlock" Text="Selbstabholer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="SelbstabholerLabel_MouseDown" Cursor="Hand"/>
                
                 </Label>
                 
@@ -353,7 +388,7 @@
                 <Label Grid.Row="3" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
                 
                     
-                    <TextBlock x:Name="AuslieferungTextBlock" Text="Auslieferung" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="AuslieferungLabel_MouseDown"/>
+                    <TextBlock x:Name="AuslieferungTextBlock" Text="Auslieferung" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="AuslieferungLabel_MouseDown" Cursor="Hand"/>
                
                 
                 </Label>
@@ -361,37 +396,18 @@
                 <Label x:Name="AuslieferungLabel" Grid.Row="3" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Column="1" Padding="5,5,5,5" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="AuslieferungLabel_MouseDown"/>
 
                 <Label Grid.Column="2" Grid.Row="1" Content="Bon" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
-                <ComboBox x:Name="cb_bonNummer" Grid.Column="3" Grid.Row="1" Margin="0,7,10,7" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="Black" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.5,0.5"/>
+                <ComboBox x:Name="cb_bonNummer" Grid.Column="3" Grid.Row="1" Margin="0,7,10,7" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="Black" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.5,0.5" Cursor="Hand"/>
 
 
 
                 <Label Grid.Column="2" Grid.Row="2" Content="Kasse" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
-                <ComboBox x:Name="cb_cashRegister" Grid.Column="3" Grid.Row="2" Margin="0,2,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" FontSize="18" DisplayMemberPath="Name" >
+                <ComboBox x:Name="cb_cashRegister" Grid.Column="3" Grid.Row="2" Margin="0,2,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" FontSize="18" DisplayMemberPath="Name" Cursor="Hand" >
                     <ComboBoxItem Content="Theke" />
                     <ComboBoxItem Content="Kasse1" />
                 </ComboBox>
-                <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10" Padding="5,0,5,0">
-                    <Button x:Name="btn_zuordnen" Content="Zuordnen" Foreground="White" FontWeight="Bold" Click="Btn_zuordnen_Click" BorderThickness="0" Background="{x:Null}">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="border" Property="CornerRadius" Value="5"/>
-                                                    <Setter TargetName="border" Property="Background" Value="#E54B3C"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Background" Value="{x:Null}"/>
-                            </Style>
-                        </Button.Style>
+                <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10">
+                    <Button x:Name="btn_zuordnen"  Style="{DynamicResource ButtonStyle1}" Padding="5,0,5,0" Content="Zuordnen" Foreground="White" FontWeight="Bold" Click="Btn_zuordnen_Click" BorderThickness="0" Background="{x:Null}" Cursor="Hand">
+                       
                     </Button>
                 </Border>
 
@@ -421,27 +437,27 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,50,0">
                 <!-- Barzahlung-Button -->
                 <Border Background="#FF602C" CornerRadius="10">
-                    <Button x:Name="btn_cash" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" BorderBrush="{x:Null}" >
+                    <Button x:Name="btn_cash" Style="{DynamicResource ButtonStyle1}" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" BorderBrush="{x:Null}" Cursor="Hand" >
                         <!-- Icon für Barzahlung (Beispiel) -->
-                        <TextBlock Text="Bar" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="Bar" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"/>
                     </Button>
 
                 </Border>
 
                 <!-- Kartenzahlung-Button -->
                 <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
-                    <Button x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" BorderBrush="{x:Null}"  >
+                    <Button Style="{DynamicResource ButtonStyle1}" x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" BorderBrush="{x:Null}" Cursor="Hand"  >
                         <!-- Icon für Kartenzahlung (Beispiel) -->
-                        <TextBlock Text="Karte" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="Karte" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"/>
                     </Button>
                 </Border>
 
                 <!-- PayPal-Button -->
                 <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
 
-                    <Button x:Name="btn_paypal" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" BorderBrush="{x:Null}" >
+                    <Button x:Name="btn_paypal" Style="{DynamicResource ButtonStyle1}" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" BorderBrush="{x:Null}" Cursor="Hand" >
                     <!-- Icon für PayPal (Beispiel) -->
-                    <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"/>
                     </Button>
                 </Border> 
             </StackPanel>
