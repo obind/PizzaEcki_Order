@@ -91,8 +91,18 @@ namespace PizzaEcki
             LoadDrivers();
             DataContext = this;
             currentBonNumber = _databaseManager.CheckAndResetBonNumberIfNecessary();
+            
 
+            //Setzen des Standart Druckers
+            if (string.IsNullOrEmpty(PizzaEcki.Properties.Settings.Default.SelectedPrinter))
+            {
+                // Verwende System.Drawing.Printing, um den Standarddrucker zu ermitteln
+                string defaultPrinterName = new PrinterSettings().PrinterName;
 
+                // Speichere den Namen des Standarddruckers in den Einstellungen
+                PizzaEcki.Properties.Settings.Default.SelectedPrinter = defaultPrinterName;
+                PizzaEcki.Properties.Settings.Default.Save();
+            }
             _reloadTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(2)
@@ -593,7 +603,7 @@ namespace PizzaEcki
                 // Überprüfe, ob Mittagsangebot anwendbar ist
                 if (isHappyHourNow && IsEligibleForLunchOffer(selectedDish, selectedSize))
                 {
-                    basePrice = 7; // Preis für das Mittagsangebot setzen
+                    basePrice = 9; // Preis für das Mittagsangebot setzen
                 }
 
                 // Setze den Grundpreis für das Gericht
@@ -656,9 +666,9 @@ namespace PizzaEcki
         }
         private bool IsEligibleForLunchOffer(Dish selectedDish, string selectedSize)
         {
-            return (selectedDish.Kategorie == DishCategory.Pizza && selectedSize == "L") ||
-                   (selectedDish.Kategorie == DishCategory.Nudeln) ||
-                   (selectedDish.Kategorie == DishCategory.Pasta);
+            return (selectedDish.Kategorie == DishCategory.Pizza && selectedSize == "L" && selectedDish.HappyHour == "1") ||
+                   (selectedDish.Kategorie == DishCategory.Nudeln && selectedDish.HappyHour == "1") ||
+                   (selectedDish.Kategorie == DishCategory.Pasta && selectedDish.HappyHour == "1");
 
         }
 
@@ -931,6 +941,8 @@ namespace PizzaEcki
         private void SizeComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
+            
+            
             {
                 ExtrasComboBox.Focus();
             }

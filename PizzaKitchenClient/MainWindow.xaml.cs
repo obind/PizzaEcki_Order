@@ -22,6 +22,7 @@ namespace PizzaKitchenClient
         private DispatcherTimer refreshTimer = new DispatcherTimer();
         private Order _selectedOrder;
         private Order order;
+        private List<Driver> drivers;
         private bool isErrorMessageDisplayed = false;
         private bool isDelivery = false;
         public event Action<List<Order>> OnLetzteZuordnungRequested;
@@ -31,8 +32,8 @@ namespace PizzaKitchenClient
             this.WindowState = WindowState.Maximized;
             Loaded += MainWindow_Loaded;
             OrdersList.ItemsSource = UnassignedOrders;
-            OrdersList.SelectionChanged += OrdersList_SelectionChanged_1;
-            AssignButton.IsEnabled = false;
+          //  OrdersList.SelectionChanged += OrdersList_SelectionChanged_1;
+          
             refreshTimer.Interval = TimeSpan.FromSeconds(5); // Aktualisiere alle 30 Sekunden
             refreshTimer.Tick += RefreshTimer_Tick;
             refreshTimer.Start();
@@ -49,6 +50,21 @@ namespace PizzaKitchenClient
         {
            // await signalRService.HubConnection.StartAsync();
         }
+        private void ToggleColumnVisibility(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+            string columnName = menuItem.Tag.ToString();
+
+            // Finde die entsprechende Spalte in der GridView
+            var column = (OrdersList.View as GridView).Columns.FirstOrDefault(c => c.Header.ToString() == columnName);
+
+            if (column != null)
+            {
+                // Toggle die Sichtbarkeit der Spalte
+                column.Width = menuItem.IsChecked ? Double.NaN : 0;
+            }
+        }
+
 
         private async Task LoadUnassignedOrdersAsync()
         {
@@ -124,63 +140,87 @@ namespace PizzaKitchenClient
             }
         }
 
-        private async void DriversComboBox_Loaded(object sender, RoutedEventArgs e)
+        private async void DriversPanel_Loaded(object sender, RoutedEventArgs e)
         {
-           
-                try
+            try
+            {
+                List<Driver> driversFromApi = await _apiService.GetAllDriversAsync();
+                drivers = driversFromApi;
+
+                // Filtere die Liste, um nur Fahrer mit positiver ID zu behalten
+                var filteredDrivers = driversFromApi.Where(driver => driver.Id >= 0).ToList();
+
+                DriversPanel.Children.Clear(); // Entfernt vorhandene Buttons, falls vorhanden
+
+                foreach (var driver in filteredDrivers)
                 {
-                    List<Driver> driversFromApi = await _apiService.GetAllDriversAsync();
+                    // Erstelle einen neuen Button für jeden Fahrer
+                    Button driverButton = new Button
+                    {
+                        Content = driver.Name, // Oder jede andere relevante Information
+                        Background = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF602C")),
+                        Foreground = System.Windows.Media.Brushes.White,
+                        FontSize = 16,  
+                        FontWeight = FontWeights.Bold,
+                        Padding = new Thickness(10, 5, 10, 5),
+                        Margin= Margin = new Thickness(0, 5, 10, 5),
+                        
+                        Tag = driver,
+                        Style = (Style)FindResource("ButtonStyle1")
+                    };
+                    driverButton.Style = (Style)this.FindResource("ButtonStyle1");
 
-                    // Filtere die Liste, um nur Fahrer mit positiver ID zu behalten
-                    var filteredDrivers = driversFromApi.Where(driver => driver.Id >= 0).ToList();
+                    // Optional: Füge ein Click-Event hinzu
+                    driverButton.Click += DriverButton_Click;
 
-                    DriversComboBox.ItemsSource = filteredDrivers;
+                    // Füge den Button zum StackPanel hinzu
+                    DriversPanel.Children.Add(driverButton);
                 }
-                catch (Exception ex)
-                {
-                    // Fehlerbehandlung hier
-                    MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
-                
-                }
-
+            }
+            catch (Exception ex)
+            {
+                // Fehlerbehandlung hier
+                MessageBox.Show("Fehler beim Laden der Fahrer: " + ex.Message);
+            }
         }
 
-        private async void OnAssignButtonClicked(object sender, RoutedEventArgs e)
+        private async void DriverButton_Click(object sender, RoutedEventArgs e)
         {
-            if (OrdersList.SelectedItem is Order selectedOrder && DriversComboBox.SelectedItem is Driver selectedDriver)
+            if (OrdersList.SelectedItem is Order selectedOrder)
             {
-                // Deaktiviere den Button, wenn CustomerPhoneNumber 1 oder 2 ist
-                if (selectedOrder.CustomerPhoneNumber == "1" || selectedOrder.CustomerPhoneNumber == "2")
+                Button clickedButton = sender as Button;
+                if (clickedButton.Tag is Driver selectedDriver) // Hier wird die Typüberprüfung durchgeführt
                 {
-                    MessageBox.Show("Diese Bestellung kann nicht zugewiesen werden.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return; // Verlasse die Methode frühzeitig
-                }
+                    if (!selectedOrder.IsDelivery)
+                    {
+                        MessageBox.Show("Fahrer können nur Lieferungen übernehmen.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
 
-                if (!selectedOrder.IsDelivery)
-                {
-                    MessageBox.Show("Fahrer können keine Abholungen übernehmen.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
+                    // Hier verwendest du nun selectedDriver.Id, da du das Driver-Objekt korrekt extrahiert hast
+                    try
+                    {
+                        await _apiService.SaveOrderAssignmentAsync(selectedOrder.OrderId.ToString(), selectedDriver.Id, selectedOrder.OrderItems.Sum(item => item.Gesamt));
+                        UnassignedOrders.Remove(selectedOrder); // Entferne die Bestellung aus der ObservableCollection
 
-                double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
-
-                try
-                {
-                    await _apiService.SaveOrderAssignmentAsync(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
-                    UnassignedOrders.Remove(selectedOrder); // Entferne die Bestellung aus der ObservableCollection
-                    DriversComboBox.SelectedItem = null;
-                    HighlightSelectedItem(); // Aktualisiere die Hervorhebung
+                        // Hier könntest du weitere UI-Updates vornehmen, um den Erfolg der Operation anzuzeigen
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Fehler beim Zuweisen der Bestellung: " + ex.Message);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show("Fehler beim Zuweisen der Bestellung: " + ex.Message);
+                    MessageBox.Show("Bitte wählen Sie einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             else
             {
-                MessageBox.Show("Bitte wählen Sie einen Fahrer aus.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Bitte wählen Sie eine Bestellung aus der Liste aus.", "Auswahl erforderlich", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
 
         private async void CheckServerConnection()
         {
@@ -206,21 +246,21 @@ namespace PizzaKitchenClient
             }
         }
 
-        private void OrdersList_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
-        {
-            // Aktualisiere das ausgewählte Item
-            _selectedOrder = OrdersList.SelectedItem as Order;
-            HighlightSelectedItem();
-            if (OrdersList.SelectedItem is Order selectedOrder)
-            {
-                // Deaktiviere den Zuordnen-Button, wenn die PhoneNumber 1 oder 2 ist
-                AssignButton.IsEnabled = !(selectedOrder.CustomerPhoneNumber == "Mitnehmer" || selectedOrder.CustomerPhoneNumber == "Selbstabholer");
-            }
-            else
-            {
-                AssignButton.IsEnabled = false; // Deaktiviere den Button, wenn nichts ausgewählt ist
-            }
-        }
+        //private void OrdersList_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        //{
+        //    // Aktualisiere das ausgewählte Item
+        //    _selectedOrder = OrdersList.SelectedItem as Order;
+        //    HighlightSelectedItem();
+        //    if (OrdersList.SelectedItem is Order selectedOrder)
+        //    {
+        //        // Deaktiviere den Zuordnen-Button, wenn die PhoneNumber 1 oder 2 ist
+        //        AssignButton.IsEnabled = !(selectedOrder.CustomerPhoneNumber == "Mitnehmer" || selectedOrder.CustomerPhoneNumber == "Selbstabholer");
+        //    }
+        //    else
+        //    {
+        //        AssignButton.IsEnabled = false; // Deaktiviere den Button, wenn nichts ausgewählt ist
+        //    }
+        //}
 
 
         private void HighlightSelectedItem()

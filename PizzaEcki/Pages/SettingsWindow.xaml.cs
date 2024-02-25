@@ -32,6 +32,11 @@ namespace PizzaEcki.Pages
             HappyHourStartTimePicker.Value = DateTime.Today.Add(Properties.Settings.Default.HappyHourStart);
             HappyHourEndTimePicker.Value = DateTime.Today.Add(Properties.Settings.Default.HappyHourEnd);
 
+            if (LocalPrinterComboBox.Items.Contains(PizzaEcki.Properties.Settings.Default.SelectedPrinter))
+            {
+                LocalPrinterComboBox.SelectedItem = PizzaEcki.Properties.Settings.Default.SelectedPrinter;
+            }
+
         }
 
         private void LoadDrivers()
