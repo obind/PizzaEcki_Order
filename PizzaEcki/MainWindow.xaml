@@ -122,7 +122,7 @@
         </ResourceDictionary>
 
     </Window.Resources>
-    <Grid Background="#FF1D1E20">
+    <Grid Background="#FF1D1E20" Cursor="Hand">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
@@ -227,7 +227,13 @@
                     <Label Content="Eingabe" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center"/>
                 </Border>
                 <Label Grid.Row="1" Content="Gericht" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" FontStretch="ExtraCondensed" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
-                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" SelectionChanged ="DishComboBox_TextChanged" IsEditable="True"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" Grid.Column="1" Padding="5,0,5,0" TabIndex="5" Background="#FF5F6269" BorderBrush="#FF5F6269" VerticalAlignment="Bottom" Cursor="Hand" />
+                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" 
+                          SelectionChanged ="DishComboBox_SelectionChanged"
+                          IsEditable="True"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown"
+                          VerticalContentAlignment="Center" FontSize="18" 
+                          Grid.Column="1" Padding="5,0,5,0" TabIndex="5"
+                          Background="#FF5F6269" BorderBrush="#FF5F6269"
+                          VerticalAlignment="Bottom" Cursor="Hand" />
 
                 <Label Grid.Row="2" Content="Extras" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
                 <ComboBox x:Name="ExtrasComboBox" Grid.Row="2" Margin="0,0,10,0" Padding="5,0,5,0" IsEditable="True" 
@@ -241,7 +247,7 @@
                     HorizontalContentAlignment="Stretch" 
                     VerticalContentAlignment="Center" 
                     Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
-                    IsEditable="True" TabIndex="8" 
+                    IsEditable="True" TabIndex="6" 
                     Text="1" MinWidth="40" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand">   
                     <ComboBoxItem>1</ComboBoxItem>
                     <ComboBoxItem>2</ComboBoxItem>
@@ -259,7 +265,7 @@
 
 
                 <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
-                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" MinWidth="40" Cursor="Hand"/>
+                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="8" KeyDown="SizeComboBox_KeyDown" MinWidth="40" Cursor="Hand"/>
 
                 <Label Grid.Row="3" Grid.Column="2" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="30,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="5,0,5,0" MinHeight="20" />
                 <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100" Cursor="Hand" />

@@ -43,7 +43,7 @@ namespace PizzaEcki
         public string _customerNr;
         private string _pickupType = "";
 
-        private int currentReceiptNumber = 0; // das kann auch aus einer Datenbank oder einer Datei gelesen werden
+        private int currentReceiptNumber = 0;
         private int Auslieferung = 0;
         private int Selbstabholer = 0;
         private int Mitnehmer = 0;
@@ -270,7 +270,7 @@ namespace PizzaEcki
             }
         }
         //Gerichte
-        private void DishComboBox_TextChanged(object sender, SelectionChangedEventArgs e)
+        private void DishComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Prüfe, ob ein Gericht ausgewählt ist
             if (DishComboBox.SelectedItem == null)
@@ -280,13 +280,16 @@ namespace PizzaEcki
                 tempOrderItem.Nr = 0;
                 return;
             }
-
             SizeComboBox.SelectedItem = "L";
 
             // Umwandeln des ausgewählten Items in ein Dish-Objekt, um auf dessen Eigenschaften zugreifen zu können
             Dish selectedDish = (Dish)DishComboBox.SelectedItem;
             tempOrderItem.Gericht = selectedDish.Name.ToString();
             tempOrderItem.OrderItemId = selectedDish.Id;
+            if (tempOrderItem.OrderItemId == 700)
+            {
+                ShowPartyPizzaPopup(); // Methode zum Anzeigen des Popups
+            }
 
             var sizes = DishSizeManager.CategorySizes[selectedDish.Kategorie];
 
@@ -299,6 +302,7 @@ namespace PizzaEcki
 
             tempOrderItem.Extras = "";
         }
+
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -326,6 +330,32 @@ namespace PizzaEcki
             }
         }
 
+        private void ShowPartyPizzaPopup()
+        {
+            var popup = new PartyPizza(); // Angenommen, dies ist dein Popup-Fenster für die Pizza-Auswahl
+            if (popup.ShowDialog() == true) // Prüfe, ob der Dialog mit "OK" geschlossen wurde
+            {
+                // Berechne den Gesamtpreis und den Preis pro Pizza
+                double totalPrice = popup.SelectedPizzasPrices.Sum();
+                int pizzaCount = popup.SelectedPizzaIds.Count;
+
+                // Prüfe, ob Pizzen ausgewählt wurden
+                if (pizzaCount > 0)
+                {
+                    double pricePerPizza = totalPrice / pizzaCount;
+
+                    // Formatieren des Preises für die Anzeige
+                    string formattedTotalPrice = totalPrice.ToString("F2");
+                    string formattedPricePerPizza = pricePerPizza.ToString("F2");
+                    tempOrderItem.Epreis = totalPrice;
+                    MessageBox.Show($"Der Gesamtpreis für die Party Pizza ist: {formattedTotalPrice}€ (Preis pro Pizza: {formattedPricePerPizza}€)", "Preisberechnung", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Es wurden keine Pizzen ausgewählt.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
 
         //Extras
         private void ExtrasTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -383,12 +413,6 @@ namespace PizzaEcki
             }
         }
 
-
-
-
-
-
-
         private void ExtrasComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             var textBox = (TextBox)ExtrasComboBox.Template.FindName("PART_EditableTextBox", ExtrasComboBox);
@@ -401,7 +425,6 @@ namespace PizzaEcki
                 textBox.PreviewKeyDown += ExtrasComboBox_PreviewKeyDown;
             }
         }
-
 
         private void ExtrasComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -457,8 +480,6 @@ namespace PizzaEcki
             }
         }
 
-
-
         private async void ExtrasComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -495,6 +516,7 @@ namespace PizzaEcki
 
             }
         }
+
         private void UpdateTempOrderItemAmount()
         {
             int amount;
@@ -510,7 +532,10 @@ namespace PizzaEcki
         }
         private void TimePicker_KeyDown(object sender, KeyEventArgs e)
         {
-
+            if (e.Key == Key.Enter)
+            {
+                DishComboBox.Focus();
+            }
         }
         private double GetPriceForSelectedSize(Dish selectedDish, string selectedSize)
         {
@@ -541,7 +566,6 @@ namespace PizzaEcki
                     return 0; // Oder einen Standardpreis, wenn keine Größe übereinstimmt
             }
         }
-
         private bool IsHappyHour()
         {
             var currentTime = DateTime.Now.TimeOfDay;
@@ -565,15 +589,7 @@ namespace PizzaEcki
             //    return;
             //}
 
-            if (TimePickermein.Value != null)
-            {
-                // Überprüfe, ob die ausgewählte Uhrzeit in der Zukunft liegt
-                if (TimePickermein.Value.Value <= DateTime.Now)
-                {
-                    MessageBox.Show("Die eingegebene Uhrzeit muss in der Zukunft liegen.");
-                    return;
-                }
-            }
+            
 
             bool isHappyHourNow = IsHappyHour();
 
@@ -940,6 +956,22 @@ namespace PizzaEcki
         }
         private void SizeComboBox_KeyDown(object sender, KeyEventArgs e)
         {
+
+            if (e.Key >= Key.D0 && e.Key <= Key.D9 || e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+            {
+                // Ermitteln der Ziffer als Zeichen
+                char keyChar = (char)((int)'0' + (e.Key - Key.D0) % 10);
+
+                // Setzen der Eingabe in die amountComboBox
+                amountComboBox.Text = keyChar.ToString();
+
+                // Optional: Fokus zur amountComboBox setzen, um weitere Eingaben dort zu ermöglichen
+                amountComboBox.Focus();
+
+                // Verhindern, dass die Eingabe weiterverarbeitet wird (z.B. in der SizeComboBox)
+                e.Handled = true;
+            }
+
             if (e.Key == Key.Enter)
             
             
@@ -952,7 +984,6 @@ namespace PizzaEcki
             base.OnClosing(e);
             _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
         }
-
 
 
         private void PrintReceipt(Order order, Customer customer)
@@ -1380,7 +1411,6 @@ namespace PizzaEcki
             printDoc.Print();
         }
 
-
         private void btn_tables_Click(object sender, RoutedEventArgs e)
         {
             TableView tableView = new TableView();
@@ -1577,8 +1607,6 @@ namespace PizzaEcki
             var auswertungWindow = new Auswertung();
             auswertungWindow.ShowDialog();
         }
-
-
 
         private void TextBlock_MouseEnter(object sender, MouseEventArgs e)
         {

@@ -110,7 +110,7 @@
                         <!-- Fahrer-Liste -->
                     </ListView>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-                        <Button Content="Hinzufügen" Click="AddDriverButton_Click" Margin="5"   Style="{DynamicResource ButtonStyle1}" Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>
+                        <Button Content="Hinzufügen" Click="AddDriverButton_Click"   Style="{DynamicResource ButtonStyle1}" Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" RenderTransformOrigin="4.75,-2.007"/>
                         <!--<Button Content="Bearbeiten" Click="EditDriverButton_Click" Margin="5" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"  />-->
                         <!--<Button x:Name="deleteBtn" Content="Löschen" Click="DeleteDriverButton_Click"  Margin="5" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
                     </StackPanel>
