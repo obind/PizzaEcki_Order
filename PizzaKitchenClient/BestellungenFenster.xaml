@@ -13,7 +13,7 @@
         
         <services:PhoneNumberToTextConverter x:Key="PhoneNumberToTextConverter"/>
         <services:PhoneNumberToVisibilityConverter x:Key="PhoneNumberToVisibilityConverter"/>
-
+        
 
         <!-- Button-Style für orange Hintergrund -->
         <Style x:Key="OrangeButtonStyle" TargetType="Button">
@@ -84,7 +84,9 @@
                     <GridViewColumn Header="Fahrername" Width="150">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock   Text="{Binding Name, Converter={StaticResource PhoneNumberToTextConverter}}"
+                      
+                       FontSize="14" HorizontalAlignment="Center"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
