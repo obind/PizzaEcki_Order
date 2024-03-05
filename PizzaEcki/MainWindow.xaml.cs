@@ -830,19 +830,74 @@ namespace PizzaEcki
             return ++currentReceiptNumber;
         }
         //Zeigt das Vertecke Menü für Admins
+
+        private void ShowPasswordDialogAndCheck()
+        {
+            PasswordInputDialog dialog = new PasswordInputDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                if (IsPasswordCorrect(dialog.Password))
+                {
+                    // Passwort ist korrekt, F1Grid kann sichtbar gemacht werden
+                    F1Grid.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    MessageBox.Show("Das Passwort ist nicht korrekt.");
+                    // Optional: F1Grid unsichtbar machen oder andere Aktionen ausführen
+                }
+            }
+        }
+
+
+        private string DecryptPassword(string encryptedPassword)
+        {
+            // Hier sollte die Entschlüsselungslogik stehen, passend zur Verschlüsselung
+            byte[] data = Convert.FromBase64String(encryptedPassword);
+            return Encoding.UTF8.GetString(data);
+        }
+        private bool IsPasswordCorrect(string inputPassword)
+        {
+            string encryptedStoredPassword = Properties.Settings.Default.EncryptedPassword;
+            string decryptedStoredPassword = DecryptPassword(encryptedStoredPassword);
+
+            return inputPassword == decryptedStoredPassword;
+        }
+
+        private void SaveEncryptedPassword(string password)
+        {
+            string encryptedPassword = EncryptPassword(password);
+            Properties.Settings.Default.EncryptedPassword = encryptedPassword;
+            Properties.Settings.Default.Save(); // Speichern der Änderungen
+        }
+
+
+        private string EncryptPassword(string password)
+        {
+            // Eine einfache Verschlüsselungsmethode (nur als Beispiel, für echte Anwendungen stärkere Methoden verwenden)
+            // Ersetzen Sie dies durch Ihre bevorzugte Verschlüsselungsmethode
+            byte[] data = Encoding.UTF8.GetBytes(password);
+            // Verwenden Sie hier Ihre Verschlüsselungslogik
+            return Convert.ToBase64String(data);
+        }
         private void MainWindowEcki_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F2 && Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
-                // Hier kommt deine Logik zur Umschaltung der Sichtbarkeit von F1Grid
-                if (F1Grid.Visibility == Visibility.Visible)
+                if (F1Grid.Visibility == Visibility.Collapsed)
                 {
-                    F1Grid.Visibility = Visibility.Collapsed;
+                    ShowPasswordDialogAndCheck(); // Dialog anzeigen und Passwort überprüfen
                 }
                 else
                 {
-                    F1Grid.Visibility = Visibility.Visible;
+                    F1Grid.Visibility = Visibility.Collapsed; // F1Grid verbergen, wenn es bereits sichtbar ist
                 }
+            }
+
+            if (e.Key == Key.F5)
+            {
+                SetPasswordDialog setPasswordDialog = new SetPasswordDialog();  
+                    setPasswordDialog.ShowDialog(); 
             }
 
             if (e.Key == Key.F1)
@@ -918,7 +973,6 @@ namespace PizzaEcki
                 BarzahlungBtn(null, null);
             }
         }
-
         private void ShowHelpDialog()
         {
             string helpText = "F1: Zeige Hotkeys.\n" +
@@ -932,7 +986,6 @@ namespace PizzaEcki
 
             MessageBox.Show(helpText, "Hilfe zu Tastenkürzeln");
         }
-
         private void SendOrderItems(Order order)
         {
             //signalRService.SendOrderItemsAsync(order);
@@ -984,7 +1037,6 @@ namespace PizzaEcki
             base.OnClosing(e);
             _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
         }
-
 
         private void PrintReceipt(Order order, Customer customer)
         {

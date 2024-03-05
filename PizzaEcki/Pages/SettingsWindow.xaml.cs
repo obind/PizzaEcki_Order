@@ -8,6 +8,7 @@ using PizzaEcki.Database;
 using PizzaEcki.Models;
 using SharedLibrary;
 using System.Printing;
+using System.Text;
 
 namespace PizzaEcki.Pages
 {
@@ -276,5 +277,28 @@ namespace PizzaEcki.Pages
         {
             PopulatePrinterComboBoxes();
         }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveEncryptedPassword(NewPasswordInput.Password);
+            MessageBox.Show("Passwort wurde gesetzt.");
+            this.DialogResult = true;
+        }
+
+        private void SaveEncryptedPassword(string password)
+        {
+            string encryptedPassword = EncryptPassword(password);
+            Properties.Settings.Default.EncryptedPassword = encryptedPassword;
+            Properties.Settings.Default.Save(); // Speichern der Änderungen
+        }
+        private string EncryptPassword(string password)
+        {
+            // Eine einfache Verschlüsselungsmethode (nur als Beispiel, für echte Anwendungen stärkere Methoden verwenden)
+            // Ersetzen Sie dies durch Ihre bevorzugte Verschlüsselungsmethode
+            byte[] data = Encoding.UTF8.GetBytes(password);
+            // Verwenden Sie hier Ihre Verschlüsselungslogik
+            return Convert.ToBase64String(data);
+        }
+
     }
 }

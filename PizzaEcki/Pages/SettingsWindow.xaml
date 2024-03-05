@@ -238,11 +238,19 @@
                         <Label Content="Wählen Sie einen Netzwerkdrucker:" Foreground="White" Margin="0,10,0,0"/>
                         <ComboBox Name="NetworkPrinterComboBox" Width="200" Margin="10"/>
 
-                        <Button Content="Speichern" Click="SavePrinterSelectionButton_Click" Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="10,5" Margin="0,10,0,0" Style="{DynamicResource ButtonStyle1}"/>
+                        <Button Content="Speichern" Click="SavePrinterSelectionButton_Click" Background="#ff602c" Foreground="White"  FontWeight="Bold" Padding="10,5" Margin="0,10,0,0" Style="{DynamicResource ButtonStyle1}"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
-
+            <TabItem Header="Passwort" Background="#ff602c" Foreground="White" Loaded="TabItem_Loaded">
+                <Grid Background="#FF1D1E20">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Label Foreground="White" Content="Neues Passwort eingeben:" FontSize="18"/>
+                        <PasswordBox x:Name="NewPasswordInput"/>
+                        <Button Content="Speichern" HorizontalAlignment="Right" Click="SaveButton_Click"  Style="{DynamicResource ButtonStyle1}" Background="#ff602c" Foreground="White"  FontWeight="Bold" Padding="10,5" Margin="0,20,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
 
             <TabItem Header="Über" Background="#ff602c" Foreground="White">
                 <Grid Background="#FF1D1E20">
