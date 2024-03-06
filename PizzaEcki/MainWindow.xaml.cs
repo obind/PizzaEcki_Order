@@ -894,11 +894,6 @@ namespace PizzaEcki
                 }
             }
 
-            if (e.Key == Key.F5)
-            {
-                SetPasswordDialog setPasswordDialog = new SetPasswordDialog();  
-                    setPasswordDialog.ShowDialog(); 
-            }
 
             if (e.Key == Key.F1)
             {
@@ -1079,12 +1074,7 @@ namespace PizzaEcki
                 Font boldFont = new Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
                 Font titleFont = new Font("Segoe UI", 24, System.Drawing.FontStyle.Bold);
 
-                float yOffset = 10;  // Initial offset
-
-                string sloagan = "Internationale Spezialitäten";
-                float sloaganWidth = graphics.MeasureString(sloagan, regularFont).Width;
-                graphics.DrawString(sloagan, regularFont, Brushes.Black, (e.PageBounds.Width - sloaganWidth) / 2, yOffset);
-                yOffset += regularFont.GetHeight();
+              
 
                 // Title
                 string title = "PIZZA ECKI";
