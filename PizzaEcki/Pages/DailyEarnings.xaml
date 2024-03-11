@@ -86,7 +86,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Bestellungen" Binding="{Binding OrderType}" Width="*"/>
                 <DataGridTextColumn Header="Anzahl" Binding="{Binding Count}" Width="Auto"/>
-                <DataGridTextColumn Header="Gesamt" Binding="{Binding Total, StringFormat='\{0:C\}'}" Width="Auto"/>
+                <DataGridTextColumn Header="Gesamt" Binding="{Binding Total,StringFormat=' {0:F2} €'}" Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
         <!-- Fußzeile für die Summe -->
@@ -94,7 +94,7 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <TextBlock Text="Summe: " FontWeight="Bold" Padding="10,5" HorizontalAlignment="Left" Foreground="White"/>
                 <TextBlock x:Name="TotalAmountTextBlock" 
-                           Text="{Binding TotalSum, StringFormat='\{0:C\}'}" 
+                           Text="{Binding TotalSum, StringFormat=' {0:F2} €'}" 
                            Padding="10,5" 
                            HorizontalAlignment="Right" 
                            Foreground="White"/>

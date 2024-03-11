@@ -10,6 +10,7 @@ using System.Drawing; // Für das Grafik-Objekt und Schriftarten
 using System.Drawing.Printing; // Für den Druck
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace PizzaEcki.Pages
 {
@@ -30,6 +31,7 @@ namespace PizzaEcki.Pages
             LoadDailySales(DateTime.Now); // Loading the daily sales for the current date
             this.DataContext = this; // Set the DataContext to this class
            
+
         }
 
 
