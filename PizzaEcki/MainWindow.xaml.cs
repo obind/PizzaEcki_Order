@@ -68,13 +68,17 @@ namespace PizzaEcki
 
             // Erstellt eine neue Instanz von DatabaseManager, um die Verbindung zur Datenbank zu verwalten
             // und alle erforderlichen Tabellen und Initialdaten zu initialisieren.
-
+            NameTextBox.TextChanged += OnCustomerDataChanged;
+            StreetTextBox.TextChanged += OnCustomerDataChanged;
+            CityTextBox.TextChanged += OnCustomerDataChanged;
+            AdditionalInfoTextBox.TextChanged += OnCustomerDataChanged;
         }
 
         private void InitializeApplication()
         {
             _databaseManager = new DatabaseManager();
             StartServer();
+
 
             // Füllen die ComboBox für Gerichte aus der Datenbank
             dishesList = _databaseManager.GetAllDishes();
@@ -267,8 +271,10 @@ namespace PizzaEcki
             if (!isProgrammaticChange)
             {
                 SaveButton.Visibility = Visibility.Visible;
+                SaveButtonBorder.Visibility = Visibility.Visible; // Stelle sicher, dass auch der Border sichtbar wird
             }
         }
+
         //Gerichte
         private void DishComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -1035,6 +1041,7 @@ namespace PizzaEcki
 
         private void PrintReceipt(Order order, Customer customer)
         {
+           
 
             PrintDocument printDoc = new PrintDocument();
 
@@ -1067,7 +1074,7 @@ namespace PizzaEcki
             printDoc.PrintPage += (sender, e) =>
             {
                 Graphics graphics = e.Graphics;
-
+                float yOffset = 10; 
                 // Fonts
                 Font smallFont = new Font("Segoe UI", 10, System.Drawing.FontStyle.Regular);
                 Font regularFont = new Font("Segoe UI Semibold", 14, System.Drawing.FontStyle.Bold);

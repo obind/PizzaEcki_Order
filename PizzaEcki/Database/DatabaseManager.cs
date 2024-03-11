@@ -225,6 +225,29 @@ namespace PizzaEcki.Database
             _connection.Close();
             return null;
         }
+
+        public void UpdateCustomerData(Customer customer)
+        {
+            _connection.Open();
+            string sql = @"UPDATE Customers SET Name = @Name, AdditionalInfo = @AdditionalInfo 
+                   INNER JOIN Addresses ON Customers.AddressId = Addresses.Id
+                   SET Street = @Street, City = @City
+                   WHERE PhoneNumber = @PhoneNumber";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Name", customer.Name);
+                command.Parameters.AddWithValue("@Street", customer.Street);
+                command.Parameters.AddWithValue("@City", customer.City);
+                command.Parameters.AddWithValue("@AdditionalInfo", customer.AdditionalInfo);
+                command.Parameters.AddWithValue("@PhoneNumber", customer.PhoneNumber);
+
+                command.ExecuteNonQuery();
+            }
+
+            _connection.Close();
+        }
+
         public void AddOrUpdateCustomer(Customer customer)
         {
             long addressId;
