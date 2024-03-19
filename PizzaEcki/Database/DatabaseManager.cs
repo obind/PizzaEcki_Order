@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Globalization;
 using Microsoft.AspNet.SignalR.Client;
+using Microsoft.EntityFrameworkCore;
 
 namespace PizzaEcki.Database
 {
@@ -225,6 +226,32 @@ namespace PizzaEcki.Database
             _connection.Close();
             return null;
         }
+        public async Task<List<Driver>> GetAllDriversAsync()
+        {
+            _connection.Open();
+            List<Driver> drivers = new List<Driver>();
+
+            // SQL-Befehl vorbereiten
+            string sql = "SELECT * FROM Drivers";
+            using (var command = new SqliteCommand(sql, _connection))
+            {
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var driver = new Driver
+                        {
+                            Id = reader.GetInt32(0), // Annahme: Id ist die erste Spalte
+                            Name = reader.GetString(1) // Annahme: Name ist die zweite Spalte
+                                                       // Weitere Eigenschaften entsprechend zuweisen
+                        };
+                        drivers.Add(driver);
+                    }
+                }
+            }
+            _connection.Close();
+            return drivers;
+        }
 
         public void UpdateCustomerData(Customer customer)
         {
@@ -274,6 +301,110 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+
+        public async Task<List<Order>> GetOrdersWithAssignedDrivers()
+        {
+            _connection.Open();
+            List<Order> assignedOrders = new List<Order>();
+
+
+            string sql = @"
+                       SELECT 
+                Orders.OrderId,
+                Orders.BonNumber,
+                Orders.IsDelivery,
+                Orders.PaymentMethod,
+                Orders.CustomerPhoneNumber,
+                Orders.Timestamp,
+                Orders.DeliveryUntil,
+                OrderItems.OrderItemId,
+                OrderItems.Gericht,
+                OrderItems.Extras,
+                OrderItems.Größe,
+                OrderItems.Menge,
+                OrderItems.Epreis,
+                OrderItems.Gesamt,
+                OrderItems.Uhrzeit,
+                OrderItems.LieferungsArt,
+                Drivers.Id AS DriverId,
+                Drivers.Name AS Name,
+                Drivers.PhoneNumber AS DriverPhoneNumber
+                FROM 
+                Orders
+                LEFT JOIN 
+                orderAssignments ON Orders.OrderId = orderAssignments.OrderId
+                LEFT JOIN 
+                Drivers ON orderAssignments.DriverId = Drivers.Id
+                LEFT JOIN 
+                OrderItems ON Orders.OrderId = OrderItems.OrderId;
+                ";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var orderIdValue = reader["OrderId"].ToString();
+                        if (string.IsNullOrEmpty(orderIdValue))
+                        {
+                            continue;  // Überspringe diesen Datensatz
+                        }
+                        Guid currentOrderId = Guid.Parse(orderIdValue);
+
+                        Order order = assignedOrders.FirstOrDefault(o => o.OrderId == currentOrderId);
+                        if (order == null)
+                        {
+                            try
+                            {
+                                order = new Order
+                                {
+                                    OrderId = currentOrderId,
+                                    BonNumber = reader.IsDBNull(reader.GetOrdinal("BonNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("BonNumber")),
+                                    IsDelivery = reader.IsDBNull(reader.GetOrdinal("IsDelivery")) ? false : reader.GetBoolean(reader.GetOrdinal("IsDelivery")),
+                                    PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader.GetString(reader.GetOrdinal("PaymentMethod")),
+                                    CustomerPhoneNumber = reader.IsDBNull(reader.GetOrdinal("CustomerPhoneNumber")) ? null : reader.GetString(reader.GetOrdinal("CustomerPhoneNumber")),
+                                    Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString(),
+                                    DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader.GetString(reader.GetOrdinal("DeliveryUntil")),
+                                    DriverId = reader.IsDBNull(reader.GetOrdinal("DriverId")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("DriverId")),
+                                    Name = reader.IsDBNull(reader.GetOrdinal("Name")) ? null : reader.GetString(reader.GetOrdinal("Name")),
+                                    OrderItems = new List<OrderItem>()
+                                };
+                            }
+                            catch (Exception ex)
+                            {
+                                // Logge den Fehler, z.B. durch Ausgabe auf der Konsole oder in einer Datei
+                                Console.WriteLine("Fehler beim Erstellen des Order-Objekts: " + ex.Message);
+                                throw; // Wirf den Fehler weiter nach oben, damit du weißt, dass etwas schiefgelaufen ist.
+                            }
+                            assignedOrders.Add(order);
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("OrderItemId")))
+                        {
+                            OrderItem orderItem = new OrderItem
+                            {
+                                Nr = reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+                                Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+                                Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                                Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
+                                Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+                                Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+                                Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                                Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                                LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                            };
+                            order.OrderItems.Add(orderItem);
+                        }
+                    }
+                }
+            }
+
+            await _connection.CloseAsync();
+
+            return assignedOrders;
+        }
+
         //Dishes
         public void AddDishes(List<Dish> dishes)
         {
