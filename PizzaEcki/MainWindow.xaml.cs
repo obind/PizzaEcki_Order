@@ -1702,5 +1702,36 @@ namespace PizzaEcki
                 MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
             }
         }
+
+        private async void Uebersicht_Click(object sender, RoutedEventArgs e)
+        {
+
+            try
+            {
+                var ordersWithAssignedDrivers = await _databaseManager.GetOrdersWithAssignedDrivers();
+                var allDrivers = await _databaseManager.GetAllDriversAsync();
+                var updatedOrders = new List<Order>();
+
+                foreach (var order in ordersWithAssignedDrivers)
+                {
+                    if (order.DriverId.HasValue && order.DriverId > 0)
+                    {
+                        var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
+                        if (driver != null)
+                        {
+                            order.Name = driver.Name;
+                        }
+                        updatedOrders.Add(order);
+                    }
+                }
+
+                Bestellungen bestellungenFenster = new Bestellungen(updatedOrders);
+                bestellungenFenster.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
+            }
+        }
     }
 }

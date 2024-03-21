@@ -1030,7 +1030,7 @@ namespace PizzaEcki.Database
             List<Order> orders = new List<Order>();
             string sql = @"
                 SELECT 
-                    Orders.*,
+                    Orders.*,d
                     OrderItems.*
                 FROM 
                     Orders
@@ -1373,6 +1373,98 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+
+
+        public async Task UpdateOrderAsync(Order order)
+        {
+            // Prüfe zuerst, ob die Order und OrderItems nicht null und gültig sind.
+            if (order == null || order.OrderItems == null)
+            {
+                throw new ArgumentNullException(nameof(order), "Die Bestellung und ihre Artikel dürfen nicht null sein.");
+            }
+
+            // Öffne eine Transaktion
+            await _connection.OpenAsync();
+            using (var transaction = _connection.BeginTransaction())
+            {
+                try
+                {
+                    // Aktualisiere die Bestelldaten
+                    string updateOrderSql = @"
+                UPDATE Orders SET 
+                BonNumber = @BonNumber,
+                IsDelivery = @IsDelivery,
+                PaymentMethod = @PaymentMethod,
+                CustomerPhoneNumber = @CustomerPhoneNumber,    
+                DeliveryUntil = @DeliveryUntil
+                WHERE OrderId = @OrderId";
+
+                    using (var commandOrder = new SqliteCommand(updateOrderSql, _connection, transaction)) // Hier fügst du die Transaktion hinzu
+                    {
+                        commandOrder.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                        commandOrder.Parameters.AddWithValue("@BonNumber", order.BonNumber);
+                        commandOrder.Parameters.AddWithValue("@IsDelivery", order.IsDelivery);
+                        commandOrder.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod ?? (object)DBNull.Value);
+                        commandOrder.Parameters.AddWithValue("@CustomerPhoneNumber", order.CustomerPhoneNumber ?? (object)DBNull.Value);
+
+                        commandOrder.Parameters.AddWithValue("@DeliveryUntil", order.DeliveryUntil ?? (object)DBNull.Value);
+                        await commandOrder.ExecuteNonQueryAsync();
+                    }
+
+                    // Aktualisiere die OrderItems
+                    foreach (var item in order.OrderItems)
+                    {
+                        string updateItemSql = @"
+                    UPDATE OrderItems SET 
+                    Gericht = @Gericht,
+                    Größe = @Größe,
+                    Extras = @Extras,
+                    Menge = @Menge,
+                    Epreis = @Epreis,
+                    Gesamt = @Gesamt,
+                    Uhrzeit = @Uhrzeit,
+                    LieferungsArt = @LieferungsArt
+                    WHERE OrderItemId = @OrderItemId AND OrderId = @OrderId";
+
+                        using (var commandItem = new SqliteCommand(updateItemSql, _connection, transaction)) // Auch hier fügst du die Transaktion hinzu
+                        {
+                            commandItem.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                            commandItem.Parameters.AddWithValue("@OrderItemId", item.OrderItemId);
+                            commandItem.Parameters.AddWithValue("@Gericht", item.Gericht ?? (object)DBNull.Value);
+                            commandItem.Parameters.AddWithValue("@Größe", item.Größe ?? (object)DBNull.Value);
+                            commandItem.Parameters.AddWithValue("@Extras", item.Extras ?? (object)DBNull.Value);
+                            commandItem.Parameters.AddWithValue("@Menge", item.Menge);
+                            commandItem.Parameters.AddWithValue("@Epreis", item.Epreis);
+                            commandItem.Parameters.AddWithValue("@Gesamt", item.Gesamt);
+                            commandItem.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit ?? (object)DBNull.Value);
+                            commandItem.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
+                            await commandItem.ExecuteNonQueryAsync();
+                        }
+                    }
+
+                    // Commit der Transaktion, wenn alles erfolgreich war
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    // Rollback der Transaktion im Fehlerfall
+                    transaction.Rollback();
+
+                    // Hier könntest du den Fehler loggen
+                    Console.WriteLine("Fehler beim Aktualisieren der Bestellung: " + ex.Message);
+
+                    // Rethrow, um die Fehlerinformationen zu bewahren
+                    throw;
+                }
+                finally
+                {
+                    // Schließe die Verbindung in einem finally Block,
+                    // um sicherzustellen, dass sie auch bei Fehlern geschlossen wird
+                    await _connection.CloseAsync();
+                }
+            }
+        }
+
 
         public void Dispose()
         {

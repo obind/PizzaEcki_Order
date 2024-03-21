@@ -419,6 +419,9 @@
                        
                     </Button>
                 </Border>
+                <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Left" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10">
+                    <Button x:Name="Uebersicht"  Style="{DynamicResource ButtonStyle1}" Padding="5,0,5,0" Content="Übersicht" Foreground="White" FontWeight="Bold" BorderThickness="0" Background="{x:Null}" Cursor="Hand" Height="27" VerticalAlignment="Top" Click="Uebersicht_Click"/>
+                </Border>
 
 
             </Grid>

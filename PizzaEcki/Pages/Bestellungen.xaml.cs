@@ -24,6 +24,7 @@ namespace PizzaEcki.Pages
     {
         private DatabaseManager _apiSevice;
         private ObservableCollection<SharedLibrary.Order> _orders;
+        private BestellungBearbeiten _bearbeitenFenster;
         public Bestellungen(List<Order> orders)
         {
             InitializeComponent();
@@ -31,6 +32,8 @@ namespace PizzaEcki.Pages
             _orders = new ObservableCollection<Order>(orders);
             BestellungenListView.ItemsSource = _orders; // Hier wird die ItemsSource gesetzt
             Dispatcher.BeginInvoke(new Action(async () => await LoadCustomerDataAsync(_orders)));
+            BestellungenListView.MouseDoubleClick += BestellungenListView_MouseDoubleClick;
+            
         }
 
 
@@ -97,5 +100,34 @@ namespace PizzaEcki.Pages
                 textBox.Background = Brushes.White; // Optional: Hintergrundfarbe ändern, um den Bearbeitungsmodus zu signalisieren
             }
         }
+
+        private void BestellungenListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // Prüfe, ob das Bearbeitungsfenster bereits existiert und geöffnet ist
+            if (_bearbeitenFenster != null && _bearbeitenFenster.IsVisible)
+            {
+                // Bring das bereits geöffnete Fenster in den Vordergrund
+                _bearbeitenFenster.Activate();
+                e.Handled = true; // Verhindere weiteres Bubbling des Events
+            }
+            else
+            {
+                var item = ((FrameworkElement)e.OriginalSource).DataContext as Order;
+                if (item != null)
+                {
+                    _bearbeitenFenster = new BestellungBearbeiten
+                    {
+                        DataContext = item
+                    };
+                    _bearbeitenFenster.Closed += (s, args) => _bearbeitenFenster = null; // Setze es auf null, sobald das Fenster geschlossen wird
+                    _bearbeitenFenster.ShowDialog();
+                    e.Handled = true; // Verhindere weiteres Bubbling des Events
+                }
+            }
+        }
+
+
+
+
     }
 }

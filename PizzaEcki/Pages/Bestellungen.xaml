@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         xmlns:services="clr-namespace:PizzaEcki.Services" 
         mc:Ignorable="d"
-        Title="Bestellungen" Height="450" Width="800">
+        Title="Bestellungen" Height="450" Width="1000">
     <Window.Resources>
 
         <services:PhoneNumberToTextConverter x:Key="PhoneNumberToTextConverter"/>
@@ -49,12 +49,8 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}">
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <!-- Platzhalter für dynamisch hinzugefügte MenuItems -->
-                </ContextMenu>
-            </ListView.ContextMenu>
+        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" MouseDoubleClick="BestellungenListView_MouseDoubleClick">
+  
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
