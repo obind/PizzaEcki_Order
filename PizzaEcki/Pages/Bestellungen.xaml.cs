@@ -25,7 +25,8 @@ namespace PizzaEcki.Pages
         private DatabaseManager _apiSevice;
         private ObservableCollection<SharedLibrary.Order> _orders;
         private BestellungBearbeiten _bearbeitenFenster;
-        public Bestellungen(List<Order> orders)
+        public bool IsEditEnabled { get; set; }
+        public Bestellungen(List<Order> orders, bool isEditEnabled)
         {
             InitializeComponent();
             _apiSevice = new DatabaseManager();
@@ -33,8 +34,9 @@ namespace PizzaEcki.Pages
             BestellungenListView.ItemsSource = _orders; // Hier wird die ItemsSource gesetzt
             Dispatcher.BeginInvoke(new Action(async () => await LoadCustomerDataAsync(_orders)));
             BestellungenListView.MouseDoubleClick += BestellungenListView_MouseDoubleClick;
-            
+            this.IsEditEnabled = isEditEnabled; // Verwende 'this', um die Eigenschaft zu setzen
         }
+
 
 
         private async Task LoadCustomerDataAsync(IEnumerable<Order> orders)
@@ -103,6 +105,11 @@ namespace PizzaEcki.Pages
 
         private void BestellungenListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+
+            if (!IsEditEnabled)
+            {
+                return;
+            }   
             // Prüfe, ob das Bearbeitungsfenster bereits existiert und geöffnet ist
             if (_bearbeitenFenster != null && _bearbeitenFenster.IsVisible)
             {

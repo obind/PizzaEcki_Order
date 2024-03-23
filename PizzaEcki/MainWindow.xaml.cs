@@ -1683,18 +1683,20 @@ namespace PizzaEcki
 
                 foreach (var order in ordersWithAssignedDrivers)
                 {
-                    if (order.DriverId.HasValue && order.DriverId > 0)
+                    if (order.DriverId.HasValue && order.DriverId.Value != -1)
                     {
                         var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
-                        if (driver != null)
-                        {
-                            order.Name = driver.Name;
-                        }
-                        updatedOrders.Add(order);
+                        order.Name = driver?.Name ?? "Nicht zugewiesen";  // Wenn kein passender Fahrer gefunden wird, "Nicht zugewiesen" verwenden
                     }
+                    else
+                    {
+                        order.Name = "Nicht zugewiesen"; // Wenn keine DriverId zugewiesen ist, "Nicht zugewiesen" verwenden
+                    }
+
+                    updatedOrders.Add(order);
                 }
 
-                Bestellungen bestellungenFenster = new Bestellungen(updatedOrders);
+                Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, true);
                 bestellungenFenster.Show();
             }
             catch (Exception ex)
@@ -1705,7 +1707,6 @@ namespace PizzaEcki
 
         private async void Uebersicht_Click(object sender, RoutedEventArgs e)
         {
-
             try
             {
                 var ordersWithAssignedDrivers = await _databaseManager.GetOrdersWithAssignedDrivers();
@@ -1714,18 +1715,21 @@ namespace PizzaEcki
 
                 foreach (var order in ordersWithAssignedDrivers)
                 {
-                    if (order.DriverId.HasValue && order.DriverId > 0)
+                    // Überprüfe, ob eine DriverId vorhanden ist und nicht der Platzhalter für keine Zuweisung ist
+                    if (order.DriverId.HasValue && order.DriverId.Value != -1)
                     {
                         var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
-                        if (driver != null)
-                        {
-                            order.Name = driver.Name;
-                        }
-                        updatedOrders.Add(order);
+                        order.Name = driver?.Name ?? "Nicht zugewiesen";  // Wenn kein passender Fahrer gefunden wird, "Nicht zugewiesen" verwenden
                     }
+                    else
+                    {
+                        order.Name = "Nicht zugewiesen"; // Wenn keine DriverId zugewiesen ist, "Nicht zugewiesen" verwenden
+                    }
+
+                    updatedOrders.Add(order);
                 }
 
-                Bestellungen bestellungenFenster = new Bestellungen(updatedOrders);
+                Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, false);
                 bestellungenFenster.Show();
             }
             catch (Exception ex)
@@ -1733,5 +1737,6 @@ namespace PizzaEcki
                 MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
             }
         }
+
     }
 }
