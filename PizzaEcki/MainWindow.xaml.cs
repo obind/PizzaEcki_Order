@@ -855,7 +855,6 @@ namespace PizzaEcki
             }
         }
 
-
         private string DecryptPassword(string encryptedPassword)
         {
             // Hier sollte die Entschlüsselungslogik stehen, passend zur Verschlüsselung
@@ -921,7 +920,6 @@ namespace PizzaEcki
                 dailyEarnings.ShowDialog();
 
             }
-
             //Gratis gericht 
             //if (e.Key == Key.F5)
             //{
@@ -933,8 +931,6 @@ namespace PizzaEcki
 
             //    }
             //}
-
-
             if (e.Key == Key.F7)
             {
                 // Stelle sicher, dass die Liste nicht leer ist
@@ -953,17 +949,12 @@ namespace PizzaEcki
                     // Weitere UI-Updates, falls erforderlich
                 }
             }
-
-
             //F8 Löschen der Bestellung
             //Ist im anderen Fenster
-
-
             if (e.Key == Key.F11)
             {
                 BestellungenAnzeigen("alle");
             }
-
             if (e.Key == Key.F12)
             {
                 BarzahlungBtn(null, null); // Du kannst null für sender und RoutedEventArgs übergeben, da sie in deiner Methode nicht verwendet werden

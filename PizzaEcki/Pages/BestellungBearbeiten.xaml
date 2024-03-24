@@ -6,26 +6,110 @@
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
         Title="BestellungBearbeiten" Height="450" Width="800">
-    <ScrollViewer>
+    <Window.Resources>
+
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#ff3300   "/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
+
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true" CornerRadius="5">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true" >
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="Black" Direction="320" ShadowDepth="7" BlurRadius="5" Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            
+            
+        </Style>
+
+        <Style x:Key="TransparentTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="#FF5F6269"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <!-- Um den TextCursor zu verstecken, wenn die TextBox ReadOnly ist -->
+            <Setter Property="IsReadOnlyCaretVisible" Value="False"/>
+            <!-- Optional: Textfarbe anpassen, falls notwendig -->
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Resources>
+    <ScrollViewer Background="#FF1D1E20" Foreground="White">
         <StackPanel Margin="10">
-            <Label Content="Bon Nummer"/>
+            <Label Content="Bon Nummer" Foreground="White"/>
             <TextBox Text="{Binding BonNumber}"/>
 
-            <Label Content="Fahrername"/>
+            <Label Content="Fahrername" Foreground="White"/>
             <TextBox Text="{Binding Name}"/>
 
-            <Label Content="Adresse"/>
+            <Label Content="Adresse" Foreground="White"/>
             <!-- Hier könntest du die Adressdetails der Customer-Entität binden -->
-            <TextBox Text="{Binding Customer.Street}"/>
-            <TextBox Text="{Binding Customer.City}"/>
+            <TextBox Text="{Binding Customer.Street}" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" />
+            <TextBox Text="{Binding Customer.City}" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}"/>
 
-            <Label Content="Lieferung Bis"/>
-            <TextBox Text="{Binding DeliveryUntil}"/>
 
+            <Label Content="Lieferung Bis" Foreground="White"/>
+            <TextBox x:Name="DeliveryUntilTextBox" Text="{Binding DeliveryUntil, TargetNullValue='00:00', FallbackValue='00:00'}"/>
             <!-- Hier wäre eine ListView für die Bearbeitung der OrderItems -->
-            <Label Content="Bestellartikel"/>
-            <ListView ItemsSource="{Binding OrderItems}">
+            <Label Content="Bestellartikel" Foreground="#FFFFFEFE"/>
+            <ListView ItemsSource="{Binding OrderItems}" Background="#FF5F6269" Foreground="#FF606065">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF5F6269" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="BorderBrush" Value="#ff602c" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#FF5F6269" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <ListView.View>
+                    
+                    
                     <GridView>
                         <!-- Füge hier Spalten für die verschiedenen Eigenschaften der OrderItems hinzu -->
                         <GridViewColumn Header="Artikel">
@@ -36,14 +120,48 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Extras" DisplayMemberBinding="{Binding Extras}"/>
-                        <!-- ... Weitere Spalten ... -->
+                        <GridViewColumn Header="Extras">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Extras, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Größe">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Größe, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Mg.">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Menge, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Epreis">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Epreis, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Gesamt">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Gesamt, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
                     </GridView>
                 </ListView.View>
             </ListView>
 
             <!-- Button zum Speichern der Änderungen -->
-            <Button Content="Änderungen speichern" Click="Speichern_Click"/>
+            <Button Content="Änderungen speichern" Click="Speichern_Click" Style="{DynamicResource ButtonStyle1}"  Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Margin="0,20,0,0" HorizontalAlignment="Right"/>
         </StackPanel>
     </ScrollViewer>
 </Window>

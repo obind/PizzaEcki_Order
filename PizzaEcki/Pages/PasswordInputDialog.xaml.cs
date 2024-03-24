@@ -24,6 +24,7 @@ namespace PizzaEcki.Pages
         public PasswordInputDialog()
         {
             InitializeComponent();
+            PasswordInput.Focus();
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)

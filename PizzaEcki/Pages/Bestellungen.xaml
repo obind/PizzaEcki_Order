@@ -58,10 +58,12 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="#FF5F6269" />
                             <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="#ff602c" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="#FF5F6269" />
                             <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="#ff602c" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
