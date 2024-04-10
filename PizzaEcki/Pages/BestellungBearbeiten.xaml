@@ -82,15 +82,20 @@
 
             <Label Content="Adresse" Foreground="White"/>
             <!-- Hier könntest du die Adressdetails der Customer-Entität binden -->
-            <TextBox Text="{Binding Customer.Street}" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" />
-            <TextBox Text="{Binding Customer.City}" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}"/>
+            <TextBox Text="{Binding Customer.Street}" Style="{StaticResource TransparentTextBoxStyle}" />
+            <TextBox Text="{Binding Customer.City}" Style="{StaticResource TransparentTextBoxStyle}"/>
 
 
             <Label Content="Lieferung Bis" Foreground="White"/>
             <TextBox x:Name="DeliveryUntilTextBox" Text="{Binding DeliveryUntil, TargetNullValue='00:00', FallbackValue='00:00'}"/>
             <!-- Hier wäre eine ListView für die Bearbeitung der OrderItems -->
             <Label Content="Bestellartikel" Foreground="#FFFFFEFE"/>
-            <ListView ItemsSource="{Binding OrderItems}" Background="#FF5F6269" Foreground="#FF606065">
+            <ListView x:Name="BestellungenListView" ItemsSource="{Binding OrderItems}" Background="#FF5F6269" Foreground="#FF606065">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Neues Gericht anlegen" Click="AddNewOrderItem_Click"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

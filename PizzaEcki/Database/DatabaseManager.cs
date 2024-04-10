@@ -3,15 +3,13 @@ using System;
 using SQLitePCL;
 using PizzaEcki.Models;
 using System.Collections.Generic;
-using Microsoft.Win32.SafeHandles;
 using System.IO;
 using SharedLibrary;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Globalization;
-using Microsoft.AspNet.SignalR.Client;
-using Microsoft.EntityFrameworkCore;
+using System.Windows.Controls;
 
 namespace PizzaEcki.Database
 {
@@ -1132,7 +1130,7 @@ LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
             List<Order> orders = new List<Order>();
             string sql = @"
                 SELECT 
-                    Orders.*,d
+                    Orders.*,
                     OrderItems.*
                 FROM 
                     Orders
@@ -1501,17 +1499,21 @@ LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
 
         public async Task UpdateOrderAsync(Order order)
         {
-            _connection.Open();
+            if (_connection.State != ConnectionState.Open)
+            {
+                await _connection.OpenAsync();
+            }
+;
             // Aktualisiere die Bestellung in der Orders Tabelle
             string sqlOrder = @"
-        UPDATE Orders SET 
+             UPDATE Orders SET 
             BonNumber = @BonNumber,
             IsDelivery = @IsDelivery,
             PaymentMethod = @PaymentMethod,
             CustomerPhoneNumber = @CustomerPhoneNumber,
             Timestamp = @Timestamp,
             DeliveryUntil = @DeliveryUntil
-        WHERE OrderId = @OrderId";
+             WHERE OrderId = @OrderId";
 
             string convertedTimestamp = ConvertToTimeString(order.Timestamp);
             string convertedDeliveryUntil = ConvertToTimeString(order.DeliveryUntil);
@@ -1527,49 +1529,114 @@ LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
                 commandOrder.ExecuteNonQuery();
             }
 
-            
-
 
             // Aktualisiere die OrderItems in der OrderItems Tabelle
             // Hinweis: Hier könnte eine Logik erforderlich sein, um zu bestimmen, ob ein OrderItem aktualisiert oder eingefügt werden soll.
             foreach (var item in order.OrderItems)
             {
-                string sqlItem = @"
-            UPDATE OrderItems SET 
-                Gericht = @Gericht,
-                Größe = @Größe,
-                Extras = @Extras,
-                Menge = @Menge,
-                Epreis = @Epreis,
-                Gesamt = @Gesamt,
-                Uhrzeit = @Uhrzeit,
-                LieferungsArt = @LieferungsArt
-            WHERE OrderId = @OrderId";
-                using (SqliteCommand commandItem = new SqliteCommand(sqlItem, _connection))
+                if (item.Nr == 0)
                 {
-                    commandItem.Parameters.AddWithValue("@OrderItemId", item.OrderItemId);
-                    commandItem.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
-                    commandItem.Parameters.AddWithValue("@Gericht", item.Gericht ?? (object)DBNull.Value);
-                    commandItem.Parameters.AddWithValue("@Größe", item.Größe ?? (object)DBNull.Value);
-                    commandItem.Parameters.AddWithValue("@Extras", item.Extras ?? (object)DBNull.Value);
+                    // INSERT-Statement für neue OrderItems
+                    string sqlInsertItem = @"
+                    INSERT INTO OrderItems(Gericht, Größe, Extras, Menge, Epreis, Gesamt, Uhrzeit, LieferungsArt)
+                    VALUES(@Gericht, @Größe, @Extras, @Menge, @Epreis, @Gesamt, @Uhrzeit, @LieferungsArt)";
 
-                    commandItem.Parameters.AddWithValue("@Menge", item.Menge);
-                    commandItem.Parameters.AddWithValue("@Epreis", item.Epreis);
-                    commandItem.Parameters.AddWithValue("@Gesamt", item.Gesamt);
-                    commandItem.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit ?? (object)DBNull.Value);
-                    commandItem.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
-                    commandItem.ExecuteNonQuery();
+
+
+                    using (SqliteCommand commandInsertItem = new SqliteCommand(sqlInsertItem, _connection))
+                    {
+                        commandInsertItem.Parameters.AddWithValue("@OrderItemId", item.Nr);
+
+                        commandInsertItem.Parameters.AddWithValue("@Gericht", item.Gericht ?? (object)DBNull.Value);
+                        commandInsertItem.Parameters.AddWithValue("@Größe", item.Größe ?? (object)DBNull.Value);
+                        commandInsertItem.Parameters.AddWithValue("@Extras", item.Extras ?? (object)DBNull.Value);
+                        commandInsertItem.Parameters.AddWithValue("@Menge", item.Menge);
+                        commandInsertItem.Parameters.AddWithValue("@Epreis", item.Epreis);
+                        commandInsertItem.Parameters.AddWithValue("@Gesamt", item.Gesamt);
+                        commandInsertItem.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit ?? (object)DBNull.Value);
+                        commandInsertItem.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
+                        commandInsertItem.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    string sqlUpdateItem = @"
+                        UPDATE OrderItems SET 
+                            Gericht = @Gericht, 
+                            Größe = @Größe, 
+                            Extras = @Extras, 
+                            Menge = @Menge, 
+                            Epreis = @Epreis, 
+                            Gesamt = @Gesamt, 
+                            Uhrzeit = @Uhrzeit, 
+                            LieferungsArt = @LieferungsArt
+                        WHERE OrderItemId = @OrderItemId";
+
+                    using (SqliteCommand commandUpdateItem = new SqliteCommand(sqlUpdateItem, _connection))
+                    {
+                        commandUpdateItem.Parameters.AddWithValue("@OrderItemId", item.Nr); // Verwende item.Nr als OrderItemId
+
+                        commandUpdateItem.Parameters.AddWithValue("@Gericht", item.Gericht ?? (object)DBNull.Value);
+                        commandUpdateItem.Parameters.AddWithValue("@Größe", item.Größe ?? (object)DBNull.Value);
+                        commandUpdateItem.Parameters.AddWithValue("@Extras", item.Extras ?? (object)DBNull.Value);
+                        commandUpdateItem.Parameters.AddWithValue("@Menge", item.Menge);
+                        commandUpdateItem.Parameters.AddWithValue("@Epreis", item.Epreis);
+                        commandUpdateItem.Parameters.AddWithValue("@Gesamt", item.Gesamt);
+                        commandUpdateItem.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit ?? (object)DBNull.Value);
+                        commandUpdateItem.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
+                        commandUpdateItem.ExecuteNonQuery();
+                    }
                 }
             }
-
-            // Aktualisiere oder füge neue OrderAssignments ein, falls nötig
-            // Dies hängt von deiner Anwendungslogik ab
-
-            _connection.Close();
-
         }
 
+        public void SaveOrderItem(OrderItem orderItem, Guid orderId)
+        {
+            _connection.Open();
 
+            string sqlItem = @"
+        INSERT INTO OrderItems 
+        (
+            OrderId, 
+            Gericht, 
+            Größe,
+            Extras, 
+            Menge, 
+            Epreis, 
+            Gesamt, 
+            Uhrzeit, 
+            LieferungsArt
+        ) 
+        VALUES 
+        (
+            @OrderId, 
+            @Gericht, 
+            @Größe,
+            @Extras, 
+            @Menge, 
+            @Epreis, 
+            @Gesamt, 
+            @Uhrzeit, 
+            @LieferungsArt
+        )";
+
+            using (SqliteCommand commandItem = new SqliteCommand(sqlItem, _connection))
+            {
+                commandItem.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                commandItem.Parameters.AddWithValue("@Gericht", orderItem.Gericht);
+                commandItem.Parameters.AddWithValue("@Größe", orderItem.Größe ?? (object)DBNull.Value);
+                commandItem.Parameters.AddWithValue("@Extras", orderItem.Extras ?? (object)DBNull.Value);
+                commandItem.Parameters.AddWithValue("@Menge", orderItem.Menge);
+                commandItem.Parameters.AddWithValue("@Epreis", orderItem.Epreis);
+                commandItem.Parameters.AddWithValue("@Gesamt", orderItem.Gesamt);
+                commandItem.Parameters.AddWithValue("@Uhrzeit", orderItem.Uhrzeit ?? (object)DBNull.Value);
+                commandItem.Parameters.AddWithValue("@LieferungsArt", orderItem.LieferungsArt);
+
+                commandItem.ExecuteNonQuery();
+            }
+
+            _connection.Close();
+        }
 
 
         public void Dispose()
