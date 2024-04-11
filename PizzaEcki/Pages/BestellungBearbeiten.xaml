@@ -94,6 +94,8 @@
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Neues Gericht anlegen" Click="AddNewOrderItem_Click"/>
+                        <MenuItem Header="Ausgewähltes Gericht löschen" Click="DeleteOrderItem_Click"/>
+
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.ItemContainerStyle>

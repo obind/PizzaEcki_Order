@@ -411,30 +411,30 @@ namespace PizzaEcki.Database
 
 
                 string sql = @"
-                 SELECT 
-    Orders.OrderId,
-    Orders.BonNumber,
-    Orders.IsDelivery,
-    Orders.PaymentMethod,
-    Orders.CustomerPhoneNumber,
-    Orders.Timestamp,
-    Orders.DeliveryUntil,
-    OrderItems.OrderItemId,
-    OrderItems.Gericht,
-    OrderItems.Extras,
-    OrderItems.Größe,
-    OrderItems.Menge,
-    OrderItems.Epreis,
-    OrderItems.Gesamt,
-    OrderItems.Uhrzeit,
-    OrderItems.LieferungsArt,
-    COALESCE(Drivers.Id, -1) AS DriverId,  // Wenn DriverId NULL ist, gib -1 zurück
-    COALESCE(Drivers.Name, 'Nicht zugewiesen') AS DriverName,
-    Drivers.PhoneNumber AS DriverPhoneNumber
-FROM Orders
-LEFT JOIN OrderItems ON Orders.OrderId = OrderItems.OrderId
-LEFT JOIN orderAssignments ON Orders.OrderId = orderAssignments.OrderId
-LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
+                                 SELECT 
+                    Orders.OrderId,
+                    Orders.BonNumber,
+                    Orders.IsDelivery,
+                    Orders.PaymentMethod,
+                    Orders.CustomerPhoneNumber,
+                    Orders.Timestamp,
+                    Orders.DeliveryUntil,
+                    OrderItems.OrderItemId,
+                    OrderItems.Gericht,
+                    OrderItems.Extras,
+                    OrderItems.Größe,
+                    OrderItems.Menge,
+                    OrderItems.Epreis,
+                    OrderItems.Gesamt,
+                    OrderItems.Uhrzeit,
+                    OrderItems.LieferungsArt,
+                    COALESCE(Drivers.Id, -1) AS DriverId,  // Wenn DriverId NULL ist, gib -1 zurück
+                    COALESCE(Drivers.Name, 'Nicht zugewiesen') AS DriverName,
+                    Drivers.PhoneNumber AS DriverPhoneNumber
+                FROM Orders
+                LEFT JOIN OrderItems ON Orders.OrderId = OrderItems.OrderId
+                LEFT JOIN orderAssignments ON Orders.OrderId = orderAssignments.OrderId
+                LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
 
                 ";
 
@@ -505,8 +505,49 @@ LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
             
         }
 
-            //Dishes
-            public void AddDishes(List<Dish> dishes)
+
+        public async Task<List<OrderItem>> GetOrderItemsByOrderIdAsync(string orderId)
+        {
+            List<OrderItem> orderItems = new List<OrderItem>();
+
+            if (_connection.State != System.Data.ConnectionState.Open)
+                await _connection.OpenAsync();
+
+            string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@OrderId", orderId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        OrderItem item = new OrderItem
+                        {
+                            OrderItemId = Convert.ToInt32(reader["OrderItemId"]),
+                            Gericht = reader["Gericht"].ToString(),
+                            Größe = reader["Größe"].ToString(),
+                            Extras = reader["Extras"].ToString(),
+                            Menge = Convert.ToInt32(reader["Menge"]),
+                            Epreis = Convert.ToDouble(reader["Epreis"]),
+                            Gesamt = Convert.ToDouble(reader["Gesamt"]),
+                            Uhrzeit = reader["Uhrzeit"].ToString(),
+                            LieferungsArt = Convert.ToInt32(reader["LieferungsArt"])
+                        };
+                        orderItems.Add(item);
+                    }
+                }
+            }
+
+            _connection.Close();
+            return orderItems;
+        }
+
+
+
+        //Dishes
+        public void AddDishes(List<Dish> dishes)
         {
             _connection.Open();
             foreach (var dish in dishes)
@@ -927,6 +968,27 @@ LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
                 }
             }
         }
+
+        public async Task DeleteOrderItemAsync(int Nr)
+        {
+            if (_connection.State != System.Data.ConnectionState.Open)
+            {
+                await _connection.OpenAsync();
+            }
+
+            // Achte darauf, dass die SQL-Anweisung den Parameter @Nr verwendet
+            string sqlDeleteItem = "DELETE FROM OrderItems WHERE OrderItemId = @Nr";
+
+            using (SqliteCommand commandDeleteItem = new SqliteCommand(sqlDeleteItem, _connection))
+            {
+                // Binde den Parameter @Nr anstatt @OrderItemId
+                commandDeleteItem.Parameters.AddWithValue("@Nr", Nr);
+                await commandDeleteItem.ExecuteNonQueryAsync();
+            }
+
+            _connection.Close();
+        }
+
 
         public void SaveOrderAssignment(string orderId, int driverId, double price)
         {
