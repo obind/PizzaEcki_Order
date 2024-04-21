@@ -118,6 +118,9 @@ namespace PizzaEcki.Pages
                     updatedOrders.Add(order);
                 }
 
+                // Lade und aktualisiere Kundeninformationen
+                await LoadCustomerDataAsync(updatedOrders);
+
                 // Aktualisiere die ObservableCollection
                 _orders.Clear();
                 foreach (var order in updatedOrders)
@@ -133,6 +136,7 @@ namespace PizzaEcki.Pages
                 MessageBox.Show($"Fehler beim Aktualisieren der Bestellungen: {ex.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
 
 

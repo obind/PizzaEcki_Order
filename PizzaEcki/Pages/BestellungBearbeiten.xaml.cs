@@ -13,9 +13,9 @@ namespace PizzaEcki.Pages
     /// </summary>
     public partial class BestellungBearbeiten : Window
     {
-
-        public event Action OrderUpdated;
         public Func<Task> OnSaveCompleted { get; set; }
+        public event Action OrderUpdated;
+        
         private DatabaseManager databaseManager = new DatabaseManager();
         private Order _currentOrder;
         // Definiere _localOrderItems als ObservableCollection von OrderItem
@@ -28,6 +28,8 @@ namespace PizzaEcki.Pages
             OrderUpdated += ReloadOrderItems;
             // Initialisiere _localOrderItems mit den OrderItems der übergebenen Bestellung
             _localOrderItems = new ObservableCollection<OrderItem>(order.OrderItems);
+            _currentOrder = order;
+            BestellungenListView.ItemsSource = _localOrderItems;
 
             this.Loaded += BestellungBearbeiten_Loaded;
         }
@@ -35,7 +37,6 @@ namespace PizzaEcki.Pages
 
         public async void ReloadOrderItems()
         {
-            if (_currentOrder == null) return;
 
             try
             {
@@ -117,12 +118,16 @@ namespace PizzaEcki.Pages
                 var result = MessageBox.Show("Möchten Sie dieses Gericht wirklich löschen?", "Löschen bestätigen", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
-                    await databaseManager.DeleteOrderItemAsync(selectedOrderItem.Nr);
+                    // Überprüfe, ob eine gültige OrderItemId vorhanden ist
+                    int idToDelete = selectedOrderItem.OrderItemId > 0 ? selectedOrderItem.OrderItemId : selectedOrderItem.Nr;
+                    await databaseManager.DeleteOrderItemAsync(idToDelete);
                     _localOrderItems.Remove(selectedOrderItem);
+
                     OrderUpdated?.Invoke(); // Ereignis auslösen, um die Hauptansicht zu aktualisieren
                 }
             }
         }
+
 
 
 

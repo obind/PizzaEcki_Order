@@ -90,7 +90,7 @@
             <TextBox x:Name="DeliveryUntilTextBox" Text="{Binding DeliveryUntil, TargetNullValue='00:00', FallbackValue='00:00'}"/>
             <!-- Hier wäre eine ListView für die Bearbeitung der OrderItems -->
             <Label Content="Bestellartikel" Foreground="#FFFFFEFE"/>
-            <ListView x:Name="BestellungenListView" ItemsSource="{Binding OrderItems}" Background="#FF5F6269" Foreground="#FF606065">
+            <ListView x:Name="BestellungenListView" ItemsSource="{Binding _localOrderItems}" Background="#FF5F6269" Foreground="#FF606065">
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Neues Gericht anlegen" Click="AddNewOrderItem_Click"/>
