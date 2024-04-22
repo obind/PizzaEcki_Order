@@ -52,13 +52,12 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
 
-            ///
+            //Adessen Table 
             sql = "CREATE TABLE IF NOT EXISTS Addresses (Id INTEGER PRIMARY KEY AUTOINCREMENT, Street TEXT, City TEXT)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 command.ExecuteNonQuery();
             }
-
 
             //Dishes Table
             sql = "CREATE TABLE IF NOT EXISTS Gerichte (Id INTEGER PRIMARY KEY, Name TEXT, Preis_S REAL, Preis_L REAL, Preis_XL REAL, Kategorie TEXT, HappyHour TEXT, Steuersatz REAL, GratisBeilage INTEGER)";
@@ -82,7 +81,6 @@ namespace PizzaEcki.Database
             }
             InitializeStaticDrivers();
 
-
             //Settings
             _connection.Open();
             sql = "CREATE TABLE IF NOT EXISTS Settings (LastResetDate TEXT, CurrentBonNumber INTEGER)";
@@ -105,14 +103,8 @@ namespace PizzaEcki.Database
 
 
             //Zuordnungstabelle
-            sql = @"
-                CREATE TABLE IF NOT EXISTS OrderAssignments (
-                    OrderId TEXT,
-                    DriverId INTEGER,
-                    Price REAL,
-                    Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
-                    FOREIGN KEY(OrderId) REFERENCES Orders(OrderId),
-                    FOREIGN KEY(DriverId) REFERENCES Drivers(Id)
+            sql = @"CREATE TABLE IF NOT EXISTS OrderAssignments (OrderId TEXT, DriverId INTEGER,Price REAL,Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
+                    FOREIGN KEY(OrderId) REFERENCES Orders(OrderId),FOREIGN KEY(DriverId) REFERENCES Drivers(Id)
                 );
             ";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -120,15 +112,8 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
 
-
             sql = @"
-            CREATE TABLE IF NOT EXISTS Orders (
-                OrderId TEXT PRIMARY KEY,
-                BonNumber INTEGER,
-                IsDelivery BOOLEAN,
-                PaymentMethod TEXT,
-                CustomerPhoneNumber TEXT,
-                Timestamp DATETIME,
+            CREATE TABLE IF NOT EXISTS Orders (OrderId TEXT PRIMARY KEY, BonNumber INTEGER, IsDelivery BOOLEAN, PaymentMethod TEXT, CustomerPhoneNumber TEXT, Timestamp DATETIME,
                 DeliveryUntil TEXT
             )";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -137,18 +122,8 @@ namespace PizzaEcki.Database
             }
          
             sql = @"
-            CREATE TABLE IF NOT EXISTS OrderItems (
-                OrderItemId INTEGER PRIMARY KEY AUTOINCREMENT,
-                OrderId TEXT,
-                Gericht TEXT,
-                Größe TEXT,
-                Extras TEXT,
-                Menge INTEGER,
-                Epreis REAL,
-                Gesamt REAL,
-                Uhrzeit TEXT,
-                LieferungsArt INTEGER,
-                FOREIGN KEY(OrderId) REFERENCES Orders(OrderId)
+            CREATE TABLE IF NOT EXISTS OrderItems ( OrderItemId INTEGER PRIMARY KEY AUTOINCREMENT,OrderId TEXT, Gericht TEXT, Größe TEXT, Extras TEXT,
+                Menge INTEGER, Epreis REAL, Gesamt REAL, Uhrzeit TEXT, LieferungsArt INTEGER, FOREIGN KEY(OrderId) REFERENCES Orders(OrderId)
             )";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -157,396 +132,11 @@ namespace PizzaEcki.Database
 
             _connection.Close();
         }
+
+
         //Tabellen
-        public List<string> GetTableNames()
-        {
-            _connection.Open();
-            List<string> tableNames = new List<string>();
-            string sql = "SELECT name FROM sqlite_master WHERE type='table';";
-
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        tableNames.Add(reader.GetString(0));
-                    }
-                }
-            }
-            _connection.Close();
-            return tableNames;
-        }
-        public DataTable GetTableData(string tableName)
-        {
-            _connection.Open();
-            DataTable tableData = new DataTable();
-            string sql = $"SELECT * FROM {tableName};";
-
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    tableData.Load(reader);
-                }
-            }
-            _connection.Close();
-            return tableData;
-        }
-        public Customer GetCustomerByPhoneNumber(string phoneNumber)
-        {
-            _connection.Open();
-            string sql = @"SELECT c.PhoneNumber, c.Name, a.Street, a.City, c.AdditionalInfo 
-                   FROM Customers c
-                   INNER JOIN Addresses a ON c.AddressId = a.Id
-                   WHERE c.PhoneNumber = @PhoneNumber";
-
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                command.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
-
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        return new Customer
-                        {
-                            PhoneNumber = reader.GetString(0),
-                            Name = reader.GetString(1),
-                            Street = reader.GetString(2),
-                            City = reader.IsDBNull(3) ? null : reader.GetString(3), // Überprüfe auf NULL
-                            AdditionalInfo = reader.IsDBNull(4) ? null : reader.GetString(4)
-                        };
-                    }
-                }
-            }
-
-            _connection.Close();
-            return null;
-        }
-        public async Task<List<Driver>> GetAllDriversAsync()
-        {
-            _connection.Open();
-            List<Driver> drivers = new List<Driver>();
-
-            // SQL-Befehl vorbereiten
-            string sql = "SELECT * FROM Drivers";
-            using (var command = new SqliteCommand(sql, _connection))
-            {
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        var driver = new Driver
-                        {
-                            Id = reader.GetInt32(0), // Annahme: Id ist die erste Spalte
-                            Name = reader.GetString(1) // Annahme: Name ist die zweite Spalte
-                                                       // Weitere Eigenschaften entsprechend zuweisen
-                        };
-                        drivers.Add(driver);
-                    }
-                }
-            }
-            _connection.Close();
-            return drivers;
-        }
-
-        public void UpdateCustomerData(Customer customer)
-        {
-            _connection.Open();
-            string sql = @"UPDATE Customers SET Name = @Name, AdditionalInfo = @AdditionalInfo 
-                   INNER JOIN Addresses ON Customers.AddressId = Addresses.Id
-                   SET Street = @Street, City = @City
-                   WHERE PhoneNumber = @PhoneNumber";
-
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                command.Parameters.AddWithValue("@Name", customer.Name);
-                command.Parameters.AddWithValue("@Street", customer.Street);
-                command.Parameters.AddWithValue("@City", customer.City);
-                command.Parameters.AddWithValue("@AdditionalInfo", customer.AdditionalInfo);
-                command.Parameters.AddWithValue("@PhoneNumber", customer.PhoneNumber);
-
-                command.ExecuteNonQuery();
-            }
-
-            _connection.Close();
-        }
-
-        public void AddOrUpdateCustomer(Customer customer)
-        {
-            long addressId;
-
-            _connection.Open();
-            // Insert or Update Address
-            string addressSql = "INSERT OR REPLACE INTO Addresses (Street, City) VALUES (@Street, @City); SELECT last_insert_rowid();";
-            using (SqliteCommand addressCommand = new SqliteCommand(addressSql, _connection))
-            {
-                addressCommand.Parameters.AddWithValue("@Street", customer.Street);
-                addressCommand.Parameters.AddWithValue("@City", customer.City);
-                addressId = (long)addressCommand.ExecuteScalar();
-            }
-
-            // Insert or Update Customer with Address ID
-            string sql = "INSERT OR REPLACE INTO Customers (PhoneNumber, Name, AddressId, AdditionalInfo) VALUES (@PhoneNumber, @Name, @AddressId, @AdditionalInfo)";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                command.Parameters.AddWithValue("@PhoneNumber", customer.PhoneNumber);
-                command.Parameters.AddWithValue("@Name", customer.Name);
-                command.Parameters.AddWithValue("@AddressId", addressId);
-                command.Parameters.AddWithValue("@AdditionalInfo", (object)customer.AdditionalInfo ?? DBNull.Value);
-                command.ExecuteNonQuery();
-            }
-            _connection.Close();
-        }
-
-        public async Task<List<Order>> GetOrdersWithAssignedDrivers()
-        {
-            _connection.Open();
-            List<Order> assignedOrders = new List<Order>();
-
-
-            string sql = @"
-                       SELECT 
-                Orders.OrderId,
-                Orders.BonNumber,
-                Orders.IsDelivery,
-                Orders.PaymentMethod,
-                Orders.CustomerPhoneNumber,
-                Orders.Timestamp,
-                Orders.DeliveryUntil,
-                OrderItems.OrderItemId,
-                OrderItems.Gericht,
-                OrderItems.Extras,
-                OrderItems.Größe,
-                OrderItems.Menge,
-                OrderItems.Epreis,
-                OrderItems.Gesamt,
-                OrderItems.Uhrzeit,
-                OrderItems.LieferungsArt,
-                Drivers.Id AS DriverId,
-                Drivers.Name AS Name,
-                Drivers.PhoneNumber AS DriverPhoneNumber
-                FROM 
-                Orders
-                LEFT JOIN 
-                orderAssignments ON Orders.OrderId = orderAssignments.OrderId
-                LEFT JOIN 
-                Drivers ON orderAssignments.DriverId = Drivers.Id
-                LEFT JOIN 
-                OrderItems ON Orders.OrderId = OrderItems.OrderId;
-                ";
-
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = await command.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        var orderIdValue = reader["OrderId"].ToString();
-                        if (string.IsNullOrEmpty(orderIdValue))
-                        {
-                            continue;  // Überspringe diesen Datensatz
-                        }
-                        Guid currentOrderId = Guid.Parse(orderIdValue);
-
-                        Order order = assignedOrders.FirstOrDefault(o => o.OrderId == currentOrderId);
-                        if (order == null)
-                        {
-                            try
-                            {
-                                order = new Order
-                                {
-                                    OrderId = currentOrderId,
-                                    BonNumber = reader.IsDBNull(reader.GetOrdinal("BonNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("BonNumber")),
-                                    IsDelivery = reader.IsDBNull(reader.GetOrdinal("IsDelivery")) ? false : reader.GetBoolean(reader.GetOrdinal("IsDelivery")),
-                                    PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader.GetString(reader.GetOrdinal("PaymentMethod")),
-                                    CustomerPhoneNumber = reader.IsDBNull(reader.GetOrdinal("CustomerPhoneNumber")) ? null : reader.GetString(reader.GetOrdinal("CustomerPhoneNumber")),
-                                    Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString(),
-                                    DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader.GetString(reader.GetOrdinal("DeliveryUntil")),
-                                    DriverId = reader.IsDBNull(reader.GetOrdinal("DriverId")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("DriverId")),
-                                    Name = reader.IsDBNull(reader.GetOrdinal("Name")) ? null : reader.GetString(reader.GetOrdinal("Name")),
-                                    OrderItems = new List<OrderItem>()
-                                };
-                            }
-                            catch (Exception ex)
-                            {
-                                // Logge den Fehler, z.B. durch Ausgabe auf der Konsole oder in einer Datei
-                                Console.WriteLine("Fehler beim Erstellen des Order-Objekts: " + ex.Message);
-                                throw; // Wirf den Fehler weiter nach oben, damit du weißt, dass etwas schiefgelaufen ist.
-                            }
-                            assignedOrders.Add(order);
-                        }
-
-                        if (!reader.IsDBNull(reader.GetOrdinal("OrderItemId")))
-                        {
-                            OrderItem orderItem = new OrderItem
-                            {
-                                Nr = reader.GetInt32(reader.GetOrdinal("OrderItemId")),
-                                Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
-                                Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
-                                Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
-                                Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
-                                Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
-                                Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
-                                Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
-                                LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
-                            };
-                            order.OrderItems.Add(orderItem);
-                        }
-                    }
-                }
-            }
-
-            await _connection.CloseAsync();
-
-            return assignedOrders;
-        }
-
-        public async Task<List<Order>> GetAllOrdersAsync()
-        {
-
-                _connection.Open();
-                List<Order> assignedOrders = new List<Order>();
-
-
-                string sql = @"
-                                 SELECT 
-                    Orders.OrderId,
-                    Orders.BonNumber,
-                    Orders.IsDelivery,
-                    Orders.PaymentMethod,
-                    Orders.CustomerPhoneNumber,
-                    Orders.Timestamp,
-                    Orders.DeliveryUntil,
-                    OrderItems.OrderItemId,
-                    OrderItems.Gericht,
-                    OrderItems.Extras,
-                    OrderItems.Größe,
-                    OrderItems.Menge,
-                    OrderItems.Epreis,
-                    OrderItems.Gesamt,
-                    OrderItems.Uhrzeit,
-                    OrderItems.LieferungsArt,
-                    COALESCE(Drivers.Id, -1) AS DriverId,  // Wenn DriverId NULL ist, gib -1 zurück
-                    COALESCE(Drivers.Name, 'Nicht zugewiesen') AS DriverName,
-                    Drivers.PhoneNumber AS DriverPhoneNumber
-                FROM Orders
-                LEFT JOIN OrderItems ON Orders.OrderId = OrderItems.OrderId
-                LEFT JOIN orderAssignments ON Orders.OrderId = orderAssignments.OrderId
-                LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
-
-                ";
-
-                using (SqliteCommand command = new SqliteCommand(sql, _connection))
-                {
-                    using (SqliteDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            var orderIdValue = reader["OrderId"].ToString();
-                            if (string.IsNullOrEmpty(orderIdValue))
-                            {
-                                continue;  // Überspringe diesen Datensatz
-                            }
-                            Guid currentOrderId = Guid.Parse(orderIdValue);
-
-                            Order order = assignedOrders.FirstOrDefault(o => o.OrderId == currentOrderId);
-                            if (order == null)
-                            {
-                                try
-                                {
-                                    order = new Order
-                                    {
-                                        OrderId = currentOrderId,
-                                        BonNumber = reader.IsDBNull(reader.GetOrdinal("BonNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("BonNumber")),
-                                        IsDelivery = reader.IsDBNull(reader.GetOrdinal("IsDelivery")) ? false : reader.GetBoolean(reader.GetOrdinal("IsDelivery")),
-                                        PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader.GetString(reader.GetOrdinal("PaymentMethod")),
-                                        CustomerPhoneNumber = reader.IsDBNull(reader.GetOrdinal("CustomerPhoneNumber")) ? null : reader.GetString(reader.GetOrdinal("CustomerPhoneNumber")),
-                                        Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString(),
-                                        DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader.GetString(reader.GetOrdinal("DeliveryUntil")),
-                                        DriverId = reader.IsDBNull(reader.GetOrdinal("DriverId")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("DriverId")),
-                                        Name = reader.IsDBNull(reader.GetOrdinal("Name")) ? null : reader.GetString(reader.GetOrdinal("Name")),
-                                        OrderItems = new List<OrderItem>()
-                                    };
-                                }
-                                catch (Exception ex)
-                                {
-                                    // Logge den Fehler, z.B. durch Ausgabe auf der Konsole oder in einer Datei
-                                    Console.WriteLine("Fehler beim Erstellen des Order-Objekts: " + ex.Message);
-                                    throw; // Wirf den Fehler weiter nach oben, damit du weißt, dass etwas schiefgelaufen ist.
-                                }
-                                assignedOrders.Add(order);
-                            }
-
-                            if (!reader.IsDBNull(reader.GetOrdinal("OrderItemId")))
-                            {
-                                OrderItem orderItem = new OrderItem
-                                {
-                                    Nr = reader.GetInt32(reader.GetOrdinal("OrderItemId")),
-                                    Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
-                                    Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
-                                    Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
-                                    Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
-                                    Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
-                                    Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
-                                    Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
-                                    LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
-                                };
-                                order.OrderItems.Add(orderItem);
-                            }
-                        }
-                    }
-                }
-
-                await _connection.CloseAsync();
-
-                return assignedOrders;
-            
-        }
-
-
-        public async Task<List<OrderItem>> GetOrderItemsByOrderIdAsync(string orderId)
-        {
-            List<OrderItem> orderItems = new List<OrderItem>();
-
-            if (_connection.State != System.Data.ConnectionState.Open)
-                await _connection.OpenAsync();
-
-            string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
-
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                command.Parameters.AddWithValue("@OrderId", orderId);
-
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        OrderItem item = new OrderItem
-                        {
-                            OrderItemId = Convert.ToInt32(reader["OrderItemId"]),
-                            Gericht = reader["Gericht"].ToString(),
-                            Größe = reader["Größe"].ToString(),
-                            Extras = reader["Extras"].ToString(),
-                            Menge = Convert.ToInt32(reader["Menge"]),
-                            Epreis = Convert.ToDouble(reader["Epreis"]),
-                            Gesamt = Convert.ToDouble(reader["Gesamt"]),
-                            Uhrzeit = reader["Uhrzeit"].ToString(),
-                            LieferungsArt = Convert.ToInt32(reader["LieferungsArt"])
-                        };
-                        orderItems.Add(item);
-                    }
-                }
-            }
-
-            _connection.Close();
-            return orderItems;
-        }
-
-
-
-        //Dishes
+       
+        //Gericht Methoden
         public void AddDishes(List<Dish> dishes)
         {
             _connection.Open();
@@ -657,69 +247,60 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-        //public List<string> GetAllStreets()
-        //{
-
-        //    List<string> streets = new List<string>();
-        //    string sql = "SELECT DISTINCT Street FROM Addresses";
-        //    using (SqliteCommand command = new SqliteCommand(sql, _connection))
-        //    {
-        //        using (SqliteDataReader reader = command.ExecuteReader())
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                streets.Add(reader.GetString(0));
-        //            }
-        //        }
-        //    }
-        //    return streets;
-        //}
-        public List<string> GetAllCities()
+        public List<Dish> GetDishes()
         {
-            _connection.Open();
-            List<string> cities = new List<string>();
-            string sql = "SELECT DISTINCT City FROM Addresses";
+            List<Dish> dishes = new List<Dish>();
+            string sql = "SELECT * FROM Gerichte";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 using (SqliteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        cities.Add(reader.GetString(0));
+                        Dish dish = new Dish
+                        {
+                            Id = Convert.ToInt32(reader["Id"]),
+                            Name = reader["Name"].ToString(),
+                            Preis = Convert.ToDouble(reader["Preis"]),
+                            Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
+                            Größe = reader["Größe"].ToString()
+                        };
+
+                        dishes.Add(dish);
+                    }
+                }
+            }
+            return dishes;
+        }
+
+
+        //Extra Methoden 
+        public List<Extra> GetExtras()
+        {
+            _connection.Open();
+            List<Extra> extras = new List<Extra>();
+            string sql = "SELECT * FROM Extras";  // Sie müssen die Tabelle Extras erstellen
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        extras.Add(new Extra
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            ExtraPreis_S = reader.GetDouble(2),
+                            ExtraPreis_L = reader.GetDouble(3),
+                            ExtraPreis_XL = reader.GetDouble(4)
+
+                        });
                     }
                 }
             }
             _connection.Close();
-            return cities;
+            return extras;
         }
-        //public List<Dish> GetDishes()
-        //{
-        //    List<Dish> dishes = new List<Dish>();
-        //    string sql = "SELECT * FROM Gerichte";
-        //    using (SqliteCommand command = new SqliteCommand(sql, _connection))
-        //    {
-        //        using (SqliteDataReader reader = command.ExecuteReader())
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                Dish dish = new Dish
-        //                {
-        //                    Id = Convert.ToInt32(reader["Id"]),
-        //                    Name = reader["Name"].ToString(),
-        //                    Preis = Convert.ToDouble(reader["Preis"]),
-        //                    Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
-        //                    Größe = reader["Größe"].ToString()
-        //                };
-
-        //                dishes.Add(dish);
-        //            }
-        //        }
-        //    }
-        //    return dishes;
-        //}
-
-
-        //Extras
         public void AddExtras(List<Extra> extras)
         {
             _connection.Open();
@@ -729,7 +310,6 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-
         public void AddOrUpdateExtra(Extra extra)
         {
             _connection.Open();
@@ -747,34 +327,93 @@ namespace PizzaEcki.Database
             _connection.Close();
         }
 
-        public List<Extra> GetExtras()
+
+        //Fahrer Methoden
+        public void InitializeStaticDrivers()
         {
             _connection.Open();
-            List<Extra> extras = new List<Extra>();
-            string sql = "SELECT * FROM Extras";  // Sie müssen die Tabelle Extras erstellen
+            string sql = "INSERT OR IGNORE INTO Drivers (Id, Name, PhoneNumber) VALUES (-1, 'Theke', ''), (-2, 'Kasse1', '')";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+            _connection.Close();
+        } 
+        public List<Driver> GetDrivers()
+        {
+            _connection.Open();
+            List<Driver> drivers = new List<Driver>();
+            string sql = "SELECT Id, Name, PhoneNumber FROM Drivers";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            using (SqliteDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    drivers.Add(new Driver
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1),
+                        PhoneNumber = reader.GetString(2),
+                    });
+                }
+            }
+            return drivers;
+            _connection.Close();
+        }
+        public async Task<List<Driver>> GetAllDriversAsync()
+        {
+            _connection.Open();
+            List<Driver> drivers = new List<Driver>();
+
+            // SQL-Befehl vorbereiten
+            string sql = "SELECT * FROM Drivers";
+            using (var command = new SqliteCommand(sql, _connection))
+            {
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var driver = new Driver
+                        {
+                            Id = reader.GetInt32(0), // Annahme: Id ist die erste Spalte
+                            Name = reader.GetString(1) // Annahme: Name ist die zweite Spalte
+                                                       // Weitere Eigenschaften entsprechend zuweisen
+                        };
+                        drivers.Add(driver);
+                    }
+                }
+            }
+            _connection.Close();
+            return drivers;
+        }
+        public List<Driver> GetAllDrivers()
+        {
+            _connection.Open();
+            List<Driver> drivers = new List<Driver>();
+
+            // SQL-Abfrage, um alle Fahrer abzurufen
+            string sql = "SELECT * FROM Drivers";
+
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
                 using (SqliteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        extras.Add(new Extra
+                        Driver driver = new Driver
                         {
+                            // Stellen Sie sicher, dass Sie die Spalten in der richtigen Reihenfolge abrufen
                             Id = reader.GetInt32(0),
                             Name = reader.GetString(1),
-                            ExtraPreis_S = reader.GetDouble(2),
-                            ExtraPreis_L = reader.GetDouble(3), 
-                             ExtraPreis_XL = reader.GetDouble(4)
-
-                        });
+                            PhoneNumber = reader.GetString(2)
+                        };
+                        drivers.Add(driver);
                     }
                 }
             }
-             _connection.Close();
-            return extras;
+            _connection.Close();
+            return drivers;
         }
-
-        //Driver Methodes
         public void AddDriver(Driver driver)
         {
             _connection.Open();
@@ -796,16 +435,6 @@ namespace PizzaEcki.Database
                 command.Parameters.AddWithValue("@Id", driver.Id);
                 command.Parameters.AddWithValue("@Name", driver.Name);
                 command.Parameters.AddWithValue("@PhoneNumber", driver.PhoneNumber);
-                command.ExecuteNonQuery();
-            }
-            _connection.Close();
-        }
-        public void InitializeStaticDrivers()
-        {
-            _connection.Open();
-            string sql = "INSERT OR IGNORE INTO Drivers (Id, Name, PhoneNumber) VALUES (-1, 'Theke', ''), (-2, 'Kasse1', '')";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
                 command.ExecuteNonQuery();
             }
             _connection.Close();
@@ -837,355 +466,9 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+      
 
-        public List<Driver> GetDrivers()
-        {
-            _connection.Open();
-            List<Driver> drivers = new List<Driver>();
-            string sql = "SELECT Id, Name, PhoneNumber FROM Drivers";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            using (SqliteDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    drivers.Add(new Driver
-                    {
-                        Id = reader.GetInt32(0),
-                        Name = reader.GetString(1),
-                        PhoneNumber = reader.GetString(2),
-                    });
-                }
-            }
-            return drivers;
-            _connection.Close();
-        }
-
-        public List<Driver> GetAllDrivers()
-        {
-            _connection.Open();
-            List<Driver> drivers = new List<Driver>();
-
-            // SQL-Abfrage, um alle Fahrer abzurufen
-            string sql = "SELECT * FROM Drivers";
-
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        Driver driver = new Driver
-                        {
-                            // Stellen Sie sicher, dass Sie die Spalten in der richtigen Reihenfolge abrufen
-                            Id = reader.GetInt32(0),
-                            Name = reader.GetString(1),
-                            PhoneNumber = reader.GetString(2)
-                        };
-                        drivers.Add(driver);
-                    }
-                }
-            }
-            _connection.Close();
-            return drivers;
-        }
-
-        public int GetCurrentBonNumber()
-        {
-            string sql = "SELECT LastResetDate, CurrentBonNumber FROM Settings";
-            _connection.Open();
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        return int.Parse(reader["CurrentBonNumber"].ToString());
-                    }
-                    else
-                    {
-                        // Fehlerbehandlung, falls kein Eintrag gefunden wurde
-                        throw new Exception("Settings entry not found in the database.");
-                    }
-                }
-            }
-            _connection.Close();    
-        }
-
-        public async Task<bool> DeleteOrderAsync(Guid orderId)
-        {
-            
-            try
-            {
-                await _connection.OpenAsync();
-
-                using (var transaction = _connection.BeginTransaction())
-                {
-                    int result = 0;
-
-                    // Lösche zugehörige Einträge in OrderItems
-                    string sqlDeleteOrderItems = "DELETE FROM OrderItems WHERE OrderId = @OrderId;";
-                    using (var command = new SqliteCommand(sqlDeleteOrderItems, _connection, transaction))
-                    {
-                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
-                        result += await command.ExecuteNonQueryAsync();
-                    }
-
-                    // Lösche zugehörige Einträge in OrderAssignments
-                    string sqlDeleteAssignments = "DELETE FROM OrderAssignments WHERE OrderId = @OrderId;";
-                    using (var command = new SqliteCommand(sqlDeleteAssignments, _connection, transaction))
-                    {
-                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
-                        result += await command.ExecuteNonQueryAsync();
-                    }
-
-                    // Lösche den Eintrag in der Orders-Tabelle
-                    string sqlDeleteOrder = "DELETE FROM Orders WHERE OrderId = @OrderId;";
-                    using (var command = new SqliteCommand(sqlDeleteOrder, _connection, transaction))
-                    {
-                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
-                        result += await command.ExecuteNonQueryAsync();
-                    }
-
-                    transaction.Commit();
-
-                    _connection.Close();
-                    return result > 0;
-                }
-               
-            }
-            catch (Exception ex)
-            {
-                // Loggen Sie die Ausnahme oder handeln Sie sie entsprechend.
-                // Zum Beispiel:
-                // _logger.LogError(ex, "An error occurred while deleting order with ID {OrderId}", orderId);
-                return false;
-            }
-            finally
-            {
-                if (_connection.State == System.Data.ConnectionState.Open)
-                {
-                    await _connection.CloseAsync();
-                }
-            }
-        }
-
-        public async Task DeleteOrderItemAsync(int Nr)
-        {
-            if (_connection.State != System.Data.ConnectionState.Open)
-            {
-                await _connection.OpenAsync();
-            }
-
-            // Achte darauf, dass die SQL-Anweisung den Parameter @Nr verwendet
-            string sqlDeleteItem = "DELETE FROM OrderItems WHERE OrderItemId = @Nr";
-
-            using (SqliteCommand commandDeleteItem = new SqliteCommand(sqlDeleteItem, _connection))
-            {
-                // Binde den Parameter @Nr anstatt @OrderItemId
-                commandDeleteItem.Parameters.AddWithValue("@Nr", Nr);
-                await commandDeleteItem.ExecuteNonQueryAsync();
-            }
-
-            _connection.Close();
-        }
-
-
-        public void SaveOrderAssignment(string orderId, int driverId, double price)
-        {
-            _connection.Open();
-            string checkSql = "SELECT COUNT(*) FROM OrderAssignments WHERE OrderId = @OrderId";
-            using (SqliteCommand checkCommand = new SqliteCommand(checkSql, _connection))
-            {
-                checkCommand.Parameters.AddWithValue("@OrderId", orderId);
-                int count = Convert.ToInt32(checkCommand.ExecuteScalar());
-                if (count > 0)
-                {
-                    // Ein Eintrag für die angegebene OrderId existiert bereits, aktualisieren Sie ihn
-                    string updateSql = "UPDATE OrderAssignments SET DriverId = @DriverId, Price = @Price, Timestamp = @Timestamp WHERE OrderId = @OrderId";
-                    using (SqliteCommand updateCommand = new SqliteCommand(updateSql, _connection))
-                    {
-                        updateCommand.Parameters.AddWithValue("@OrderId", orderId);
-                        updateCommand.Parameters.AddWithValue("@DriverId", driverId);
-                        updateCommand.Parameters.AddWithValue("@Price", price);
-                        updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                        updateCommand.ExecuteNonQuery();
-                    }
-                }
-                else
-                {
-                    // Kein Eintrag für die angegebene OrderId, erstellen Sie einen neuen Eintrag
-                    string insertSql = "INSERT INTO OrderAssignments (OrderId, DriverId, Price, Timestamp) VALUES (@OrderId, @DriverId, @Price, @Timestamp)";
-                    using (SqliteCommand insertCommand = new SqliteCommand(insertSql, _connection))
-                    {
-                        insertCommand.Parameters.AddWithValue("@OrderId", orderId);
-                        insertCommand.Parameters.AddWithValue("@DriverId", driverId);
-                        insertCommand.Parameters.AddWithValue("@Price", price);
-                        insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                        insertCommand.ExecuteNonQuery();
-                    }
-                }
-            }
-            _connection.Close();
-        }
-
-        public void SaveOrder(Order order)
-        {
-            _connection.Open();
-            // Speichern der Bestellung in der Orders Tabelle
-            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod,CustomerPhoneNumber, Timestamp, DeliveryUntil) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber, @Timestamp, @DeliveryUntil)";
-            using (SqliteCommand commandOrder = new SqliteCommand(sqlOrder, _connection))
-            {
-                commandOrder.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
-                commandOrder.Parameters.AddWithValue("@BonNumber", order.BonNumber);
-                commandOrder.Parameters.AddWithValue("@IsDelivery", order.IsDelivery);
-                commandOrder.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
-                commandOrder.Parameters.AddWithValue("@CustomerPhoneNumber", order.CustomerPhoneNumber);
-                commandOrder.Parameters.AddWithValue("@Timestamp", order.Timestamp);
-                commandOrder.Parameters.AddWithValue("@DeliveryUntil", order.DeliveryUntil);
-                commandOrder.ExecuteNonQuery();
-            }
-
-            // Speichern der OrderItems in der OrderItems Tabelle
-            foreach (var item in order.OrderItems)
-            {
-                string sqlItem = @"
-                    INSERT INTO OrderItems 
-                    (
-                        OrderId, 
-                        Gericht, 
-                        Größe,
-                        Extras, 
-                        Menge, 
-                        Epreis, 
-                        Gesamt, 
-                        Uhrzeit, 
-                        LieferungsArt
-                    ) 
-                    VALUES 
-                    (
-                        @OrderId, 
-                        @Gericht, 
-                        @Größe,
-                        @Extras, 
-                        @Menge, 
-                        @Epreis, 
-                        @Gesamt, 
-                        @Uhrzeit, 
-                        @LieferungsArt
-                    )
-                ";
-                using (SqliteCommand commandItem = new SqliteCommand(sqlItem, _connection))
-                {
-                    commandItem.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
-                    commandItem.Parameters.Add("@Gericht", SqliteType.Text).Value = (object)item.Gericht ?? DBNull.Value;
-                    commandItem.Parameters.Add("@Größe", SqliteType.Text).Value = (object)item.Größe ?? DBNull.Value;
-                    commandItem.Parameters.Add("@Extras", SqliteType.Text).Value = (object)item.Extras ?? DBNull.Value;
-                    commandItem.Parameters.Add("@Menge", SqliteType.Integer).Value = (object)item.Menge ?? DBNull.Value;
-                    commandItem.Parameters.Add("@Epreis", SqliteType.Real).Value = (object)item.Epreis ?? DBNull.Value;
-                    commandItem.Parameters.Add("@Gesamt", SqliteType.Real).Value = (object)item.Gesamt ?? DBNull.Value;
-                    commandItem.Parameters.Add("@Uhrzeit", SqliteType.Text).Value = (object)item.Uhrzeit ?? DBNull.Value;
-                    commandItem.Parameters.Add("@LieferungsArt", SqliteType.Integer).Value = (object)item.LieferungsArt ?? DBNull.Value;
-
-                    commandItem.ExecuteNonQuery();
-                }
-            }
-
-            // Erstellen eines Eintrags in der OrderAssignments Tabelle mit einer NULL DriverId
-            // Erstellen eines Eintrags in der OrderAssignments Tabelle mit einer NULL DriverId
-            string sqlAssignment = "INSERT INTO OrderAssignments (OrderId, DriverId) VALUES (@OrderId, NULL)";
-            using (SqliteCommand commandAssignment = new SqliteCommand(sqlAssignment, _connection))
-            {
-                commandAssignment.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
-                commandAssignment.ExecuteNonQuery();
-            }
-            _connection.Close();
-        }
-
-        public List<Order> GetUnassignedOrders()
-        {
-            _connection.Open();
-            List<Order> unassignedOrders = new List<Order>();
-            string sql = @"
-                SELECT 
-                    Orders.*,
-                    OrderItems.*
-                FROM 
-                    Orders
-                LEFT JOIN 
-                    OrderItems ON Orders.OrderId = OrderItems.OrderId
-                LEFT JOIN 
-                    OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
-                WHERE 
-                    OrderAssignments.DriverId IS NULL
-            ";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var orderIdValue = reader["OrderId"].ToString();
-                        if (string.IsNullOrEmpty(orderIdValue))
-                        {
-                            var bonNumber = reader["BonNumber"].ToString();
-                            Console.WriteLine($"Fehler: OrderId ist null oder leer für BonNumber: {bonNumber}");
-                            continue;  // Überspringe diesen Datensatz
-                        }
-                        Guid currentOrderId = Guid.Parse(orderIdValue);
-
-                        Order order;
-                        if (unassignedOrders.Any(o => o.OrderId == currentOrderId))
-                        {
-                            order = unassignedOrders.First(o => o.OrderId == currentOrderId);
-                        }
-                        else
-                        {
-                            // Hier nimmst du die Daten für IsDelivery aus der Datenbank
-                            var isDeliveryValue = reader["IsDelivery"];
-                            bool isDelivery = false;
-
-                            // Wenn der Wert aus der Datenbank kommt, musst du ihn entsprechend konvertieren.
-                            if (isDeliveryValue != DBNull.Value)
-                            {
-                                isDelivery = Convert.ToInt32(isDeliveryValue) != 0;
-                            }
-
-                            order = new Order
-                            {
-                                OrderId = currentOrderId,
-                                CustomerPhoneNumber = reader["CustomerPhoneNumber"].ToString(),
-                                // Konvertiere DateTime? zu String, wenn es nicht null ist, sonst setze String auf null
-                                Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString("o"),                                                                                                                                           
-                                DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader["DeliveryUntil"].ToString(),
-                                PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader["PaymentMethod"].ToString(),
-                                BonNumber = Convert.ToInt32(reader["BonNumber"]),
-                                IsDelivery = isDelivery,
-                            };
-                            unassignedOrders.Add(order);
-
-                        }
-
-                        OrderItem orderItem = new OrderItem
-                        {
-                            Nr = reader.IsDBNull(reader.GetOrdinal("OrderItemId")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderItemId")),
-                            Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
-                            Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
-                            Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
-                            Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
-                            Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
-                            Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
-                            Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
-                            LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
-                        };
-
-                        order.OrderItems.Add(orderItem);
-                    }
-                }
-            }
-            _connection.Close();
-            return unassignedOrders;
-        }
-
+        //Order Methoden 
         public List<Order> GetAllOrders()
         {
             _connection.Open();
@@ -1266,84 +549,110 @@ namespace PizzaEcki.Database
                     }
                 }
             }
-            _connection.Close();    
+            _connection.Close();
             return orders;
         }
-
-
-        public async Task DeleteDailyOrdersAsync()
+        public async Task<List<Order>> GetAllOrdersAsync()
         {
-            // Öffnen Sie die Verbindung zur Datenbank
+
             _connection.Open();
-
-            // Beginnen Sie eine Transaktion
-            using (var transaction = _connection.BeginTransaction())
-            {
-                // Erstellen und Ausführen des SQL-Befehls zum Löschen von OrderAssignments
-                string sqlDeleteOrderAssignments = "DELETE FROM OrderAssignments";
-                using (SqliteCommand commandDeleteOrderAssignments = new SqliteCommand(sqlDeleteOrderAssignments, _connection))
-                {
-                    commandDeleteOrderAssignments.Transaction = transaction; // Verknüpfung mit der Transaktion
-                    commandDeleteOrderAssignments.ExecuteNonQuery();
-                }
-
-                // Erstellen und Ausführen des SQL-Befehls zum Löschen von OrderItems
-                string sqlDeleteOrderItems = "DELETE FROM OrderItems";
-                using (SqliteCommand commandDeleteOrderItems = new SqliteCommand(sqlDeleteOrderItems, _connection))
-                {
-                    commandDeleteOrderItems.Transaction = transaction; // Verknüpfung mit der Transaktion
-                    commandDeleteOrderItems.ExecuteNonQuery();
-                }
-
-                // Erstellen und Ausführen des SQL-Befehls zum Löschen von Orders
-                string sqlDeleteOrders = "DELETE FROM Orders";
-                using (SqliteCommand commandDeleteOrders = new SqliteCommand(sqlDeleteOrders, _connection))
-                {
-                    commandDeleteOrders.Transaction = transaction; // Verknüpfung mit der Transaktion
-                    commandDeleteOrders.ExecuteNonQuery();
-                }
-
-                // Bestätigen Sie die Transaktion
-                transaction.Commit();
-            }
-
-            // Schließen Sie die Verbindung zur Datenbank
-            _connection.Close();
-        }
+            List<Order> assignedOrders = new List<Order>();
 
 
-        public List<OrderItem> GetOrderItems(Guid orderId)
-        {
-            _connection.Open();
-            List<OrderItem> orderItems = new List<OrderItem>();
-            string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
+            string sql = @"
+                                 SELECT 
+                    Orders.OrderId,
+                    Orders.BonNumber,
+                    Orders.IsDelivery,
+                    Orders.PaymentMethod,
+                    Orders.CustomerPhoneNumber,
+                    Orders.Timestamp,
+                    Orders.DeliveryUntil,
+                    OrderItems.OrderItemId,
+                    OrderItems.Gericht,
+                    OrderItems.Extras,
+                    OrderItems.Größe,
+                    OrderItems.Menge,
+                    OrderItems.Epreis,
+                    OrderItems.Gesamt,
+                    OrderItems.Uhrzeit,
+                    OrderItems.LieferungsArt,
+                    COALESCE(Drivers.Id, -1) AS DriverId,  // Wenn DriverId NULL ist, gib -1 zurück
+                    COALESCE(Drivers.Name, 'Nicht zugewiesen') AS DriverName,
+                    Drivers.PhoneNumber AS DriverPhoneNumber
+                FROM Orders
+                LEFT JOIN OrderItems ON Orders.OrderId = OrderItems.OrderId
+                LEFT JOIN orderAssignments ON Orders.OrderId = orderAssignments.OrderId
+                LEFT JOIN Drivers ON orderAssignments.DriverId = Drivers.Id;
+
+                ";
+
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
-                command.Parameters.AddWithValue("@OrderId", orderId);
-                using (SqliteDataReader reader = command.ExecuteReader())
+                using (SqliteDataReader reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
-                        OrderItem orderItem = new OrderItem
+                        var orderIdValue = reader["OrderId"].ToString();
+                        if (string.IsNullOrEmpty(orderIdValue))
                         {
-                            Nr = reader.GetInt32(reader.GetOrdinal("Nr")),
-                            Gericht = reader.GetString(reader.GetOrdinal("Gericht")),
-                            Größe = reader.GetString(reader.GetOrdinal("Größe")),
-                            Extras = reader.GetString(reader.GetOrdinal("Extras")),
-                            Menge = reader.GetInt32(reader.GetOrdinal("Menge")),
-                            Epreis = reader.GetDouble(reader.GetOrdinal("Epreis")),
-                            Gesamt = reader.GetDouble(reader.GetOrdinal("Gesamt")),
-                            Uhrzeit = reader.GetString(reader.GetOrdinal("Uhrzeit")),
-                            LieferungsArt = reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
-                        };
-                        orderItems.Add(orderItem);
+                            continue;  // Überspringe diesen Datensatz
+                        }
+                        Guid currentOrderId = Guid.Parse(orderIdValue);
+
+                        Order order = assignedOrders.FirstOrDefault(o => o.OrderId == currentOrderId);
+                        if (order == null)
+                        {
+                            try
+                            {
+                                order = new Order
+                                {
+                                    OrderId = currentOrderId,
+                                    BonNumber = reader.IsDBNull(reader.GetOrdinal("BonNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("BonNumber")),
+                                    IsDelivery = reader.IsDBNull(reader.GetOrdinal("IsDelivery")) ? false : reader.GetBoolean(reader.GetOrdinal("IsDelivery")),
+                                    PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader.GetString(reader.GetOrdinal("PaymentMethod")),
+                                    CustomerPhoneNumber = reader.IsDBNull(reader.GetOrdinal("CustomerPhoneNumber")) ? null : reader.GetString(reader.GetOrdinal("CustomerPhoneNumber")),
+                                    Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString(),
+                                    DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader.GetString(reader.GetOrdinal("DeliveryUntil")),
+                                    DriverId = reader.IsDBNull(reader.GetOrdinal("DriverId")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("DriverId")),
+                                    Name = reader.IsDBNull(reader.GetOrdinal("Name")) ? null : reader.GetString(reader.GetOrdinal("Name")),
+                                    OrderItems = new List<OrderItem>()
+                                };
+                            }
+                            catch (Exception ex)
+                            {
+                                // Logge den Fehler, z.B. durch Ausgabe auf der Konsole oder in einer Datei
+                                Console.WriteLine("Fehler beim Erstellen des Order-Objekts: " + ex.Message);
+                                throw; // Wirf den Fehler weiter nach oben, damit du weißt, dass etwas schiefgelaufen ist.
+                            }
+                            assignedOrders.Add(order);
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("OrderItemId")))
+                        {
+                            OrderItem orderItem = new OrderItem
+                            {
+                                Nr = reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+                                Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+                                Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                                Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
+                                Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+                                Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+                                Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                                Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                                LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                            };
+                            order.OrderItems.Add(orderItem);
+                        }
                     }
                 }
             }
-            _connection.Close();
-            return orderItems;
-        }
 
+            await _connection.CloseAsync();
+
+            return assignedOrders;
+
+        }
         public List<OrderAssignment> GetOrderAssignments()
         {
             _connection.Open();
@@ -1374,191 +683,194 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
             return assignments;
-            
-        }
 
-        public double GetTotalSalesForDate(DateTime date)
+        }
+        public async Task<List<Order>> GetOrdersWithAssignedDrivers()
         {
             _connection.Open();
-            string sql = "SELECT SUM(Price) FROM OrderAssignments WHERE AssignmentDate = @Date";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
-                object result = command.ExecuteScalar();
-                return result != DBNull.Value ? Convert.ToDouble(result) : 0;
-               
-            }
-            
-        }
+            List<Order> assignedOrders = new List<Order>();
 
-        public List<DailySalesInfo> GetDailySales(DateTime date)
-        {
-            _connection.Open();
-            List<DailySalesInfo> dailySalesInfoList = new List<DailySalesInfo>();
 
-            // SQL-Query, um die täglichen Umsätze abzurufen
             string sql = @"
-            SELECT
-                IFNULL(Drivers.Name, 'Theke') as Name,
-                SUM(OrderAssignments.Price) as DailySales
-            FROM
-                OrderAssignments
-            LEFT JOIN
-                Drivers ON OrderAssignments.DriverId = Drivers.Id
-            WHERE
-                date(OrderAssignments.Timestamp) = date(@Date)
-            GROUP BY
-                IFNULL(Drivers.Name, 'Theke');
-            ";
+                       SELECT 
+                Orders.OrderId,
+                Orders.BonNumber,
+                Orders.IsDelivery,
+                Orders.PaymentMethod,
+                Orders.CustomerPhoneNumber,
+                Orders.Timestamp,
+                Orders.DeliveryUntil,
+                OrderItems.OrderItemId,
+                OrderItems.Gericht,
+                OrderItems.Extras,
+                OrderItems.Größe,
+                OrderItems.Menge,
+                OrderItems.Epreis,
+                OrderItems.Gesamt,
+                OrderItems.Uhrzeit,
+                OrderItems.LieferungsArt,
+                Drivers.Id AS DriverId,
+                Drivers.Name AS Name,
+                Drivers.PhoneNumber AS DriverPhoneNumber
+                FROM 
+                Orders
+                LEFT JOIN 
+                orderAssignments ON Orders.OrderId = orderAssignments.OrderId
+                LEFT JOIN 
+                Drivers ON orderAssignments.DriverId = Drivers.Id
+                LEFT JOIN 
+                OrderItems ON Orders.OrderId = OrderItems.OrderId;
+                ";
 
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
-                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+                using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var orderIdValue = reader["OrderId"].ToString();
+                        if (string.IsNullOrEmpty(orderIdValue))
+                        {
+                            continue;  // Überspringe diesen Datensatz
+                        }
+                        Guid currentOrderId = Guid.Parse(orderIdValue);
 
+                        Order order = assignedOrders.FirstOrDefault(o => o.OrderId == currentOrderId);
+                        if (order == null)
+                        {
+                            try
+                            {
+                                order = new Order
+                                {
+                                    OrderId = currentOrderId,
+                                    BonNumber = reader.IsDBNull(reader.GetOrdinal("BonNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("BonNumber")),
+                                    IsDelivery = reader.IsDBNull(reader.GetOrdinal("IsDelivery")) ? false : reader.GetBoolean(reader.GetOrdinal("IsDelivery")),
+                                    PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader.GetString(reader.GetOrdinal("PaymentMethod")),
+                                    CustomerPhoneNumber = reader.IsDBNull(reader.GetOrdinal("CustomerPhoneNumber")) ? null : reader.GetString(reader.GetOrdinal("CustomerPhoneNumber")),
+                                    Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString(),
+                                    DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader.GetString(reader.GetOrdinal("DeliveryUntil")),
+                                    DriverId = reader.IsDBNull(reader.GetOrdinal("DriverId")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("DriverId")),
+                                    Name = reader.IsDBNull(reader.GetOrdinal("Name")) ? null : reader.GetString(reader.GetOrdinal("Name")),
+                                    OrderItems = new List<OrderItem>()
+                                };
+                            }
+                            catch (Exception ex)
+                            {
+                                // Logge den Fehler, z.B. durch Ausgabe auf der Konsole oder in einer Datei
+                                Console.WriteLine("Fehler beim Erstellen des Order-Objekts: " + ex.Message);
+                                throw; // Wirf den Fehler weiter nach oben, damit du weißt, dass etwas schiefgelaufen ist.
+                            }
+                            assignedOrders.Add(order);
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("OrderItemId")))
+                        {
+                            OrderItem orderItem = new OrderItem
+                            {
+                                Nr = reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+                                Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+                                Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                                Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
+                                Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+                                Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+                                Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                                Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                                LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                            };
+                            order.OrderItems.Add(orderItem);
+                        }
+                    }
+                }
+            }
+
+            await _connection.CloseAsync();
+
+            return assignedOrders;
+        }
+        public List<Order> GetUnassignedOrders()
+        {
+            _connection.Open();
+            List<Order> unassignedOrders = new List<Order>();
+            string sql = @"
+                SELECT 
+                    Orders.*,
+                    OrderItems.*
+                FROM 
+                    Orders
+                LEFT JOIN 
+                    OrderItems ON Orders.OrderId = OrderItems.OrderId
+                LEFT JOIN 
+                    OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
+                WHERE 
+                    OrderAssignments.DriverId IS NULL
+            ";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
                 using (SqliteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        DailySalesInfo dailySalesInfo = new DailySalesInfo
+                        var orderIdValue = reader["OrderId"].ToString();
+                        if (string.IsNullOrEmpty(orderIdValue))
                         {
-                            Name = reader.GetString(0),
-                            DailySales = reader.IsDBNull(1) ? 0 : reader.GetDouble(1)  // Überprüfung auf NULL
-                        };
-                        dailySalesInfoList.Add(dailySalesInfo);
-                    }
-                }
-            }
-            _connection.Close();
-            return dailySalesInfoList;
-        }
-        public int CheckAndResetBonNumberIfNecessary()
-        {
-            _connection.Open();
-            string getSettingsSql = "SELECT LastResetDate, CurrentBonNumber FROM Settings LIMIT 1";
-            string updateSettingsSql = "UPDATE Settings SET CurrentBonNumber = 1, LastResetDate = @LastResetDate";
-            int currentBonNumber = 0;
+                            var bonNumber = reader["BonNumber"].ToString();
+                            Console.WriteLine($"Fehler: OrderId ist null oder leer für BonNumber: {bonNumber}");
+                            continue;  // Überspringe diesen Datensatz
+                        }
+                        Guid currentOrderId = Guid.Parse(orderIdValue);
 
-            using (SqliteCommand getSettingsCommand = new SqliteCommand(getSettingsSql, _connection))
-            {
-                using (SqliteDataReader reader = getSettingsCommand.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        var lastResetDateValue = reader["LastResetDate"].ToString();
-                        DateTime lastResetDate;
-
-                        // Prüfe, ob der Wert nicht leer ist, und versuche ihn zu parsen
-                        if (!string.IsNullOrEmpty(lastResetDateValue) && DateTime.TryParse(lastResetDateValue, out lastResetDate))
+                        Order order;
+                        if (unassignedOrders.Any(o => o.OrderId == currentOrderId))
                         {
-                            currentBonNumber = int.Parse(reader["CurrentBonNumber"].ToString());
-                            var currentDate = DateTime.Now.Date;
-
-                            if (currentDate > lastResetDate)
-                            {
-                                // Zurücksetzen der Bonnummer und Aktualisieren des Reset-Datums
-                                using (SqliteCommand updateSettingsCommand = new SqliteCommand(updateSettingsSql, _connection))
-                                {
-                                    updateSettingsCommand.Parameters.AddWithValue("@LastResetDate", currentDate.ToString("yyyy-MM-dd"));
-                                    updateSettingsCommand.ExecuteNonQuery();
-                                }
-
-                                // Setze die Bonnummer auf den Anfangswert zurück
-                                currentBonNumber = 0;
-                            }
+                            order = unassignedOrders.First(o => o.OrderId == currentOrderId);
                         }
                         else
                         {
-                            // Der Wert ist leer oder null, setze LastResetDate auf das heutige Datum
-                            lastResetDate = DateTime.Now.Date;
+                            // Hier nimmst du die Daten für IsDelivery aus der Datenbank
+                            var isDeliveryValue = reader["IsDelivery"];
+                            bool isDelivery = false;
 
-                            // Erstelle eine SQL-Anweisung, um das LastResetDate auf das heutige Datum zu setzen
-                            string updateLastResetDateSql = "UPDATE Settings SET LastResetDate = @LastResetDate WHERE CurrentBonNumber = @CurrentBonNumber";
-
-                            using (SqliteCommand updateCommand = new SqliteCommand(updateLastResetDateSql, _connection))
+                            // Wenn der Wert aus der Datenbank kommt, musst du ihn entsprechend konvertieren.
+                            if (isDeliveryValue != DBNull.Value)
                             {
-                                // Setze die Parameter für das SQL-Statement
-                                updateCommand.Parameters.AddWithValue("@LastResetDate", lastResetDate.ToString("yyyy-MM-dd"));
-                                updateCommand.Parameters.AddWithValue("@CurrentBonNumber", reader["CurrentBonNumber"]);
-
-                                // Führe das SQL-Statement aus
-                                updateCommand.ExecuteNonQuery();
+                                isDelivery = Convert.ToInt32(isDeliveryValue) != 0;
                             }
 
-                            // Optional: Setze hier die Bonnummer zurück, falls erforderlich
-                            // currentBonNumber = 1; // Oder ein anderer Startwert
+                            order = new Order
+                            {
+                                OrderId = currentOrderId,
+                                CustomerPhoneNumber = reader["CustomerPhoneNumber"].ToString(),
+                                // Konvertiere DateTime? zu String, wenn es nicht null ist, sonst setze String auf null
+                                Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString("o"),
+                                DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader["DeliveryUntil"].ToString(),
+                                PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader["PaymentMethod"].ToString(),
+                                BonNumber = Convert.ToInt32(reader["BonNumber"]),
+                                IsDelivery = isDelivery,
+                            };
+                            unassignedOrders.Add(order);
+
                         }
 
+                        OrderItem orderItem = new OrderItem
+                        {
+                            Nr = reader.IsDBNull(reader.GetOrdinal("OrderItemId")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+                            Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+                            Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                            Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
+                            Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+                            Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+                            Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                            Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                            LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                        };
 
-
+                        order.OrderItems.Add(orderItem);
                     }
-                    else
-                    {
-                        // Fehlerbehandlung, falls kein Eintrag gefunden wurde
-                        throw new Exception("Settings entry not found in the database.");
-                    }
-                }
-                _connection.Close();
-            }
-
-            return currentBonNumber; // Rückgabe der aktuellen oder zurückgesetzten Bonnummer
-        }
-
-        public void ResetBonNumberForTesting()
-        {
-            string updateSettingsSql = "UPDATE Settings SET CurrentBonNumber = 1, LastResetDate = @LastResetDate";
-
-            _connection.Open();
-            using (SqliteCommand updateSettingsCommand = new SqliteCommand(updateSettingsSql, _connection))
-            {
-                // Setze das LastResetDate auf das aktuelle Datum für Testzwecke
-                updateSettingsCommand.Parameters.AddWithValue("@LastResetDate", DateTime.Now.ToString("yyyy-MM-dd"));
-                int rowsAffected = updateSettingsCommand.ExecuteNonQuery();
-
-                if (rowsAffected == 0)
-                {
-                    // Kein Eintrag wurde aktualisiert, hier könnte eine Fehlerbehandlung erfolgen
-                    throw new Exception("No settings entry was updated. Please check if the settings entry exists.");
                 }
             }
             _connection.Close();
+            return unassignedOrders;
         }
-
-        public void UpdateCurrentBonNumber(int newNumber)
-        {
-            string sql = "UPDATE Settings SET CurrentBonNumber = @number";
-            _connection.Open();
-
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                command.Parameters.AddWithValue("@number", newNumber);
-                command.ExecuteNonQuery();
-            }
-            _connection.Close();
-        }
-
-        private string ConvertToTimeString(string input)
-        {
-            // Wenn der Eingabewert leer ist, gib einen leeren String zurück oder einen Standardwert wie "00:00"
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return "00:00"; // oder return string.Empty; für einen leeren Wert
-            }
-
-            // Versuche, das Eingabedatum zu parsen und in das Format HH:mm zu konvertieren
-            DateTime parsedDate;
-            if (DateTime.TryParseExact(input, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
-            {
-                // Bei Erfolg, gib das konvertierte Format zurück
-                return parsedDate.ToString("HH:mm");
-            }
-            else
-            {
-                // Wenn die Konvertierung fehlschlägt, gib den Eingabewert zurück oder handle den Fehler
-                return "00:00"; // oder return input; um den ursprünglichen Wert beizubehalten
-            }
-        }
-
-
         public async Task UpdateOrderAsync(Order order)
         {
             if (_connection.State != ConnectionState.Open)
@@ -1651,7 +963,291 @@ namespace PizzaEcki.Database
                 }
             }
         }
+        public void SaveOrder(Order order)
+        {
+            _connection.Open();
+            // Speichern der Bestellung in der Orders Tabelle
+            string sqlOrder = "INSERT INTO Orders (OrderId, BonNumber,IsDelivery,PaymentMethod,CustomerPhoneNumber, Timestamp, DeliveryUntil) VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber, @Timestamp, @DeliveryUntil)";
+            using (SqliteCommand commandOrder = new SqliteCommand(sqlOrder, _connection))
+            {
+                commandOrder.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                commandOrder.Parameters.AddWithValue("@BonNumber", order.BonNumber);
+                commandOrder.Parameters.AddWithValue("@IsDelivery", order.IsDelivery);
+                commandOrder.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
+                commandOrder.Parameters.AddWithValue("@CustomerPhoneNumber", order.CustomerPhoneNumber);
+                commandOrder.Parameters.AddWithValue("@Timestamp", order.Timestamp);
+                commandOrder.Parameters.AddWithValue("@DeliveryUntil", order.DeliveryUntil);
+                commandOrder.ExecuteNonQuery();
+            }
 
+            // Speichern der OrderItems in der OrderItems Tabelle
+            foreach (var item in order.OrderItems)
+            {
+                string sqlItem = @"
+                    INSERT INTO OrderItems 
+                    (
+                        OrderId, 
+                        Gericht, 
+                        Größe,
+                        Extras, 
+                        Menge, 
+                        Epreis, 
+                        Gesamt, 
+                        Uhrzeit, 
+                        LieferungsArt
+                    ) 
+                    VALUES 
+                    (
+                        @OrderId, 
+                        @Gericht, 
+                        @Größe,
+                        @Extras, 
+                        @Menge, 
+                        @Epreis, 
+                        @Gesamt, 
+                        @Uhrzeit, 
+                        @LieferungsArt
+                    )
+                ";
+                using (SqliteCommand commandItem = new SqliteCommand(sqlItem, _connection))
+                {
+                    commandItem.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                    commandItem.Parameters.Add("@Gericht", SqliteType.Text).Value = (object)item.Gericht ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Größe", SqliteType.Text).Value = (object)item.Größe ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Extras", SqliteType.Text).Value = (object)item.Extras ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Menge", SqliteType.Integer).Value = (object)item.Menge ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Epreis", SqliteType.Real).Value = (object)item.Epreis ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Gesamt", SqliteType.Real).Value = (object)item.Gesamt ?? DBNull.Value;
+                    commandItem.Parameters.Add("@Uhrzeit", SqliteType.Text).Value = (object)item.Uhrzeit ?? DBNull.Value;
+                    commandItem.Parameters.Add("@LieferungsArt", SqliteType.Integer).Value = (object)item.LieferungsArt ?? DBNull.Value;
+
+                    commandItem.ExecuteNonQuery();
+                }
+            }
+
+            // Erstellen eines Eintrags in der OrderAssignments Tabelle mit einer NULL DriverId
+            // Erstellen eines Eintrags in der OrderAssignments Tabelle mit einer NULL DriverId
+            string sqlAssignment = "INSERT INTO OrderAssignments (OrderId, DriverId) VALUES (@OrderId, NULL)";
+            using (SqliteCommand commandAssignment = new SqliteCommand(sqlAssignment, _connection))
+            {
+                commandAssignment.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());
+                commandAssignment.ExecuteNonQuery();
+            }
+            _connection.Close();
+        }
+        public void SaveOrderAssignment(string orderId, int driverId, double price)
+        {
+            _connection.Open();
+            string checkSql = "SELECT COUNT(*) FROM OrderAssignments WHERE OrderId = @OrderId";
+            using (SqliteCommand checkCommand = new SqliteCommand(checkSql, _connection))
+            {
+                checkCommand.Parameters.AddWithValue("@OrderId", orderId);
+                int count = Convert.ToInt32(checkCommand.ExecuteScalar());
+                if (count > 0)
+                {
+                    // Ein Eintrag für die angegebene OrderId existiert bereits, aktualisieren Sie ihn
+                    string updateSql = "UPDATE OrderAssignments SET DriverId = @DriverId, Price = @Price, Timestamp = @Timestamp WHERE OrderId = @OrderId";
+                    using (SqliteCommand updateCommand = new SqliteCommand(updateSql, _connection))
+                    {
+                        updateCommand.Parameters.AddWithValue("@OrderId", orderId);
+                        updateCommand.Parameters.AddWithValue("@DriverId", driverId);
+                        updateCommand.Parameters.AddWithValue("@Price", price);
+                        updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                        updateCommand.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    // Kein Eintrag für die angegebene OrderId, erstellen Sie einen neuen Eintrag
+                    string insertSql = "INSERT INTO OrderAssignments (OrderId, DriverId, Price, Timestamp) VALUES (@OrderId, @DriverId, @Price, @Timestamp)";
+                    using (SqliteCommand insertCommand = new SqliteCommand(insertSql, _connection))
+                    {
+                        insertCommand.Parameters.AddWithValue("@OrderId", orderId);
+                        insertCommand.Parameters.AddWithValue("@DriverId", driverId);
+                        insertCommand.Parameters.AddWithValue("@Price", price);
+                        insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                        insertCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            _connection.Close();
+        }
+        public async Task<bool> DeleteOrderAsync(Guid orderId)
+        {
+
+            try
+            {
+                await _connection.OpenAsync();
+
+                using (var transaction = _connection.BeginTransaction())
+                {
+                    int result = 0;
+
+                    // Lösche zugehörige Einträge in OrderItems
+                    string sqlDeleteOrderItems = "DELETE FROM OrderItems WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteOrderItems, _connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    // Lösche zugehörige Einträge in OrderAssignments
+                    string sqlDeleteAssignments = "DELETE FROM OrderAssignments WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteAssignments, _connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    // Lösche den Eintrag in der Orders-Tabelle
+                    string sqlDeleteOrder = "DELETE FROM Orders WHERE OrderId = @OrderId;";
+                    using (var command = new SqliteCommand(sqlDeleteOrder, _connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", orderId.ToString());
+                        result += await command.ExecuteNonQueryAsync();
+                    }
+
+                    transaction.Commit();
+
+                    _connection.Close();
+                    return result > 0;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Loggen Sie die Ausnahme oder handeln Sie sie entsprechend.
+                // Zum Beispiel:
+                // _logger.LogError(ex, "An error occurred while deleting order with ID {OrderId}", orderId);
+                return false;
+            }
+            finally
+            {
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    await _connection.CloseAsync();
+                }
+            }
+        }
+
+
+        //OrderItem Methoden
+        public List<OrderItem> GetOrderItems(Guid orderId)
+        {
+            _connection.Open();
+            List<OrderItem> orderItems = new List<OrderItem>();
+            string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@OrderId", orderId);
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        OrderItem orderItem = new OrderItem
+                        {
+                            Nr = reader.GetInt32(reader.GetOrdinal("Nr")),
+                            Gericht = reader.GetString(reader.GetOrdinal("Gericht")),
+                            Größe = reader.GetString(reader.GetOrdinal("Größe")),
+                            Extras = reader.GetString(reader.GetOrdinal("Extras")),
+                            Menge = reader.GetInt32(reader.GetOrdinal("Menge")),
+                            Epreis = reader.GetDouble(reader.GetOrdinal("Epreis")),
+                            Gesamt = reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                            Uhrzeit = reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                            LieferungsArt = reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                        };
+                        orderItems.Add(orderItem);
+                    }
+                }
+            }
+            _connection.Close();
+            return orderItems;
+        }
+        public async Task<List<OrderItem>> GetOrderItemsByOrderIdAsync(string orderId)
+        {
+            List<OrderItem> orderItems = new List<OrderItem>();
+
+            if (_connection.State != System.Data.ConnectionState.Open)
+                await _connection.OpenAsync();
+
+            string sql = "SELECT * FROM OrderItems WHERE OrderId = @OrderId";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@OrderId", orderId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        OrderItem item = new OrderItem
+                        {
+                            OrderItemId = Convert.ToInt32(reader["OrderItemId"]),
+                            Gericht = reader["Gericht"].ToString(),
+                            Größe = reader["Größe"].ToString(),
+                            Extras = reader["Extras"].ToString(),
+                            Menge = Convert.ToInt32(reader["Menge"]),
+                            Epreis = Convert.ToDouble(reader["Epreis"]),
+                            Gesamt = Convert.ToDouble(reader["Gesamt"]),
+                            Uhrzeit = reader["Uhrzeit"].ToString(),
+                            LieferungsArt = Convert.ToInt32(reader["LieferungsArt"])
+                        };
+                        orderItems.Add(item);
+                    }
+                }
+            }
+
+            _connection.Close();
+            return orderItems;
+        }
+        public async Task<OrderItem> AddOrderItemAsync(OrderItem item)
+        {
+            if (_connection.State != System.Data.ConnectionState.Open)
+                await _connection.OpenAsync();
+
+            string sqlInsertItem = "INSERT INTO OrderItems (OrderId, Gericht, Größe, Extras, Menge, Epreis, Gesamt, LieferungsArt, Uhrzeit) VALUES (@OrderId, @Gericht, @Größe, @Extras, @Menge, @Epreis, @Gesamt, @LieferungsArt, @Uhrzeit);";
+            sqlInsertItem += "SELECT last_insert_rowid();"; // SQLite specific for getting last inserted ID
+
+            using (SqliteCommand commandInsertItem = new SqliteCommand(sqlInsertItem, _connection))
+            {
+                // Bind parameters
+                commandInsertItem.Parameters.AddWithValue("@OrderId", item.OrderId);
+                commandInsertItem.Parameters.AddWithValue("@Gericht", item.Gericht);
+                commandInsertItem.Parameters.AddWithValue("@Größe", item.Größe);
+                commandInsertItem.Parameters.AddWithValue("@Extras", item.Extras);
+                commandInsertItem.Parameters.AddWithValue("@Menge", item.Menge);
+                commandInsertItem.Parameters.AddWithValue("@Epreis", item.Epreis);
+                commandInsertItem.Parameters.AddWithValue("@Gesamt", item.Gesamt);
+                commandInsertItem.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
+                commandInsertItem.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit);
+
+                // Execute the query and get the inserted OrderItem ID
+                int newId = Convert.ToInt32(await commandInsertItem.ExecuteScalarAsync());
+                item.OrderItemId = newId;
+            }
+
+            _connection.Close();
+            return item;
+        }
+        public async Task DeleteOrderItemAsync(int Nr)
+        {
+            if (_connection.State != System.Data.ConnectionState.Open)
+            {
+                await _connection.OpenAsync();
+            }
+
+            // Achte darauf, dass die SQL-Anweisung den Parameter @Nr verwendet
+            string sqlDeleteItem = "DELETE FROM OrderItems WHERE OrderItemId = @Nr";
+
+            using (SqliteCommand commandDeleteItem = new SqliteCommand(sqlDeleteItem, _connection))
+            {
+                // Binde den Parameter @Nr anstatt @OrderItemId
+                commandDeleteItem.Parameters.AddWithValue("@Nr", Nr);
+                await commandDeleteItem.ExecuteNonQueryAsync();
+            }
+
+            _connection.Close();
+        }
         public void SaveOrderItem(OrderItem orderItem, Guid orderId)
         {
             _connection.Open();
@@ -1699,15 +1295,406 @@ namespace PizzaEcki.Database
 
             _connection.Close();
         }
+    
+
+        //Customer methoden 
+        public Customer GetCustomerByPhoneNumber(string phoneNumber)
+        {
+            _connection.Open();
+            string sql = @"SELECT c.PhoneNumber, c.Name, a.Street, a.City, c.AdditionalInfo 
+                   FROM Customers c
+                   INNER JOIN Addresses a ON c.AddressId = a.Id
+                   WHERE c.PhoneNumber = @PhoneNumber";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new Customer
+                        {
+                            PhoneNumber = reader.GetString(0),
+                            Name = reader.GetString(1),
+                            Street = reader.GetString(2),
+                            City = reader.IsDBNull(3) ? null : reader.GetString(3), // Überprüfe auf NULL
+                            AdditionalInfo = reader.IsDBNull(4) ? null : reader.GetString(4)
+                        };
+                    }
+                }
+            }
+
+            _connection.Close();
+            return null;
+        }
+        public void AddOrUpdateCustomer(Customer customer)
+        {
+            long addressId;
+
+            _connection.Open();
+            // Insert or Update Address
+            string addressSql = "INSERT OR REPLACE INTO Addresses (Street, City) VALUES (@Street, @City); SELECT last_insert_rowid();";
+            using (SqliteCommand addressCommand = new SqliteCommand(addressSql, _connection))
+            {
+                addressCommand.Parameters.AddWithValue("@Street", customer.Street);
+                addressCommand.Parameters.AddWithValue("@City", customer.City);
+                addressId = (long)addressCommand.ExecuteScalar();
+            }
+
+            // Insert or Update Customer with Address ID
+            string sql = "INSERT OR REPLACE INTO Customers (PhoneNumber, Name, AddressId, AdditionalInfo) VALUES (@PhoneNumber, @Name, @AddressId, @AdditionalInfo)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@PhoneNumber", customer.PhoneNumber);
+                command.Parameters.AddWithValue("@Name", customer.Name);
+                command.Parameters.AddWithValue("@AddressId", addressId);
+                command.Parameters.AddWithValue("@AdditionalInfo", (object)customer.AdditionalInfo ?? DBNull.Value);
+                command.ExecuteNonQuery();
+            }
+            _connection.Close();
+        }
+        public void UpdateCustomerData(Customer customer)
+        {
+            _connection.Open();
+            string sql = @"UPDATE Customers SET Name = @Name, AdditionalInfo = @AdditionalInfo 
+                   INNER JOIN Addresses ON Customers.AddressId = Addresses.Id
+                   SET Street = @Street, City = @City
+                   WHERE PhoneNumber = @PhoneNumber";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Name", customer.Name);
+                command.Parameters.AddWithValue("@Street", customer.Street);
+                command.Parameters.AddWithValue("@City", customer.City);
+                command.Parameters.AddWithValue("@AdditionalInfo", customer.AdditionalInfo);
+                command.Parameters.AddWithValue("@PhoneNumber", customer.PhoneNumber);
+
+                command.ExecuteNonQuery();
+            }
+
+            _connection.Close();
+        }
+        public List<string> GetAllCities()
+        {
+            _connection.Open();
+            List<string> cities = new List<string>();
+            string sql = "SELECT DISTINCT City FROM Addresses";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        cities.Add(reader.GetString(0));
+                    }
+                }
+            }
+            _connection.Close();
+            return cities;
+        }
+        public List<string> GetAllStreets()
+        {
+
+            List<string> streets = new List<string>();
+            string sql = "SELECT DISTINCT Street FROM Addresses";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        streets.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return streets;
+        }
 
 
+        //Admin Methoden
+        public List<DailySalesInfo> GetDailySales(DateTime date)
+        {
+            _connection.Open();
+            List<DailySalesInfo> dailySalesInfoList = new List<DailySalesInfo>();
+
+            // SQL-Query, um die täglichen Umsätze abzurufen
+            string sql = @"
+            SELECT
+                IFNULL(Drivers.Name, 'Theke') as Name,
+                SUM(OrderAssignments.Price) as DailySales
+            FROM
+                OrderAssignments
+            LEFT JOIN
+                Drivers ON OrderAssignments.DriverId = Drivers.Id
+            WHERE
+                date(OrderAssignments.Timestamp) = date(@Date)
+            GROUP BY
+                IFNULL(Drivers.Name, 'Theke');
+            ";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        DailySalesInfo dailySalesInfo = new DailySalesInfo
+                        {
+                            Name = reader.GetString(0),
+                            DailySales = reader.IsDBNull(1) ? 0 : reader.GetDouble(1)  // Überprüfung auf NULL
+                        };
+                        dailySalesInfoList.Add(dailySalesInfo);
+                    }
+                }
+            }
+            _connection.Close();
+            return dailySalesInfoList;
+        }
+        public async Task DeleteDailyOrdersAsync()
+        {
+            // Öffnen Sie die Verbindung zur Datenbank
+            _connection.Open();
+
+            // Beginnen Sie eine Transaktion
+            using (var transaction = _connection.BeginTransaction())
+            {
+                // Erstellen und Ausführen des SQL-Befehls zum Löschen von OrderAssignments
+                string sqlDeleteOrderAssignments = "DELETE FROM OrderAssignments";
+                using (SqliteCommand commandDeleteOrderAssignments = new SqliteCommand(sqlDeleteOrderAssignments, _connection))
+                {
+                    commandDeleteOrderAssignments.Transaction = transaction; // Verknüpfung mit der Transaktion
+                    commandDeleteOrderAssignments.ExecuteNonQuery();
+                }
+
+                // Erstellen und Ausführen des SQL-Befehls zum Löschen von OrderItems
+                string sqlDeleteOrderItems = "DELETE FROM OrderItems";
+                using (SqliteCommand commandDeleteOrderItems = new SqliteCommand(sqlDeleteOrderItems, _connection))
+                {
+                    commandDeleteOrderItems.Transaction = transaction; // Verknüpfung mit der Transaktion
+                    commandDeleteOrderItems.ExecuteNonQuery();
+                }
+
+                // Erstellen und Ausführen des SQL-Befehls zum Löschen von Orders
+                string sqlDeleteOrders = "DELETE FROM Orders";
+                using (SqliteCommand commandDeleteOrders = new SqliteCommand(sqlDeleteOrders, _connection))
+                {
+                    commandDeleteOrders.Transaction = transaction; // Verknüpfung mit der Transaktion
+                    commandDeleteOrders.ExecuteNonQuery();
+                }
+
+                // Bestätigen Sie die Transaktion
+                transaction.Commit();
+            }
+
+            // Schließen Sie die Verbindung zur Datenbank
+            _connection.Close();
+        }
+        public double GetTotalSalesForDate(DateTime date)
+        {
+            _connection.Open();
+            string sql = "SELECT SUM(Price) FROM OrderAssignments WHERE AssignmentDate = @Date";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+                object result = command.ExecuteScalar();
+                return result != DBNull.Value ? Convert.ToDouble(result) : 0;
+
+            }
+
+        }
+
+
+        //Verwaltungs methoden
+        public int GetCurrentBonNumber()
+        {
+            string sql = "SELECT LastResetDate, CurrentBonNumber FROM Settings";
+            _connection.Open();
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return int.Parse(reader["CurrentBonNumber"].ToString());
+                    }
+                    else
+                    {
+                        // Fehlerbehandlung, falls kein Eintrag gefunden wurde
+                        throw new Exception("Settings entry not found in the database.");
+                    }
+                }
+            }
+            _connection.Close();
+        }
+        public List<string> GetTableNames()
+        {
+            _connection.Open();
+            List<string> tableNames = new List<string>();
+            string sql = "SELECT name FROM sqlite_master WHERE type='table';";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tableNames.Add(reader.GetString(0));
+                    }
+                }
+            }
+            _connection.Close();
+            return tableNames;
+        }
+        public DataTable GetTableData(string tableName)
+        {
+            _connection.Open();
+            DataTable tableData = new DataTable();
+            string sql = $"SELECT * FROM {tableName};";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    tableData.Load(reader);
+                }
+            }
+            _connection.Close();
+            return tableData;
+        }
+        public void UpdateCurrentBonNumber(int newNumber)
+        {
+            string sql = "UPDATE Settings SET CurrentBonNumber = @number";
+            _connection.Open();
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@number", newNumber);
+                command.ExecuteNonQuery();
+            }
+            _connection.Close();
+        }
+        private string ConvertToTimeString(string input)
+        {
+            // Wenn der Eingabewert leer ist, gib einen leeren String zurück oder einen Standardwert wie "00:00"
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return "00:00"; // oder return string.Empty; für einen leeren Wert
+            }
+
+            // Versuche, das Eingabedatum zu parsen und in das Format HH:mm zu konvertieren
+            DateTime parsedDate;
+            if (DateTime.TryParseExact(input, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+            {
+                // Bei Erfolg, gib das konvertierte Format zurück
+                return parsedDate.ToString("HH:mm");
+            }
+            else
+            {
+                // Wenn die Konvertierung fehlschlägt, gib den Eingabewert zurück oder handle den Fehler
+                return "00:00"; // oder return input; um den ursprünglichen Wert beizubehalten
+            }
+        }
+        public int CheckAndResetBonNumberIfNecessary()
+        {
+            _connection.Open();
+            string getSettingsSql = "SELECT LastResetDate, CurrentBonNumber FROM Settings LIMIT 1";
+            string updateSettingsSql = "UPDATE Settings SET CurrentBonNumber = 1, LastResetDate = @LastResetDate";
+            int currentBonNumber = 0;
+
+            using (SqliteCommand getSettingsCommand = new SqliteCommand(getSettingsSql, _connection))
+            {
+                using (SqliteDataReader reader = getSettingsCommand.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        var lastResetDateValue = reader["LastResetDate"].ToString();
+                        DateTime lastResetDate;
+
+                        // Prüfe, ob der Wert nicht leer ist, und versuche ihn zu parsen
+                        if (!string.IsNullOrEmpty(lastResetDateValue) && DateTime.TryParse(lastResetDateValue, out lastResetDate))
+                        {
+                            currentBonNumber = int.Parse(reader["CurrentBonNumber"].ToString());
+                            var currentDate = DateTime.Now.Date;
+
+                            if (currentDate > lastResetDate)
+                            {
+                                // Zurücksetzen der Bonnummer und Aktualisieren des Reset-Datums
+                                using (SqliteCommand updateSettingsCommand = new SqliteCommand(updateSettingsSql, _connection))
+                                {
+                                    updateSettingsCommand.Parameters.AddWithValue("@LastResetDate", currentDate.ToString("yyyy-MM-dd"));
+                                    updateSettingsCommand.ExecuteNonQuery();
+                                }
+
+                                // Setze die Bonnummer auf den Anfangswert zurück
+                                currentBonNumber = 0;
+                            }
+                        }
+                        else
+                        {
+                            // Der Wert ist leer oder null, setze LastResetDate auf das heutige Datum
+                            lastResetDate = DateTime.Now.Date;
+
+                            // Erstelle eine SQL-Anweisung, um das LastResetDate auf das heutige Datum zu setzen
+                            string updateLastResetDateSql = "UPDATE Settings SET LastResetDate = @LastResetDate WHERE CurrentBonNumber = @CurrentBonNumber";
+
+                            using (SqliteCommand updateCommand = new SqliteCommand(updateLastResetDateSql, _connection))
+                            {
+                                // Setze die Parameter für das SQL-Statement
+                                updateCommand.Parameters.AddWithValue("@LastResetDate", lastResetDate.ToString("yyyy-MM-dd"));
+                                updateCommand.Parameters.AddWithValue("@CurrentBonNumber", reader["CurrentBonNumber"]);
+
+                                // Führe das SQL-Statement aus
+                                updateCommand.ExecuteNonQuery();
+                            }
+
+                            // Optional: Setze hier die Bonnummer zurück, falls erforderlich
+                            // currentBonNumber = 1; // Oder ein anderer Startwert
+                        }
+
+
+
+                    }
+                    else
+                    {
+                        // Fehlerbehandlung, falls kein Eintrag gefunden wurde
+                        throw new Exception("Settings entry not found in the database.");
+                    }
+                }
+                _connection.Close();
+            }
+
+            return currentBonNumber; // Rückgabe der aktuellen oder zurückgesetzten Bonnummer
+        }
+
+
+        //Dev Methoden
+        public void ResetBonNumberForTesting()
+        {
+            string updateSettingsSql = "UPDATE Settings SET CurrentBonNumber = 1, LastResetDate = @LastResetDate";
+
+            _connection.Open();
+            using (SqliteCommand updateSettingsCommand = new SqliteCommand(updateSettingsSql, _connection))
+            {
+                // Setze das LastResetDate auf das aktuelle Datum für Testzwecke
+                updateSettingsCommand.Parameters.AddWithValue("@LastResetDate", DateTime.Now.ToString("yyyy-MM-dd"));
+                int rowsAffected = updateSettingsCommand.ExecuteNonQuery();
+
+                if (rowsAffected == 0)
+                {
+                    // Kein Eintrag wurde aktualisiert, hier könnte eine Fehlerbehandlung erfolgen
+                    throw new Exception("No settings entry was updated. Please check if the settings entry exists.");
+                }
+            }
+            _connection.Close();
+        }
         public void Dispose()
         {
             _connection?.Close();
             _connection?.Dispose();
         }
-
-       
-
     }
 }
