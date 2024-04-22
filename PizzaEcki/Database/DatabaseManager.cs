@@ -247,32 +247,7 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-        public List<Dish> GetDishes()
-        {
-            List<Dish> dishes = new List<Dish>();
-            string sql = "SELECT * FROM Gerichte";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        Dish dish = new Dish
-                        {
-                            Id = Convert.ToInt32(reader["Id"]),
-                            Name = reader["Name"].ToString(),
-                            Preis = Convert.ToDouble(reader["Preis"]),
-                            Kategorie = (DishCategory)Convert.ToInt32(reader["Kategorie"]),
-                            Größe = reader["Größe"].ToString()
-                        };
-
-                        dishes.Add(dish);
-                    }
-                }
-            }
-            return dishes;
-        }
-
+      
 
         //Extra Methoden 
         public List<Extra> GetExtras()
@@ -1200,34 +1175,33 @@ namespace PizzaEcki.Database
             _connection.Close();
             return orderItems;
         }
-        public async Task<OrderItem> AddOrderItemAsync(OrderItem item)
+        public async Task AddOrderItemAsync(OrderItem item)
         {
             if (_connection.State != System.Data.ConnectionState.Open)
                 await _connection.OpenAsync();
 
-            string sqlInsertItem = "INSERT INTO OrderItems (OrderId, Gericht, Größe, Extras, Menge, Epreis, Gesamt, LieferungsArt, Uhrzeit) VALUES (@OrderId, @Gericht, @Größe, @Extras, @Menge, @Epreis, @Gesamt, @LieferungsArt, @Uhrzeit);";
-            sqlInsertItem += "SELECT last_insert_rowid();"; // SQLite specific for getting last inserted ID
+            string sqlInsert = @"
+        INSERT INTO OrderItems (OrderId, Gericht, Größe, Extras, Menge, Epreis, Gesamt, LieferungsArt, Uhrzeit)
+        VALUES (@OrderId, @Gericht, @Größe, @Extras, @Menge, @Epreis, @Gesamt, @LieferungsArt, @Uhrzeit);
+        SELECT last_insert_rowid();";
 
-            using (SqliteCommand commandInsertItem = new SqliteCommand(sqlInsertItem, _connection))
+            using (SqliteCommand command = new SqliteCommand(sqlInsert, _connection))
             {
-                // Bind parameters
-                commandInsertItem.Parameters.AddWithValue("@OrderId", item.OrderId);
-                commandInsertItem.Parameters.AddWithValue("@Gericht", item.Gericht);
-                commandInsertItem.Parameters.AddWithValue("@Größe", item.Größe);
-                commandInsertItem.Parameters.AddWithValue("@Extras", item.Extras);
-                commandInsertItem.Parameters.AddWithValue("@Menge", item.Menge);
-                commandInsertItem.Parameters.AddWithValue("@Epreis", item.Epreis);
-                commandInsertItem.Parameters.AddWithValue("@Gesamt", item.Gesamt);
-                commandInsertItem.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
-                commandInsertItem.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit);
+                command.Parameters.AddWithValue("@OrderId", item.OrderId.ToString());
+                command.Parameters.AddWithValue("@Gericht", item.Gericht);
+                command.Parameters.AddWithValue("@Größe", item.Größe);
+                command.Parameters.AddWithValue("@Extras", item.Extras ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@Menge", item.Menge);
+                command.Parameters.AddWithValue("@Epreis", item.Epreis);
+                command.Parameters.AddWithValue("@Gesamt", item.Gesamt);
+                command.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
+                command.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit);
 
-                // Execute the query and get the inserted OrderItem ID
-                int newId = Convert.ToInt32(await commandInsertItem.ExecuteScalarAsync());
-                item.OrderItemId = newId;
+                // Führe das Einfügen aus und erhalte die ID
+                item.OrderItemId = (int)(long)await command.ExecuteScalarAsync();
             }
 
             _connection.Close();
-            return item;
         }
         public async Task DeleteOrderItemAsync(int Nr)
         {
@@ -1300,6 +1274,10 @@ namespace PizzaEcki.Database
         //Customer methoden 
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
         {
+            if (phoneNumber == "1" || phoneNumber == "2")
+            {
+                return null; // Oder ein Standard-Customer-Objekt, falls benötigt
+            }
             _connection.Open();
             string sql = @"SELECT c.PhoneNumber, c.Name, a.Street, a.City, c.AdditionalInfo 
                    FROM Customers c

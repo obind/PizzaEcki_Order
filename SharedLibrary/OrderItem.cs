@@ -22,6 +22,10 @@ namespace SharedLibrary
         [Key]
         [JsonPropertyName("orderItemId")]
         public int OrderItemId { get; set; }
+        
+        [JsonPropertyName("orderId")]
+        public Guid OrderId { get; set; }
+
 
         [JsonPropertyName("gericht")]
         public string Gericht { get; set; }

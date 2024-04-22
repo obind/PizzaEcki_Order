@@ -666,7 +666,7 @@ namespace PizzaEcki
 
             // Berechnen Sie den Gesamtpreis eines Gerichtes mit Berücksichtigung der Anzahl
             tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
-
+            tempOrderItem.Uhrzeit = TimePickermein.Value?.ToString("HH:mm") ?? string.Empty;
             // Fügen Sie das tempOrderItem zur Liste hinzu
             tempOrderItem.Nr = orderItems.Count + 1;
             orderItems.Add(tempOrderItem);

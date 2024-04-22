@@ -96,20 +96,30 @@ namespace PizzaEcki.Pages
             }
         }
 
-        private void AddNewOrderItem_Click(object sender, RoutedEventArgs e)
+        private async void AddNewOrderItem_Click(object sender, RoutedEventArgs e)
         {
+            // Erstelle ein neues OrderItem mit Standardwerten oder UI-Eingaben
             var newItem = new OrderItem
             {
+                OrderId = _currentOrder.OrderId,
                 Gericht = "Neues Gericht",
                 Extras = "",
-                Größe = "",
+                Größe = "Standardgröße",
                 Menge = 1,
-                Epreis = 0,
-                Gesamt = 0,
+                Epreis = 0.0,
+                Gesamt = 0.0,
+                LieferungsArt = 0, // Standardlieferart, könnte dynamisch gesetzt werden
+                Uhrzeit = DateTime.Now.ToString("HH:mm:ss") // Beispiel für aktuelle Uhrzeit
             };
 
+            // Füge das neue Item zur ObservableCollection hinzu
             _localOrderItems.Add(newItem);
+
+            // Optional: Speichere das neue OrderItem sofort in der Datenbank
+            await databaseManager.AddOrderItemAsync(newItem);
+            OrderUpdated?.Invoke();
         }
+
 
         private async void DeleteOrderItem_Click(object sender, RoutedEventArgs e)
         {

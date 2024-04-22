@@ -86,6 +86,15 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    <GridViewColumn Header="Kunde" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+
+                                <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" HorizontalAlignment="Center"/>
+
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Adresse" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -96,16 +105,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <!--<GridViewColumn Header="Kunde" Width="200">
-                     <GridViewColumn.CellTemplate>
-                         <DataTemplate>
-                             -->
-                    <!--<TextBlock Text="{Binding Customer.Name}" Foreground="White" FontSize="14" HorizontalAlignment="Center"
-                 Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}"/>-->
-                    <!--
-                         </DataTemplate>
-                     </GridViewColumn.CellTemplate>
-                 </GridViewColumn>-->
+                   
                     <!--<GridViewColumn Header="Fahrer-ID" Width="100">
                      <GridViewColumn.CellTemplate>
                          <DataTemplate>
