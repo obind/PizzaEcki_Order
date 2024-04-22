@@ -666,7 +666,7 @@ namespace PizzaEcki
 
             // Berechnen Sie den Gesamtpreis eines Gerichtes mit Berücksichtigung der Anzahl
             tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
-
+            tempOrderItem.Uhrzeit = TimePickermein.Value?.ToString("HH:mm") ?? string.Empty;
             // Fügen Sie das tempOrderItem zur Liste hinzu
             tempOrderItem.Nr = orderItems.Count + 1;
             orderItems.Add(tempOrderItem);
@@ -855,7 +855,6 @@ namespace PizzaEcki
             }
         }
 
-
         private string DecryptPassword(string encryptedPassword)
         {
             // Hier sollte die Entschlüsselungslogik stehen, passend zur Verschlüsselung
@@ -921,7 +920,6 @@ namespace PizzaEcki
                 dailyEarnings.ShowDialog();
 
             }
-
             //Gratis gericht 
             //if (e.Key == Key.F5)
             //{
@@ -933,8 +931,6 @@ namespace PizzaEcki
 
             //    }
             //}
-
-
             if (e.Key == Key.F7)
             {
                 // Stelle sicher, dass die Liste nicht leer ist
@@ -953,17 +949,12 @@ namespace PizzaEcki
                     // Weitere UI-Updates, falls erforderlich
                 }
             }
-
-
             //F8 Löschen der Bestellung
             //Ist im anderen Fenster
-
-
             if (e.Key == Key.F11)
             {
                 BestellungenAnzeigen("alle");
             }
-
             if (e.Key == Key.F12)
             {
                 BarzahlungBtn(null, null); // Du kannst null für sender und RoutedEventArgs übergeben, da sie in deiner Methode nicht verwendet werden
@@ -1673,7 +1664,70 @@ namespace PizzaEcki
             }
         }
 
+        private async void Bestellungen_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var ordersWithAssignedDrivers = await  _databaseManager.GetOrdersWithAssignedDrivers();
+                var allDrivers = await _databaseManager.GetAllDriversAsync();
+                var updatedOrders = new List<Order>();
 
+                foreach (var order in ordersWithAssignedDrivers)
+                {
+                    if (order.DriverId.HasValue && order.DriverId.Value != -1)
+                    {
+                        var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
+                        order.Name = driver?.Name ?? "Nicht zugewiesen";  // Wenn kein passender Fahrer gefunden wird, "Nicht zugewiesen" verwenden
+                    }
+                    else
+                    {
+                        order.Name = "Nicht zugewiesen"; // Wenn keine DriverId zugewiesen ist, "Nicht zugewiesen" verwenden
+                    }
+
+                    updatedOrders.Add(order);
+                }
+
+                Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, true);
+                bestellungenFenster.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
+            }
+        }
+
+        private async void Uebersicht_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var ordersWithAssignedDrivers = await _databaseManager.GetOrdersWithAssignedDrivers();
+                var allDrivers = await _databaseManager.GetAllDriversAsync();
+                var updatedOrders = new List<Order>();
+
+                foreach (var order in ordersWithAssignedDrivers)
+                {
+                    // Überprüfe, ob eine DriverId vorhanden ist und nicht der Platzhalter für keine Zuweisung ist
+                    if (order.DriverId.HasValue && order.DriverId.Value != -1)
+                    {
+                        var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
+                        order.Name = driver?.Name ?? "Nicht zugewiesen";  // Wenn kein passender Fahrer gefunden wird, "Nicht zugewiesen" verwenden
+                    }
+                    else
+                    {
+                        order.Name = "Nicht zugewiesen"; // Wenn keine DriverId zugewiesen ist, "Nicht zugewiesen" verwenden
+                    }
+
+                    updatedOrders.Add(order);
+                }
+
+                Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, false);
+                bestellungenFenster.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
+            }
+        }
 
     }
 }

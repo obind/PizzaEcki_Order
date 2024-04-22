@@ -162,35 +162,35 @@ namespace PizzaServer
             await connection.OpenAsync();
 
             string sql = @"
-       SELECT 
-Orders.OrderId,
-Orders.BonNumber,
-Orders.IsDelivery,
-Orders.PaymentMethod,
-Orders.CustomerPhoneNumber,
-Orders.Timestamp,
-Orders.DeliveryUntil,
-OrderItems.OrderItemId,
-OrderItems.Gericht,
-OrderItems.Extras,
-OrderItems.Größe,
-OrderItems.Menge,
-OrderItems.Epreis,
-OrderItems.Gesamt,
-OrderItems.Uhrzeit,
-OrderItems.LieferungsArt,
-Drivers.Id AS DriverId,
-Drivers.Name AS Name,
-Drivers.PhoneNumber AS DriverPhoneNumber
-FROM 
-Orders
-LEFT JOIN 
-orderAssignments ON Orders.OrderId = orderAssignments.OrderId
-LEFT JOIN 
-Drivers ON orderAssignments.DriverId = Drivers.Id
-LEFT JOIN 
-OrderItems ON Orders.OrderId = OrderItems.OrderId;
-";
+                       SELECT 
+                Orders.OrderId,
+                Orders.BonNumber,
+                Orders.IsDelivery,
+                Orders.PaymentMethod,
+                Orders.CustomerPhoneNumber,
+                Orders.Timestamp,
+                Orders.DeliveryUntil,
+                OrderItems.OrderItemId,
+                OrderItems.Gericht,
+                OrderItems.Extras,
+                OrderItems.Größe,
+                OrderItems.Menge,
+                OrderItems.Epreis,
+                OrderItems.Gesamt,
+                OrderItems.Uhrzeit,
+                OrderItems.LieferungsArt,
+                Drivers.Id AS DriverId,
+                Drivers.Name AS Name,
+                Drivers.PhoneNumber AS DriverPhoneNumber
+                FROM 
+                Orders
+                LEFT JOIN 
+                orderAssignments ON Orders.OrderId = orderAssignments.OrderId
+                LEFT JOIN 
+                Drivers ON orderAssignments.DriverId = Drivers.Id
+                LEFT JOIN 
+                OrderItems ON Orders.OrderId = OrderItems.OrderId;
+                ";
 
             using (SqliteCommand command = new SqliteCommand(sql, connection))
             {
