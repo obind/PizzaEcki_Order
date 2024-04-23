@@ -6,7 +6,7 @@
         xmlns:services="clr-namespace:PizzaKitchenClient.Services" 
         xmlns:local="clr-namespace:PizzaKitchenClient"
         mc:Ignorable="d"
-        Title="BestellungenFenster" Height="666" Width="1000">
+        Title="Letzte Zuordnung" Height="666" Width="1000">
 
     
     <Window.Resources>
