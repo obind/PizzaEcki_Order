@@ -229,7 +229,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn x:Name="Gericht" Header="Gerichte" Width="600">
+                    <GridViewColumn x:Name="Gericht" Header="Gerichte" Width="1100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ItemsControl ItemsSource="{Binding OrderItems}">
@@ -242,7 +242,7 @@
                                                     <TextBlock Text="{Binding Menge}" Width="50" FontWeight="Bold" />
                                                     <TextBlock Text="Größe: " Width="50" />
                                                     <TextBlock Text="{Binding Größe}" Width="30" FontWeight="Bold" />
-                                                    <TextBlock Text="{Binding Gericht}" Width="150" FontWeight="Bold" />
+                                                    <TextBlock Text="{Binding Gericht}" Margin="0 0 20 0" FontWeight="Bold" />
                                                     <TextBlock Text="Extras: " Width="70" />
                                                     <TextBlock Text="{Binding Extras}" FontWeight="Bold" />
                                                 </StackPanel>

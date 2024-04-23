@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="PartyPizza" Height="450" Width="800">
+        Title="PartyPizza" Height="300" Width="500">
     <Window.Resources>
 
 
@@ -91,15 +91,16 @@
           Grid.Row="0"
           Height="Auto" Width="Auto"
           IsEditable="True"
+         Focusable="True"
           SelectionChanged="PizzaComboBox_SelectionChanged"
           Style="{StaticResource FocusedComboBoxStyle}"
           Margin="20,13,20,10" PreviewKeyDown="PizzaComboBox_PreviewKeyDown"/>
 
         <!-- ListBox für ausgewählte Pizzen -->
-        <ListBox x:Name="selectedPizzasListBox"
-                 Grid.Row="1"
-                 Margin="20,0,20,10"
-                 Background="#5f6269" Foreground="White" FontSize="16"/>
+        <ListBox x:Name="selectedPizzasListBox" Grid.Row="1" Margin="20,0,20,10" Background="#5f6269" Foreground="White" FontSize="16"
+         DisplayMemberPath="Name" KeyDown="SelectedPizzasListBox_KeyDown">
+        </ListBox>
+
 
         <!-- Button zur Bestätigung -->
         <Button x:Name="confirmButton"
@@ -108,6 +109,8 @@
                 Click="ConfirmButton_Click"
                 Margin="0,0,20,20"
                 Foreground="White"
+                FontSize="16"
+                Padding="10 5 10 5"
                 Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Right"/>
     </Grid>
 </Window>

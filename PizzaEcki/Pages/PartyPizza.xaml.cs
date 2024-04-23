@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation.Peers;
+using System.Windows.Controls;
 using System.Windows.Input;
 using PizzaEcki.Database;
 using PizzaEcki.Models;
@@ -26,6 +27,7 @@ namespace PizzaEcki.Pages
         {
             InitializeComponent();
             InitializePizzaComboBox();
+            PizzaComboBox.Focus();
         }
 
         private void InitializePizzaComboBox()
@@ -38,7 +40,6 @@ namespace PizzaEcki.Pages
             PizzaComboBox.ItemsSource = pizzaDishes;
         }
 
-        
 
         private void AddSelectedPizza(Dish selectedPizza)
         {
@@ -66,6 +67,13 @@ namespace PizzaEcki.Pages
             tempOrderItem.OrderItemId = selectedDish.Id;
         }
 
+        public string DescriptionOfSelectedPizzas
+        {
+            get
+            {
+                return "Party Pizza (" + string.Join(", ", selectedPizzas.Select(p => p.Id)) + ")";
+            }
+        }
 
         private void PizzaComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -73,34 +81,73 @@ namespace PizzaEcki.Pages
             {
                 if (selectedPizzasListBox.Items.Count < 6) // Erlaube bis zu 6 Einträge
                 {
-                    var selectedItem = PizzaComboBox.SelectedItem as Dish;
+                    Dish selectedItem = PizzaComboBox.SelectedItem as Dish;
                     if (selectedItem != null)
                     {
-                        PizzaComboBox.IsDropDownOpen = false;
-
-                        // Füge das ausgewählte Gericht der ListBox hinzu, ohne zu prüfen, ob es bereits vorhanden ist
                         selectedPizzas.Add(selectedItem);
-                        selectedPizzasListBox.Items.Add(selectedItem.ToString());
+                        selectedPizzasListBox.Items.Add(selectedItem);
 
                         PizzaComboBox.Text = string.Empty; // Leere den Text in der ComboBox für eine neue Auswahl
-
-                        // Stelle den Fokus zurück zur ComboBox
-                        PizzaComboBox.Focus();
+                        UpdatePrice(); // Aktualisiere den Preis
                     }
                 }
                 else
                 {
                     MessageBox.Show("Es können maximal 6 Pizzen ausgewählt werden.");
                 }
-
                 e.Handled = true; // Markiere das Ereignis als behandelt
+                PizzaComboBox.Focus();
             }
         }
+
+        private void SelectedPizzasListBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && selectedPizzasListBox.SelectedItem != null)
+            {
+                Console.WriteLine("Selected Item Type: " + selectedPizzasListBox.SelectedItem.GetType().FullName);  // Debug Ausgabe
+
+                Dish dishToRemove = selectedPizzasListBox.SelectedItem as Dish;
+                if (dishToRemove != null)
+                {
+                    selectedPizzas.Remove(dishToRemove);
+                    selectedPizzasListBox.Items.Remove(dishToRemove);
+                    UpdatePrice();  // Methode zum Aktualisieren des Preises nach dem Entfernen
+                }
+                else
+                {
+                    Console.WriteLine("Fehler: Die Umwandlung des selektierten Items in 'Dish' ist fehlgeschlagen.");
+                }
+            }
+        }
+
+
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = true;
             this.Close();
         }
+
+        private void UpdatePrice()
+        {
+            double averagePrice = AveragePricePerPizza; // Berechnung des Durchschnittspreises
+
+            // Optional: aktualisiere zusätzlich das `tempOrderItem`, wenn nötig
+            tempOrderItem.Epreis = averagePrice;
+        }
+
+
+        public double AveragePricePerPizza
+        {
+            get
+            {
+                double totalPrice = SelectedPizzasPrices.Sum();
+                int pizzaCount = selectedPizzas.Count; // Verwende die Liste direkt für eine genaue Zählung
+                return pizzaCount > 0 ? totalPrice / pizzaCount : 0;
+            }
+        }
+
+
+
     }
 }

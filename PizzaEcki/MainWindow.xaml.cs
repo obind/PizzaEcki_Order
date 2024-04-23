@@ -20,6 +20,7 @@ using System.Windows.Threading;
 using System.Diagnostics;
 using static PizzaEcki.Pages.SettingsWindow;
 using System.IO;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 
 namespace PizzaEcki
@@ -341,20 +342,19 @@ namespace PizzaEcki
             var popup = new PartyPizza(); // Angenommen, dies ist dein Popup-Fenster für die Pizza-Auswahl
             if (popup.ShowDialog() == true) // Prüfe, ob der Dialog mit "OK" geschlossen wurde
             {
-                // Berechne den Gesamtpreis und den Preis pro Pizza
+                double averagePricePerPizza = popup.AveragePricePerPizza;
                 double totalPrice = popup.SelectedPizzasPrices.Sum();
                 int pizzaCount = popup.SelectedPizzaIds.Count;
 
                 // Prüfe, ob Pizzen ausgewählt wurden
                 if (pizzaCount > 0)
                 {
-                    double pricePerPizza = totalPrice / pizzaCount;
-
-                    // Formatieren des Preises für die Anzeige
                     string formattedTotalPrice = totalPrice.ToString("F2");
-                    string formattedPricePerPizza = pricePerPizza.ToString("F2");
-                    tempOrderItem.Epreis = totalPrice;
-                    MessageBox.Show($"Der Gesamtpreis für die Party Pizza ist: {formattedTotalPrice}€ (Preis pro Pizza: {formattedPricePerPizza}€)", "Preisberechnung", MessageBoxButton.OK, MessageBoxImage.Information);
+                    string formattedPricePerPizza = averagePricePerPizza.ToString("F2");
+                    tempOrderItem.Gericht = popup.DescriptionOfSelectedPizzas;
+                    tempOrderItem.Epreis = averagePricePerPizza; // Setze den durchschnittlichen Preis
+                    SizeComboBox.SelectedItem = "XL";
+                    tempOrderItem.Größe = "XL"; 
                 }
                 else
                 {
@@ -583,7 +583,7 @@ namespace PizzaEcki
 
         private void ProcessOrder()
         {
-            if (dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
+            if (!tempOrderItem.Gericht.StartsWith("Party Pizza") && dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
             {
                 MessageBox.Show("Bitte gebe ein Gericht an.");
                 return;
@@ -600,21 +600,16 @@ namespace PizzaEcki
             bool isHappyHourNow = IsHappyHour();
 
 
-            // Setze den Epreis zurück
-            tempOrderItem.Epreis = 0;
+           if(tempOrderItem.OrderItemId != 700)
+            {
+                tempOrderItem.Epreis = 0;
+            }
 
             Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
             string selectedSize = SizeComboBox.SelectedItem.ToString();
             tempOrderItem.Größe = selectedSize;
             tempOrderItem.Menge = 1;
 
-
-            //Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
-            //if (selectedDish != null)
-            //{
-            //    string selectedSize = SizeComboBox.SelectedItem.ToString();
-            //    
-            //}
             bool isHappyHour = IsHappyHour();
 
             if (selectedDish != null)
@@ -628,8 +623,11 @@ namespace PizzaEcki
                     basePrice = 9; // Preis für das Mittagsangebot setzen
                 }
 
-                // Setze den Grundpreis für das Gericht
-                tempOrderItem.Epreis = basePrice;
+               if(tempOrderItem.OrderItemId != 700)
+                {
+                    tempOrderItem.Epreis = basePrice;
+                }
+           
 
                 // Verarbeite alle ausgewählten Extras
                 if (tempOrderItem.Extras != null)
