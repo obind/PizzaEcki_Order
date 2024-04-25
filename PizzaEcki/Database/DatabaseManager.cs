@@ -414,34 +414,59 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-        public void DeleteDriver(int id)
+        public bool DeleteDriver(int driverId)
         {
-            _connection.Open();
-            string sql = "DELETE FROM Drivers WHERE Id = @Id";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            try
             {
-                command.Parameters.AddWithValue("@Id", id);
-                command.ExecuteNonQuery();
+                if (_connection.State != System.Data.ConnectionState.Open)
+                    _connection.Open();
+
+                // Überprüfe, ob der Fahrer Bestellungen zugewiesen hat
+                string sqlCheckAssignments = "SELECT COUNT(*) FROM OrderAssignments WHERE DriverId = @DriverId";
+                using (SqliteCommand commandCheck = new SqliteCommand(sqlCheckAssignments, _connection))
+                {
+                    commandCheck.Parameters.AddWithValue("@DriverId", driverId);
+                    long assignmentsCount = (long)commandCheck.ExecuteScalar();
+                    if (assignmentsCount > 0)
+                    {
+                        // Der Fahrer hat zugewiesene Bestellungen und kann nicht gelöscht werden
+                        return false;
+                    }
+                }
+
+                // Wenn keine Bestellungen zugewiesen sind, führe das Löschen durch
+                string sqlDelete = "DELETE FROM Drivers WHERE Id = @DriverId";
+                using (SqliteCommand commandDelete = new SqliteCommand(sqlDelete, _connection))
+                {
+                    commandDelete.Parameters.AddWithValue("@DriverId", driverId);
+                    int rowsAffected = commandDelete.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
             }
-            _connection.Close();
+            catch (Exception ex)
+            {
+                // Fehlerbehandlung hier
+                // Zum Beispiel Logging des Fehlers
+                Console.WriteLine("Fehler beim Löschen des Fahrers: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
-        public void UnassignDriverFromOrders(int driverId)
+
+        private async Task<bool> HasAssignedOrders(int driverId)
         {
-            string updateSql = @"
-                UPDATE OrderAssignments
-                SET DriverId = -500
-                WHERE DriverId = @DriverId;";
-
-            _connection.Open();
-
-            using (var command = new SqliteCommand(updateSql, _connection))
+            string sqlCheckAssignments = "SELECT COUNT(*) FROM OrderAssignments WHERE DriverId = @DriverId";
+            using (SqliteCommand commandCheckAssignments = new SqliteCommand(sqlCheckAssignments, _connection))
             {
-                command.Parameters.AddWithValue("@DriverId", driverId);
-                command.ExecuteNonQuery();
+                commandCheckAssignments.Parameters.AddWithValue("@DriverId", driverId);
+                long count = (long)await commandCheckAssignments.ExecuteScalarAsync();
+                return count > 0;
             }
-            _connection.Close();
         }
-      
+
 
         //Order Methoden 
         public List<Order> GetAllOrders()

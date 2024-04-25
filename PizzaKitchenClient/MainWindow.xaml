@@ -6,7 +6,7 @@
     <Window.Resources>
 
         <services:TextToColorConverter x:Key="TextToColorConverter"/>
-        
+
         <ContextMenu  x:Key="HeaderContextMenu">
             <MenuItem Header="Bon" IsCheckable="True" IsChecked="True" Click="ToggleColumnVisibility" Tag="Bon"/>
             <MenuItem Header="Kunde" IsCheckable="True" IsChecked="True" Click="ToggleColumnVisibility" Tag="Kunde"/>
@@ -17,7 +17,7 @@
             <MenuItem Header="Lieferart" IsCheckable="True" IsChecked="True" Click="ToggleColumnVisibility" Tag="Lieferart"/>
             <MenuItem Header="Gerichte" IsCheckable="True" IsChecked="True" Click="ToggleColumnVisibility" Tag="Gerichte"/>
         </ContextMenu>
-        
+
         <!-- Definiere einen Style für GridViewColumnHeader -->
         <Style TargetType="GridViewColumnHeader">
             <Setter Property="ContextMenu" Value="{StaticResource HeaderContextMenu}" />
@@ -28,7 +28,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="5"/>
         </Style>
-        
+
         <Style x:Key="CustomButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#FF602C"/>
             <Setter Property="Foreground" Value="White"/>
@@ -138,8 +138,8 @@
         </Grid.ColumnDefinitions>
         <ListView x:Name="OrdersList" Margin="20,10,20,10" Grid.ColumnSpan="3" FontSize="16" SelectionMode="Single" Foreground="White" Background="#FF3D4248" HorizontalContentAlignment="Center">
 
-            
-            
+
+
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -157,16 +157,16 @@
                     </Style.Triggers>
                 </Style>
             </ListView.ItemContainerStyle>
-            
+
             <ListView.View>
-                
+
                 <GridView >
                     <GridViewColumn x:Name="Bon" Header="Bon" Width="50" >
                         <GridViewColumn.CellTemplate >
                             <DataTemplate >
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
                                     <TextBlock Text="{Binding BonNumber}"  HorizontalAlignment="Center" />
-                                </Border> 
+                                </Border>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -196,8 +196,8 @@
                             <DataTemplate>
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
                                     <TextBlock Text="{Binding Timestamp}" HorizontalAlignment="Center" />
-                                </Border> 
-                                </DataTemplate>
+                                </Border>
+                            </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
@@ -215,8 +215,8 @@
                             <DataTemplate>
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
                                     <TextBlock Text="{Binding Customer.Street}" HorizontalAlignment="Center" />
-                                </Border> 
-                                </DataTemplate>
+                                </Border>
+                            </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn x:Name="Lieferart" Header="Lieferart" Width="150">
@@ -224,8 +224,8 @@
                             <DataTemplate>
                                 <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
                                     <TextBlock Text="{Binding LieferStatus}" HorizontalAlignment="Center" />
-                                </Border> 
-                                </DataTemplate>
+                                </Border>
+                            </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
@@ -262,9 +262,9 @@
 
             <!-- Dynamisch generierte Buttons werden hier hinzugefügt -->
         </WrapPanel>
-        <Button Name="LetzteZuordnung_btn"  Style="{DynamicResource ButtonStyle1}" Grid.Column="2" Grid.Row="1" Content="Letzte Zuordnung" Margin="10,0,10,0"  Background="#FF602C" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Click="LetzteZuordnung_btn_Click"/>
+        <Button Name="LetzteZuordnung_btn"  Style="{DynamicResource ButtonStyle1}" Grid.Column="2" Grid.Row="1" Content="Letzte Zuordnung" Margin="10,0,18,0"  Background="#FF602C" Foreground="White" FontWeight="SemiBold" Padding="1,5,1,5" Click="LetzteZuordnung_btn_Click"/>
 
-        <Label x:Name="ConnectionStatusLabel" Grid.Row="2" Grid.Column="2"  Content="Nicht verbunden" HorizontalAlignment="Center" Foreground="White"/>
+        <Label x:Name="ConnectionStatusLabel" Grid.Row="2" Grid.Column="2"  Content="Nicht verbunden" Foreground="White" Margin="12,0,20,0" HorizontalAlignment="Center"/>
 
     </Grid>
 </Window>

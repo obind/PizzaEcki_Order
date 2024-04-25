@@ -183,11 +183,17 @@ namespace PizzaEcki.Pages
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    _dbManager.UnassignDriverFromOrders(selectedDriver.Id);
-                    _dbManager.DeleteDriver(selectedDriver.Id);
+                    bool deleteSuccessful = _dbManager.DeleteDriver(selectedDriver.Id);
 
-                    // Hier müsstest du die Liste der Fahrer aktualisieren, zum Beispiel:
-                    LoadDrivers();
+                    if (deleteSuccessful)
+                    {
+                        // Aktualisiere die Liste der Fahrer
+                        LoadDrivers();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Der Fahrer konnte nicht gelöscht werden, da er zugewiesene Bestellungen hat.", "Löschen fehlgeschlagen", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
             else
@@ -195,25 +201,9 @@ namespace PizzaEcki.Pages
                 MessageBox.Show("Bitte wählen Sie einen Fahrer zum Löschen aus.");
             }
         }
-        private void PopulateNetworkPrinterComboBox()
-        {
-            NetworkPrinterComboBox.Items.Clear();
 
-            // Erstellen eines neuen PrintServers
-            var server = new PrintServer();
 
-            // Abrufen der Druckerwarteschlangen, die auf dem Server verfügbar sind
-            var queues = server.GetPrintQueues(new[] { EnumeratedPrintQueueTypes.Connections });
 
-            foreach (var queue in queues)
-            {
-                // Fügen Sie nur Netzwerkdrucker hinzu
-                if (queue.IsShared)
-                {
-                    NetworkPrinterComboBox.Items.Add(queue.Name);
-                }
-            }
-        }
 
 
         private void PopulatePrinterComboBoxes()
@@ -225,20 +215,12 @@ namespace PizzaEcki.Pages
                 LocalPrinterComboBox.Items.Add(printer);
             }
 
-            // Netzwerkdrucker
-            PopulateNetworkPrinterComboBox();
-
+         
             // Setzen der aktuell gespeicherten Drucker, falls vorhanden
             var savedLocalPrinter = PizzaEcki.Properties.Settings.Default.SelectedPrinter;
             if (!string.IsNullOrEmpty(savedLocalPrinter) && LocalPrinterComboBox.Items.Contains(savedLocalPrinter))
             {
                 LocalPrinterComboBox.SelectedItem = savedLocalPrinter;
-            }
-
-            var savedNetworkPrinter = PizzaEcki.Properties.Settings.Default.NetworkPrinter;
-            if (!string.IsNullOrEmpty(savedNetworkPrinter) && NetworkPrinterComboBox.Items.Contains(savedNetworkPrinter))
-            {
-                NetworkPrinterComboBox.SelectedItem = savedNetworkPrinter;
             }
         }
 
@@ -258,13 +240,7 @@ namespace PizzaEcki.Pages
                 saveSuccessful = false;
             }
 
-            // Speichern des Netzwerkdruckers
-            if (NetworkPrinterComboBox.SelectedItem != null)
-            {
-                string selectedNetworkPrinter = NetworkPrinterComboBox.SelectedItem.ToString();
-                PizzaEcki.Properties.Settings.Default.NetworkPrinter = selectedNetworkPrinter;
-            }
-
+            
 
             if (saveSuccessful)
             {

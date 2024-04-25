@@ -6,7 +6,7 @@
         xmlns:services="clr-namespace:PizzaKitchenClient.Services" 
         xmlns:local="clr-namespace:PizzaKitchenClient"
         mc:Ignorable="d"
-        Title="Letzte Zuordnung" Height="666" Width="1000">
+        Title="Letzte Zuordnung" Height="400" Width="1015">
 
     
     <Window.Resources>
@@ -51,7 +51,7 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" ContextMenuOpening="BestellungenListView_ContextMenuOpening">
+        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ContextMenuOpening="BestellungenListView_ContextMenuOpening">
             <ListView.ContextMenu>
                 <ContextMenu>
                     <!-- Platzhalter für dynamisch hinzugefügte MenuItems -->
