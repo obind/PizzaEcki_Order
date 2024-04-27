@@ -229,14 +229,14 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn x:Name="Gericht" Header="Gerichte" Width="1100">
+                    <!--<GridViewColumn x:Name="Gericht" Header="Gerichte" Width="1100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ItemsControl ItemsSource="{Binding OrderItems}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border BorderBrush="#FF602C" BorderThickness="0,0,0,0" Margin="0,5">
-                                                <!-- Trennlinie zwischen den Items -->
+                                                --><!-- Trennlinie zwischen den Items --><!--
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                                     <TextBlock Text="Menge: " Width="50" />
                                                     <TextBlock Text="{Binding Menge}" Width="50" FontWeight="Bold" />
@@ -252,7 +252,7 @@
                                 </ItemsControl>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                    </GridViewColumn>-->
                 </GridView>
             </ListView.View>
         </ListView>

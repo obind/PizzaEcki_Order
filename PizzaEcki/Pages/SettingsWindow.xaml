@@ -247,10 +247,15 @@
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Label Foreground="White" Content="Neues Passwort eingeben:" FontSize="18"/>
                         <PasswordBox x:Name="NewPasswordInput"/>
+
+                        <Label Foreground="White" Content="Passwort bestätigen:" FontSize="18"/>
+                        <PasswordBox x:Name="ConfirmPasswordInput"/>
+
                         <Button Content="Speichern" HorizontalAlignment="Right" Click="SaveButton_Click"  Style="{DynamicResource ButtonStyle1}" Background="#ff602c" Foreground="White"  FontWeight="Bold" Padding="10,5" Margin="0,20,0,0"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
+
 
             <TabItem Header="Über" Background="#ff602c" Foreground="White">
                 <Grid Background="#FF1D1E20">

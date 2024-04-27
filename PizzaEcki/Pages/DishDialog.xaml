@@ -104,19 +104,13 @@
 
             <!-- HappyHour -->
         <Label Content="HappyHour:" Grid.Row="6" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center" FontSize="14"/>
-            <CheckBox Name="HappyHourCheckBox" Grid.Row="6" Grid.Column="1" Margin="10" VerticalAlignment="Center"/>
+        <CheckBox Name="HappyHourCheckBox" Grid.Row="6" Grid.Column="1" Margin="10" VerticalAlignment="Center"/>
 
-            <!-- Steuersatz -->
-        <Label Content="Steuersatz:" Grid.Row="7" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center" FontSize="14"/>
-        <TextBox Name="TaxRateTextBox" Grid.Row="7" Grid.Column="1" Margin="10" Width="200" HorizontalAlignment="Left"  Padding="5,0,5,0" Background="White" Foreground="Black" VerticalContentAlignment="Center"/>
+        <!-- Gratis Beilage -->
+        <Label Content="Gratis Beilage:" Grid.Row="7" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center" FontSize="14"/>
+        <CheckBox Name="FreeSideCheckBox" Grid.Row="7" Grid.Column="1" Margin="10" VerticalAlignment="Center"/>
 
-
-            <!-- Gratis Beilage -->
-        <Label Content="Gratis Beilage:" Grid.Row="8" Grid.Column="0" Margin="10" Foreground="White" HorizontalAlignment="Center" FontSize="14"/>
-            <CheckBox Name="FreeSideCheckBox" Grid.Row="8" Grid.Column="1" Margin="10" VerticalAlignment="Center"/>
-
-
-            <!-- Speichern Button -->
-        <Button Content="Speichern" Grid.Row="9" Grid.ColumnSpan="2" Click="SaveButton_Click" Margin="10" HorizontalAlignment="Center"  Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="#FF602C"  Style="{DynamicResource ButtonStyle1}" VerticalAlignment="Top"/>
+        <!-- Speichern Button -->
+        <Button Content="Speichern" Grid.Row="8" Grid.ColumnSpan="2" Click="SaveButton_Click" Margin="10" HorizontalAlignment="Center"  Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="#FF602C"  Style="{DynamicResource ButtonStyle1}" VerticalAlignment="Top"/>
     </Grid>
 </Window>

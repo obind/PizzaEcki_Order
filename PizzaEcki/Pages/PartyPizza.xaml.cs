@@ -79,39 +79,69 @@ namespace PizzaEcki.Pages
         {
             if (e.Key == Key.Enter)
             {
-                if (selectedPizzasListBox.Items.Count < 6) // Erlaube bis zu 6 Einträge
-                {
-                    Dish selectedItem = PizzaComboBox.SelectedItem as Dish;
-                    if (selectedItem != null)
+          
+                
+                    // Wenn die ComboBox leer ist, zeige "OK" und bereite vor zum Schließen
+                    if (PizzaComboBox.Text == "")
                     {
-                        selectedPizzas.Add(selectedItem);
-                        selectedPizzasListBox.Items.Add(selectedItem);
-
-                        PizzaComboBox.Text = string.Empty; // Leere den Text in der ComboBox für eine neue Auswahl
-                        UpdatePrice(); // Aktualisiere den Preis
+                        PizzaComboBox.Text = "OK";
+                     
                     }
-                }
-                else
-                {
-                    MessageBox.Show("Es können maximal 6 Pizzen ausgewählt werden.");
-                }
-                e.Handled = true; // Markiere das Ereignis als behandelt
-                PizzaComboBox.Focus();
+                    else if (PizzaComboBox.Text == "OK")
+                    {
+                        // Wenn "OK" schon angezeigt wird, schließe das Fenster
+                        ConfirmAndClose();
+                    }
+                    else
+                    {
+
+                        Dish selectedItem = PizzaComboBox.SelectedItem as Dish;
+                        if (selectedItem != null)
+                        {
+                            selectedPizzas.Add(selectedItem);
+                            selectedPizzasListBox.Items.Add(selectedItem);
+                            PizzaComboBox.Text = string.Empty; // ComboBox leeren
+                            UpdatePrice();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Bitte wähle eine gültige Pizza aus.");
+                        }
+                        e.Handled = true;
+                    }
+                    e.Handled = true; // Verhindert weitere Handler
+                
+                PizzaComboBox.Focus(); // Setzt den Fokus zurück auf die ComboBox
             }
         }
+
+        private void ConfirmAndClose()
+        {
+            if (selectedPizzas.Count > 0)
+            {
+                this.DialogResult = true; // Setze DialogResult auf true, um anzuzeigen, dass alles korrekt abgeschlossen wurde
+                this.Close(); // Schließe das Fenster
+            }
+            else
+            {
+                this.DialogResult = false;
+          
+            }
+        }
+
 
         private void SelectedPizzasListBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete && selectedPizzasListBox.SelectedItem != null)
             {
-                Console.WriteLine("Selected Item Type: " + selectedPizzasListBox.SelectedItem.GetType().FullName);  // Debug Ausgabe
+                Console.WriteLine("Selected Item Type: " + selectedPizzasListBox.SelectedItem.GetType().FullName);
 
                 Dish dishToRemove = selectedPizzasListBox.SelectedItem as Dish;
                 if (dishToRemove != null)
                 {
                     selectedPizzas.Remove(dishToRemove);
                     selectedPizzasListBox.Items.Remove(dishToRemove);
-                    UpdatePrice();  // Methode zum Aktualisieren des Preises nach dem Entfernen
+                    UpdatePrice();
                 }
                 else
                 {
@@ -130,24 +160,18 @@ namespace PizzaEcki.Pages
 
         private void UpdatePrice()
         {
-            double averagePrice = AveragePricePerPizza; // Berechnung des Durchschnittspreises
-
-            // Optional: aktualisiere zusätzlich das `tempOrderItem`, wenn nötig
+            double averagePrice = AveragePricePerPizza;
             tempOrderItem.Epreis = averagePrice;
         }
-
 
         public double AveragePricePerPizza
         {
             get
             {
                 double totalPrice = SelectedPizzasPrices.Sum();
-                int pizzaCount = selectedPizzas.Count; // Verwende die Liste direkt für eine genaue Zählung
+                int pizzaCount = selectedPizzas.Count;
                 return pizzaCount > 0 ? totalPrice / pizzaCount : 0;
             }
         }
-
-
-
     }
 }

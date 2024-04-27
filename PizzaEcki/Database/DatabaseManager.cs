@@ -1298,7 +1298,7 @@ namespace PizzaEcki.Database
 
         //Customer methoden 
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
-        {
+            {
             if (phoneNumber == "1" || phoneNumber == "2")
             {
                 return null; // Oder ein Standard-Customer-Objekt, falls benötigt

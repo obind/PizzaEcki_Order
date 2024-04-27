@@ -64,11 +64,6 @@ namespace PizzaEcki
         {
             InitializeComponent();
             InitializeApplication();
-            //signalRService = new SignalRService();
-            //signalRService.StartConnectionAsync();
-
-            // Erstellt eine neue Instanz von DatabaseManager, um die Verbindung zur Datenbank zu verwalten
-            // und alle erforderlichen Tabellen und Initialdaten zu initialisieren.
             NameTextBox.TextChanged += OnCustomerDataChanged;
             StreetTextBox.TextChanged += OnCustomerDataChanged;
             CityTextBox.TextChanged += OnCustomerDataChanged;
@@ -80,33 +75,26 @@ namespace PizzaEcki
             _databaseManager = new DatabaseManager();
             StartServer();
 
-
-            // Füllen die ComboBox für Gerichte aus der Datenbank
             dishesList = _databaseManager.GetAllDishes();
             DishComboBox.ItemsSource = dishesList;
 
-            // Füllen die ComboBox für Extras aus der Datenbank
+   
             extrasList = _databaseManager.GetExtras();
             ExtrasComboBox.ItemsSource = extrasList;
 
-            //Den Time Picker Vorbereiten zum Programm start 
             TimePickermein.Value = null;
             TimePickermein.TimeInterval = new TimeSpan(0, 30, 0);
 
             LoadDrivers();
             DataContext = this;
             currentBonNumber = _databaseManager.CheckAndResetBonNumberIfNecessary();
-            
-
-            //Setzen des Standart Druckers
-            if (string.IsNullOrEmpty(PizzaEcki.Properties.Settings.Default.SelectedPrinter))
+                
+            if (string.IsNullOrEmpty(Properties.Settings.Default.SelectedPrinter))
             {
-                // Verwende System.Drawing.Printing, um den Standarddrucker zu ermitteln
                 string defaultPrinterName = new PrinterSettings().PrinterName;
 
-                // Speichere den Namen des Standarddruckers in den Einstellungen
-                PizzaEcki.Properties.Settings.Default.SelectedPrinter = defaultPrinterName;
-                PizzaEcki.Properties.Settings.Default.Save();
+                Properties.Settings.Default.SelectedPrinter = defaultPrinterName;
+                Properties.Settings.Default.Save();
             }
             _reloadTimer = new DispatcherTimer
             {
@@ -128,7 +116,7 @@ namespace PizzaEcki
                 {
                     Process serverProcess = new Process();
                     serverProcess.StartInfo.FileName = serverExePath;
-                    serverProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(serverExePath); // Wichtig: Setzen Sie das Arbeitsverzeichnis
+                    serverProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(serverExePath);
                     serverProcess.StartInfo.CreateNoWindow = true;
                     serverProcess.StartInfo.UseShellExecute = false;
                     serverProcess.Start();
@@ -166,7 +154,6 @@ namespace PizzaEcki
         }
         private void PhoneNumberTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            // Überprüfung, ob die Enter-Taste gedrückt wurde
             if (e.Key == Key.Return)
             {
                 _customerNr = PhoneNumberTextBox.Text;
@@ -187,12 +174,11 @@ namespace PizzaEcki
                         _pickupType = "Mitnehmer";
                         DishComboBox.Focus();
                     }
-                    else // Suche nach einem Kunden mit der eingegebenen Telefonnummer
+                    else
                     {
                         Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
                         if (customer != null) // Kunde gefunden
                         {
-                            //Rufe die MEthode auf um die Textfelder Automatisch zu füllen
                             SetCustomerDataToFields(customer);
                             DishComboBox.Focus();
                             Auslieferung++;
@@ -200,9 +186,8 @@ namespace PizzaEcki
 
 
                         }
-                        else // Kunde nicht gefunden
-                        {
-                            // Aufforderung zur Erstellung eines neuen Kunden
+                        else
+                        {                   
                             MessageBoxResult result = MessageBox.Show("Es ist noch kein Kunde mit der Nummer bekannt. \nWollen Sie einen anlegen?", "Frage", MessageBoxButton.YesNo, MessageBoxImage.Question);
                             if (result == MessageBoxResult.Yes)
                             {
@@ -215,13 +200,12 @@ namespace PizzaEcki
                         }
                     }
                 }
-                else // Fehlermeldung, wenn keine Telefonnummer eingegeben wurde
+                else
                 {
                     MessageBox.Show("Bitte eine KundenNr eingeben");
                 }
             }
 
-            // Zurücksetzen der Felder, wenn die Escape-Taste gedrückt wird
             if (e.Key == Key.Escape)
             {
                 PhoneNumberTextBox.Text = string.Empty;
@@ -234,9 +218,9 @@ namespace PizzaEcki
         }
         private void OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!isProgrammaticChange) // prüft, ob die Änderung durch den Benutzer und nicht durch den Code gemacht wurde
+            if (!isProgrammaticChange)
             {
-                SaveButton.Visibility = Visibility.Visible; // Zeigt den "Speichern"-Button an
+                SaveButton.Visibility = Visibility.Visible; 
             }
         }
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
@@ -251,10 +235,8 @@ namespace PizzaEcki
                 AdditionalInfo = AdditionalInfoTextBox.Text
             };
 
-            // Füge den neuen Kunden hinzu oder aktualisiere den bestehenden Kunden
             _databaseManager.AddOrUpdateCustomer(customer);
 
-            // Nach dem Speichern den "SaveButton" wieder ausblenden
             SaveButton.Visibility = Visibility.Collapsed;
         }
         //Methode um die Textfelder automatisch zu füllen
@@ -272,7 +254,7 @@ namespace PizzaEcki
             if (!isProgrammaticChange)
             {
                 SaveButton.Visibility = Visibility.Visible;
-                SaveButtonBorder.Visibility = Visibility.Visible; // Stelle sicher, dass auch der Border sichtbar wird
+                SaveButtonBorder.Visibility = Visibility.Visible;
             }
         }
 
@@ -289,7 +271,6 @@ namespace PizzaEcki
             }
             SizeComboBox.SelectedItem = "L";
 
-            // Umwandeln des ausgewählten Items in ein Dish-Objekt, um auf dessen Eigenschaften zugreifen zu können
             Dish selectedDish = (Dish)DishComboBox.SelectedItem;
             tempOrderItem.Gericht = selectedDish.Name.ToString();
             tempOrderItem.OrderItemId = selectedDish.Id;
@@ -339,27 +320,34 @@ namespace PizzaEcki
 
         private void ShowPartyPizzaPopup()
         {
-            var popup = new PartyPizza(); // Angenommen, dies ist dein Popup-Fenster für die Pizza-Auswahl
-            if (popup.ShowDialog() == true) // Prüfe, ob der Dialog mit "OK" geschlossen wurde
+            var popup = new PartyPizza();
+            bool? dialogResult = popup.ShowDialog();
+
+            if (dialogResult == true) 
             {
                 double averagePricePerPizza = popup.AveragePricePerPizza;
                 double totalPrice = popup.SelectedPizzasPrices.Sum();
                 int pizzaCount = popup.SelectedPizzaIds.Count;
 
-                // Prüfe, ob Pizzen ausgewählt wurden
+
                 if (pizzaCount > 0)
                 {
                     string formattedTotalPrice = totalPrice.ToString("F2");
                     string formattedPricePerPizza = averagePricePerPizza.ToString("F2");
                     tempOrderItem.Gericht = popup.DescriptionOfSelectedPizzas;
-                    tempOrderItem.Epreis = averagePricePerPizza; // Setze den durchschnittlichen Preis
+                    tempOrderItem.Epreis = averagePricePerPizza;
                     SizeComboBox.SelectedItem = "XL";
                     tempOrderItem.Größe = "XL"; 
                 }
-                else
-                {
-                    MessageBox.Show("Es wurden keine Pizzen ausgewählt.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+               
+            }
+            else
+            {
+                SizeComboBox.SelectedItem = null;
+                DishComboBox.Text = string.Empty;
+                DishComboBox.SelectedItem = null;
+                
+
             }
         }
 
@@ -919,17 +907,17 @@ namespace PizzaEcki
 
             }
             //Gratis gericht 
-            //if (e.Key == Key.F5)
-            //{
-            //    // Setze den Preis des aktuell ausgewählten Gerichts auf 0
-            //    if (tempOrderItem != null)
-            //    {
-            //        tempOrderItem.Epreis = 0;
+            if (e.Key == Key.F5)
+            {
+                // Setze den Preis des aktuell ausgewählten Gerichts auf 0
+                if (tempOrderItem != null)
+                {
+                    tempOrderItem.Epreis = 0;
 
 
-            //    }
-            //}
-            if (e.Key == Key.F7)
+                }
+                //}
+                if (e.Key == Key.F7)
             {
                 // Stelle sicher, dass die Liste nicht leer ist
                 if (orderItems.Any())
@@ -1243,211 +1231,6 @@ namespace PizzaEcki
 
         }
 
-        private void PrintToNetworkPrinter(Order order, Customer customer)
-        {
-            // Erstellen des PrintDocument-Objekts
-            PrintDocument printDoc = new PrintDocument();
-
-            // Setzen des Druckers auf den Netzwerkdrucker
-            string networkPrinter = PizzaEcki.Properties.Settings.Default.NetworkPrinter;
-            if (!string.IsNullOrEmpty(networkPrinter))
-            {
-                printDoc.PrinterSettings.PrinterName = networkPrinter;
-            }
-
-            // Überprüfen, ob der Drucker verfügbar ist
-            if (!printDoc.PrinterSettings.IsValid)
-            {
-                MessageBox.Show("Der Netzwerkdrucker ist nicht verfügbar.");
-                return;
-            }
-
-            printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
-            printDoc.PrintPage += (sender, e) =>
-            {
-                Graphics graphics = e.Graphics;
-
-                // Fonts
-                Font regularFont = new Font("Segoe UI", 16, System.Drawing.FontStyle.Bold);
-                Font boldFont = new Font("Segoe UI", 14, System.Drawing.FontStyle.Bold);
-                Font titleFont = new Font("Segoe UI", 24, System.Drawing.FontStyle.Bold);
-
-                float yOffset = 10;  // Initial offset
-
-                string sloagan = "Internationale Spezialitäten";
-                float sloaganWidth = graphics.MeasureString(sloagan, regularFont).Width;
-                graphics.DrawString(sloagan, regularFont, Brushes.Black, (e.PageBounds.Width - sloaganWidth) / 2, yOffset);
-                yOffset += regularFont.GetHeight();
-
-                // Title
-                string title = "PIZZA ECKI";
-                float titleWidth = graphics.MeasureString(title, titleFont).Width;
-                graphics.DrawString(title, titleFont, Brushes.Black, (e.PageBounds.Width - titleWidth) / 2, yOffset);
-                yOffset += titleFont.GetHeight();
-
-                // Adresse
-                SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", regularFont);
-                float addressX = (e.PageBounds.Width - addressSize.Width) / 2;
-                graphics.DrawString("Woerdener Str. 4 · 33803 Steinhagen", regularFont, Brushes.Black, addressX, yOffset);
-                yOffset += addressSize.Height;  // 10 pixels Abstand
-
-                // Datum und Uhrzeit
-                string dateStr = DateTime.Now.ToString("dd.MM.yyyy");
-                string timeStr = DateTime.Now.ToString("HH:mm");
-                graphics.DrawString(dateStr, regularFont, Brushes.Black, 0, yOffset);
-                SizeF timeSize = graphics.MeasureString(timeStr, regularFont);
-                graphics.DrawString(timeStr, regularFont, Brushes.Black, e.PageBounds.Width - timeSize.Width - 15, yOffset);
-                // 10 pixels Abstand
-
-                Pen blackPen = new Pen(Color.Black, 1);
-
-                // Zeichne eine Trennlinie nach der Überschrift
-                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
-                yOffset += regularFont.GetHeight() + 10;
-
-
-                if (isDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
-                {
-                    string addressStr = "Tel: " + customer.PhoneNumber + "\r\n" + customer.Name + "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
-                    graphics.DrawString(addressStr, boldFont, Brushes.Black, 0, yOffset);
-
-                    // Hier ändern wir den yOffset, um zwei Zeilenhöhen hinzuzufügen, eine für jede Zeile der Adresse.
-                    yOffset += boldFont.GetHeight() * 6;  // Anpassen für den Zeilenumbruch in der Adresse
-                }
-
-                string bonNumberStr = $"Bon Nummer: {order.BonNumber}";
-                SizeF bonNumberSize = graphics.MeasureString(bonNumberStr, boldFont);
-                float bonNumberX = (e.PageBounds.Width - bonNumberSize.Width) / 2;
-                graphics.DrawString(bonNumberStr, boldFont, Brushes.Black, bonNumberX, yOffset);
-                yOffset += bonNumberSize.Height + 5;
-
-                if (!string.IsNullOrEmpty(_pickupType))
-                {
-                    string pickupTypeStr = _pickupType; // "Selbstabholer" oder "Mitnehmer"
-                    graphics.DrawString(pickupTypeStr, boldFont, Brushes.Black, 0, yOffset);
-                    yOffset += boldFont.GetHeight() + 10;
-                }
-
-                var deliveryUntilStr = TimePickermein.Value.HasValue
-                    ? TimePickermein.Value.Value.ToString("HH:mm")
-                    : string.Empty; // Leer, wenn kein Wert vorhanden
-
-                if (isDelivery && !string.IsNullOrEmpty(deliveryUntilStr))
-                {
-                    string deliveryTimeStr = "Lieferung bis: " + deliveryUntilStr;
-                    graphics.DrawString(deliveryTimeStr, boldFont, Brushes.Black, 0, yOffset);
-                    yOffset += regularFont.GetHeight() + 5;
-                }
-                else if (!string.IsNullOrEmpty(deliveryUntilStr))
-                {
-                    string deliveryTimeStr = "Abholung bis: " + deliveryUntilStr;
-                    graphics.DrawString(deliveryTimeStr, boldFont, Brushes.Black, 0, yOffset);
-                    yOffset += regularFont.GetHeight() + 5;
-                }
-
-
-                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
-                yOffset += 5;
-
-
-                // Tabellenüberschrift
-                string headerAnz = "Anz  ";
-                string headerNr = "Nr  ";
-                string headerGericht = "Gericht  ";
-                string headerGr = "Gr.  ";
-                string headerPreis = "Preis";
-
-                // Definiere die Positionen der Spaltenköpfe
-                float headerAnzPosition = 0;
-                float headerNrPosition = 45;  // 
-                float headerGerichtPosition = 80;  // Angenommene Position, anpassen nach Bedarf
-                float headerGrPosition = 15;  // Angenommene Position, anpassen nach Bedarf
-                                               // Preis rechtsbündig, Abstand vom rechten Rand
-                float headerPreisPosition = e.PageBounds.Width - graphics.MeasureString(headerPreis, regularFont).Width;
-
-                // Zeichne die Tabellenüberschrift#
-                graphics.DrawString(headerAnz, regularFont, Brushes.Black, headerAnzPosition, yOffset);
-                graphics.DrawString(headerNr, regularFont, Brushes.Black, headerNrPosition, yOffset);
-                graphics.DrawString(headerGericht, regularFont, Brushes.Black, headerGerichtPosition, yOffset);
-                graphics.DrawString(headerGr, regularFont, Brushes.Black, headerGrPosition, yOffset);
-                graphics.DrawString(headerPreis, regularFont, Brushes.Black, headerPreisPosition, yOffset);
-
-                // Zeichne eine Trennlinie nach der Überschrift
-                yOffset += regularFont.GetHeight();
-                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
-                yOffset += 3; // Füge einen kleinen Abstand nach der Linie hinzu
-
-                // Vorhandener Code für Bestellzeilen ...
-                Font extraFont = new Font("Segoe UI", 10);
-                foreach (var item in order.OrderItems)
-                {
-                    string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht}";
-                    string itemSizeStr = $"{item.Größe} h";
-                    string itemPriceStr = $"{item.Gesamt:C}";
-
-                    // Zeichne die Bestellzeile
-                    graphics.DrawString(itemNameStr, regularFont, Brushes.Black, headerAnzPosition, yOffset);
-                    graphics.DrawString(itemSizeStr, regularFont, Brushes.Black, headerGrPosition, yOffset);
-                    SizeF itemPriceSize = graphics.MeasureString(itemPriceStr, regularFont);
-                    graphics.DrawString(itemPriceStr, regularFont, Brushes.Black, e.PageBounds.Width - itemPriceSize.Width, yOffset);
-
-                    // Aktualisiere yOffset für die nächste Zeile
-                    yOffset += regularFont.GetHeight();
-
-                    // Überprüfe, ob es Extras gibt und zeige sie an
-                    if (!string.IsNullOrWhiteSpace(item.Extras))
-                    {
-                        // Bereite den String mit Extras vor
-                        string extrasStr = item.Extras.Trim();
-                        // Stelle sicher, dass der String nicht mit einem Komma endet
-                        if (extrasStr.EndsWith(","))
-                        {
-                            extrasStr = extrasStr.Substring(0, extrasStr.Length - 1);
-                        }
-
-                        // Zeichne die Extras
-                        graphics.DrawString(extrasStr, extraFont, Brushes.Black, headerGerichtPosition + 10, yOffset);
-
-                        // Aktualisiere yOffset für die nächste Zeile
-                        yOffset += extraFont.GetHeight();
-                    }
-
-                    yOffset += 10; // Füge einen kleinen Abstand nach der Linie hinzu
-                }
-
-                // Zeichne eine abschließende Trennlinie am Ende der
-
-
-                // Zeichne eine abschließende Trennlinie am Ende der Bestellliste
-                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
-                yOffset += 10;  // Füge einen größeren Abstand nach der Linie hinzu, um Platz für den Gesamtpreis zu schaffen
-
-                // Berechne den Gesamtpreis
-                // Berechne den Gesamtpreis
-                decimal gesamtpreis = order.OrderItems.Sum(item => (decimal)item.Gesamt);
-
-
-                // Zeichne den Gesamtpreis
-                string gesamtpreisStr = $"Gesamtpreis: {gesamtpreis:C}";
-                SizeF gesamtpreisSize = graphics.MeasureString(gesamtpreisStr, boldFont);
-                graphics.DrawString(gesamtpreisStr, boldFont, Brushes.Black, e.PageBounds.Width - gesamtpreisSize.Width - 15, yOffset);
-
-                // Aktualisiere yOffset für möglichen weiteren Inhalt
-                yOffset += boldFont.GetHeight() + 20;
-
-
-
-
-                // Bezahlmethode
-                string paymentMethodStr = "Bezahlmethode: " + order.PaymentMethod;
-                graphics.DrawString(paymentMethodStr, boldFont, Brushes.Black, 0, yOffset);
-                yOffset += boldFont.GetHeight();  // Weiterer Abstand für die nächste Zeile
-
-            };
-
-            // Auslösen des Druckvorgangs
-            printDoc.Print();
-        }
 
         private void btn_tables_Click(object sender, RoutedEventArgs e)
         {

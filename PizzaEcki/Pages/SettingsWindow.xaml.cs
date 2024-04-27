@@ -256,10 +256,19 @@ namespace PizzaEcki.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveEncryptedPassword(NewPasswordInput.Password);
-            MessageBox.Show("Passwort wurde gesetzt.");
-            this.DialogResult = true;
+            // Überprüfe, ob die Passwörter übereinstimmen
+            if (NewPasswordInput.Password == ConfirmPasswordInput.Password)
+            {
+                SaveEncryptedPassword(NewPasswordInput.Password);
+                MessageBox.Show("Passwort wurde gesetzt.");
+                this.DialogResult = true;
+            }
+            else
+            {
+                MessageBox.Show("Die Passwörter stimmen nicht überein.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
 
         private void SaveEncryptedPassword(string password)
         {

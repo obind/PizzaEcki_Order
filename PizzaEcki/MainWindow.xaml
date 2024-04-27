@@ -6,7 +6,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Order Mate" KeyDown="MainWindowEcki_KeyDown"
-       MinWidth="1000" MinHeight="580" >
+       MinWidth="1000" MinHeight="580" Cursor="Arrow" >
 
 
     <Window.Resources>
@@ -122,7 +122,7 @@
         </ResourceDictionary>
 
     </Window.Resources>
-    <Grid Background="#FF1D1E20" Cursor="Hand">
+    <Grid Background="#FF1D1E20" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
