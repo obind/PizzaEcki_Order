@@ -102,6 +102,7 @@ namespace PizzaEcki
             };
             _reloadTimer.Tick += ReloadTimer_Tick;
             _reloadTimer.Start();
+            SetDefaultpassword();
         }
 
         private void StartServer()
@@ -615,6 +616,8 @@ namespace PizzaEcki
                 {
                     tempOrderItem.Epreis = basePrice;
                 }
+
+
            
 
                 // Verarbeite alle ausgewählten Extras
@@ -859,7 +862,19 @@ namespace PizzaEcki
         {
             string encryptedPassword = EncryptPassword(password);
             Properties.Settings.Default.EncryptedPassword = encryptedPassword;
-            Properties.Settings.Default.Save(); // Speichern der Änderungen
+            Properties.Settings.Default.Save();
+
+          
+        }
+
+        private void SetDefaultpassword() {
+            if (Properties.Settings.Default.EncryptedPassword == null || Properties.Settings.Default.EncryptedPassword == "")
+            {
+                string standardPassword = EncryptPassword("ecki");
+                Properties.Settings.Default.EncryptedPassword = standardPassword;
+                Properties.Settings.Default.Save();
+
+            }
         }
 
 
@@ -907,17 +922,27 @@ namespace PizzaEcki
 
             }
             //Gratis gericht 
-            if (e.Key == Key.F5)
-            {
-                // Setze den Preis des aktuell ausgewählten Gerichts auf 0
-                if (tempOrderItem != null)
+     
+                if (e.Key == Key.F5)
                 {
-                    tempOrderItem.Epreis = 0;
+                    // Überprüfen, ob ein Gericht im DataGrid ausgewählt ist
+                    var selectedItem = myDataGrid.SelectedItem as OrderItem;
+                    if (selectedItem != null)
+                    {
+                        // Setze den Preis des ausgewählten Gerichts auf 0
+                        selectedItem.Epreis = 0.00;
+                         selectedItem.Gesamt = 0.00;
 
+                        // Update the row in DataGrid
+                        myDataGrid.Items.Refresh();
 
+                        // Optional: Berechne erneut den Gesamtpreis, falls nötig
+                        CalculateTotal(orderItems);
+                    }
                 }
-                //}
-                if (e.Key == Key.F7)
+           
+
+            if (e.Key == Key.F7)
             {
                 // Stelle sicher, dass die Liste nicht leer ist
                 if (orderItems.Any())
@@ -950,6 +975,7 @@ namespace PizzaEcki
                 secretPrintTriggered = true;
                 BarzahlungBtn(null, null);
             }
+             
         }
         private void ShowHelpDialog()
         {

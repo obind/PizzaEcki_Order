@@ -97,11 +97,7 @@ namespace PizzaEcki.Pages
 
            
 
-            // Steuersatz
-            if (double.TryParse(TaxRateTextBox.Text, out double steuersatz))
-            {
-                Dish.Steuersatz = steuersatz;
-            }
+          
 
             _dbManager.AddOrUpdateDish(Dish);
             DialogResult = true;
