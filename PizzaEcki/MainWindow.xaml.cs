@@ -980,7 +980,7 @@ namespace PizzaEcki
         {
             string helpText = "F1: Zeige Hotkeys.\n" +
                               "F2: Kunde speichern.\n" +
-                              "F4: Bestellung löschen.\n" +
+                              "F4: Tagesumsatz Anzeigen.\n" +
                               "F5: Markiert das aktuelle Gericht als gratis.\n" +
                               "F7: Letztes Gericht löschen.\n" +
                               //"F8: Küchen Druck.\n" +
