@@ -226,7 +226,6 @@ namespace PizzaEcki
         }
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
         {
-            // Erstelle ein neues Customer-Objekt mit den Werten aus den Eingabefeldern
             Customer customer = new Customer
             {
                 PhoneNumber = PhoneNumberTextBox.Text,
@@ -984,7 +983,7 @@ namespace PizzaEcki
                               "F4: Bestellung löschen.\n" +
                               "F5: Markiert das aktuelle Gericht als gratis.\n" +
                               "F7: Letztes Gericht löschen.\n" +
-                              "F8: Küchen Druck.\n" +
+                              //"F8: Küchen Druck.\n" +
                               "F11: Alle Bestellungen anzeigen.\n" +
                               "F12: Bestellung abschließen und drucken.";
 
@@ -1505,35 +1504,8 @@ namespace PizzaEcki
 
         private async void Uebersicht_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var ordersWithAssignedDrivers = await _databaseManager.GetOrdersWithAssignedDrivers();
-                var allDrivers = await _databaseManager.GetAllDriversAsync();
-                var updatedOrders = new List<Order>();
 
-                foreach (var order in ordersWithAssignedDrivers)
-                {
-                    // Überprüfe, ob eine DriverId vorhanden ist und nicht der Platzhalter für keine Zuweisung ist
-                    if (order.DriverId.HasValue && order.DriverId.Value != -1)
-                    {
-                        var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
-                        order.Name = driver?.Name ?? "Nicht zugewiesen";  // Wenn kein passender Fahrer gefunden wird, "Nicht zugewiesen" verwenden
-                    }
-                    else
-                    {
-                        order.Name = "Nicht zugewiesen"; // Wenn keine DriverId zugewiesen ist, "Nicht zugewiesen" verwenden
-                    }
-
-                    updatedOrders.Add(order);
-                }
-
-                Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, false);
-                bestellungenFenster.Show();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
-            }
+            BestellungenAnzeigen("alle");
         }
 
     }
