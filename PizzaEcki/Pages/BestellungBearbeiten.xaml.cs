@@ -40,13 +40,12 @@ namespace PizzaEcki.Pages
 
             try
             {
-                // Hole die aktuellen OrderItems für die gegebene OrderId
                 var updatedOrderItems = await databaseManager.GetOrderItemsByOrderIdAsync(_currentOrder.OrderId.ToString());
-                _localOrderItems.Clear(); // Bestehende Einträge löschen
+                _localOrderItems.Clear();
 
                 foreach (var item in updatedOrderItems)
                 {
-                    _localOrderItems.Add(item); // Neue, aktuelle Einträge hinzufügen
+                    _localOrderItems.Add(item);
                 }
             }
             catch (Exception ex)
@@ -58,8 +57,7 @@ namespace PizzaEcki.Pages
 
         private void BestellungBearbeiten_Loaded(object sender, RoutedEventArgs e)
         {
-            // Initialisiere die Ansicht
-            // Zum Beispiel könntest du hier _localOrderItems an ein UI-Element binden
+           
         }
 
         private async void Speichern_Click(object sender, RoutedEventArgs e)
@@ -98,24 +96,21 @@ namespace PizzaEcki.Pages
 
         private async void AddNewOrderItem_Click(object sender, RoutedEventArgs e)
         {
-            // Erstelle ein neues OrderItem mit Standardwerten oder UI-Eingaben
             var newItem = new OrderItem
             {
                 OrderId = _currentOrder.OrderId,
-                Gericht = "Neues Gericht",
+                Gericht = null,
                 Extras = "",
                 Größe = "Standardgröße",
                 Menge = 1,
                 Epreis = 0.0,
                 Gesamt = 0.0,
-                LieferungsArt = 0, // Standardlieferart, könnte dynamisch gesetzt werden
-                Uhrzeit = DateTime.Now.ToString("HH:mm:ss") // Beispiel für aktuelle Uhrzeit
+                LieferungsArt = 0,
+                Uhrzeit = DateTime.Now.ToString("HH:mm:ss") 
             };
-
-            // Füge das neue Item zur ObservableCollection hinzu
+       
             _localOrderItems.Add(newItem);
 
-            // Optional: Speichere das neue OrderItem sofort in der Datenbank
             await databaseManager.AddOrderItemAsync(newItem);
             OrderUpdated?.Invoke();
         }

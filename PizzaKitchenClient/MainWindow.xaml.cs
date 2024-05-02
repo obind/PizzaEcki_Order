@@ -44,6 +44,7 @@ namespace PizzaKitchenClient
         private async void RefreshTimer_Tick(object sender, EventArgs e)
         {
             await LoadUnassignedOrdersAsync();
+            await _apiService.GetAllDriversAsync();
             CheckServerConnection();
         }
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)

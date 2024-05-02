@@ -95,10 +95,6 @@ namespace PizzaEcki.Pages
             // Gratis Beilage
             Dish.GratisBeilage = FreeSideCheckBox.IsChecked == true ? 1 : 0;
 
-           
-
-          
-
             _dbManager.AddOrUpdateDish(Dish);
             DialogResult = true;
         }

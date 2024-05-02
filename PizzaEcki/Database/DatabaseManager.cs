@@ -950,7 +950,7 @@ namespace PizzaEcki.Database
                     {
                         commandUpdateItem.Parameters.AddWithValue("@OrderItemId", item.Nr); // Verwende item.Nr als OrderItemId
 
-                        commandUpdateItem.Parameters.AddWithValue("@Gericht", item.Gericht ?? (object)DBNull.Value);
+                         commandUpdateItem.Parameters.AddWithValue("@Gericht", item.Gericht ?? (object)DBNull.Value);
                         commandUpdateItem.Parameters.AddWithValue("@Größe", item.Größe ?? (object)DBNull.Value);
                         commandUpdateItem.Parameters.AddWithValue("@Extras", item.Extras ?? (object)DBNull.Value);
                         commandUpdateItem.Parameters.AddWithValue("@Menge", item.Menge);
@@ -962,6 +962,7 @@ namespace PizzaEcki.Database
                     }
                 }
             }
+            _connection.Close();
         }
         public void SaveOrder(Order order)
         {
