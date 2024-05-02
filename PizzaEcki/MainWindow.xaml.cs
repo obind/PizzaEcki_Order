@@ -887,30 +887,37 @@ namespace PizzaEcki
         }
         private void MainWindowEcki_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.F2 && Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            if (e.Key == Key.F2 && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
             {
-                if (F1Grid.Visibility == Visibility.Collapsed)
+                if (F1Grid.Visibility == Visibility.Hidden)
                 {
                     ShowPasswordDialogAndCheck(); // Dialog anzeigen und Passwort überprüfen
                 }
                 else
                 {
-                    F1Grid.Visibility = Visibility.Collapsed; // F1Grid verbergen, wenn es bereits sichtbar ist
+                    F1Grid.Visibility = Visibility.Hidden; // F1Grid verbergen
                 }
+                e.Handled = true; // Ereignis als behandelt markieren
+                return; // Beende die Verarbeitung weiterer Aktionen
             }
 
-
-            if (e.Key == Key.F1)
+            // Überprüfung für F1 ohne weitere Modifikatoren
+            if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 ShowHelpDialog();
+                e.Handled = true; // Ereignis als behandelt markieren
+                return;
             }
 
-            if (e.Key == Key.F2)
+            // Überprüfung für F2 ohne weitere Modifikatoren
+            if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 if (SaveButton.Visibility == Visibility.Visible)
                 {
                     OnSaveButtonClicked(this, new RoutedEventArgs());
+                    e.Handled = true; // Ereignis als behandelt markieren
                 }
+                return;
             }
             //Zeige die Tagesübersicht
 
