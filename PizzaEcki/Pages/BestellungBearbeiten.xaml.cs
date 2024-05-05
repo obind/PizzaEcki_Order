@@ -66,14 +66,11 @@ namespace PizzaEcki.Pages
             if (orderToUpdate != null)
             {
                 try
-                {
-                  
-
-                    // Stelle sicher, dass die OrderItems der Bestellung aktualisiert werden
+                {          
                     orderToUpdate.OrderItems = _localOrderItems.ToList();
 
                     await databaseManager.UpdateOrderAsync(orderToUpdate);
-
+                    OrderUpdated?.Invoke();
                     MessageBox.Show("Die Bestellung wurde erfolgreich aktualisiert.", "Erfolg", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     if (OnSaveCompleted != null)
@@ -99,7 +96,8 @@ namespace PizzaEcki.Pages
             var newItem = new OrderItem
             {
                 OrderId = _currentOrder.OrderId,
-                Gericht = null,
+                Nr = -1,
+                Gericht = "",
                 Extras = "",
                 Größe = "Standardgröße",
                 Menge = 1,
@@ -109,10 +107,10 @@ namespace PizzaEcki.Pages
                 Uhrzeit = DateTime.Now.ToString("HH:mm:ss") 
             };
        
-            _localOrderItems.Add(newItem);
+           
 
-            await databaseManager.AddOrderItemAsync(newItem);
-            OrderUpdated?.Invoke();
+            
+            _localOrderItems.Add(newItem);
         }
 
 

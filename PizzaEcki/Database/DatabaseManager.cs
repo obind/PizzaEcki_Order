@@ -908,28 +908,25 @@ namespace PizzaEcki.Database
             // Hinweis: Hier könnte eine Logik erforderlich sein, um zu bestimmen, ob ein OrderItem aktualisiert oder eingefügt werden soll.
             foreach (var item in order.OrderItems)
             {
-                if (item.Nr == 0)
+                if (item.Nr == -1) // Neues Item
                 {
-                    // INSERT-Statement für neue OrderItems
-                    string sqlInsertItem = @"
-                    INSERT INTO OrderItems(Gericht, Größe, Extras, Menge, Epreis, Gesamt, Uhrzeit, LieferungsArt)
-                    VALUES(@Gericht, @Größe, @Extras, @Menge, @Epreis, @Gesamt, @Uhrzeit, @LieferungsArt)";
-
-
-
+                    string sqlInsertItem = @"INSERT INTO OrderItems (OrderId, Gericht, Größe, Extras, Menge, Epreis, Gesamt, LieferungsArt, Uhrzeit)
+                VALUES (@OrderId, @Gericht, @Größe, @Extras, @Menge, @Epreis, @Gesamt, @LieferungsArt, @Uhrzeit)";
                     using (SqliteCommand commandInsertItem = new SqliteCommand(sqlInsertItem, _connection))
                     {
-                        commandInsertItem.Parameters.AddWithValue("@OrderItemId", item.Nr);
 
-                        commandInsertItem.Parameters.AddWithValue("@Gericht", item.Gericht ?? (object)DBNull.Value);
-                        commandInsertItem.Parameters.AddWithValue("@Größe", item.Größe ?? (object)DBNull.Value);
-                        commandInsertItem.Parameters.AddWithValue("@Extras", item.Extras ?? (object)DBNull.Value);
-                        commandInsertItem.Parameters.AddWithValue("@Menge", item.Menge);
-                        commandInsertItem.Parameters.AddWithValue("@Epreis", item.Epreis);
-                        commandInsertItem.Parameters.AddWithValue("@Gesamt", item.Gesamt);
-                        commandInsertItem.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit ?? (object)DBNull.Value);
-                        commandInsertItem.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
-                        commandInsertItem.ExecuteNonQuery();
+                            commandInsertItem.Parameters.AddWithValue("@OrderItemId", item.Nr);
+                            commandInsertItem.Parameters.AddWithValue("@OrderId", order.OrderId.ToString());    
+                            commandInsertItem.Parameters.AddWithValue("@Gericht", item.Gericht ?? (object)DBNull.Value);
+                            commandInsertItem.Parameters.AddWithValue("@Größe", item.Größe ?? (object)DBNull.Value);
+                            commandInsertItem.Parameters.AddWithValue("@Extras", item.Extras ?? (object)DBNull.Value);
+                            commandInsertItem.Parameters.AddWithValue("@Menge", item.Menge);
+                            commandInsertItem.Parameters.AddWithValue("@Epreis", item.Epreis);
+                            commandInsertItem.Parameters.AddWithValue("@Gesamt", item.Gesamt);
+                            commandInsertItem.Parameters.AddWithValue("@Uhrzeit", item.Uhrzeit ?? (object)DBNull.Value);
+                            commandInsertItem.Parameters.AddWithValue("@LieferungsArt", item.LieferungsArt);
+                            commandInsertItem.ExecuteNonQuery();
+                        
                     }
                 }
                 else
