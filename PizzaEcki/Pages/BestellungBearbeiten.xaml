@@ -75,22 +75,22 @@
     <ScrollViewer Background="#FF1D1E20" Foreground="White">
         <StackPanel Margin="10">
             <Label Content="Bon Nummer" Foreground="White"/>
-            <TextBox Text="{Binding BonNumber}"/>
+            <TextBox Text="{Binding BonNumber}" Padding="5px" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" Cursor="Arrow"/>
 
             <Label Content="Fahrername" Foreground="White"/>
-            <TextBox Text="{Binding Name}"/>
+            <TextBox Text="{Binding Name}" Padding="5px" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" Cursor="Arrow"/>
 
             <Label Content="Adresse" Foreground="White"/>
             <!-- Hier könntest du die Adressdetails der Customer-Entität binden -->
-            <TextBox Text="{Binding Customer.Street}" Style="{StaticResource TransparentTextBoxStyle}" />
-            <TextBox Text="{Binding Customer.City}" Style="{StaticResource TransparentTextBoxStyle}"/>
+            <TextBox Text="{Binding Customer.Street}" Style="{StaticResource TransparentTextBoxStyle}" IsReadOnly="True" Cursor="Arrow" />
+            <TextBox Text="{Binding Customer.City}" Style="{StaticResource TransparentTextBoxStyle}" IsReadOnly="True" Cursor="Arrow"/>
 
 
             <Label Content="Lieferung Bis" Foreground="White"/>
-            <TextBox x:Name="DeliveryUntilTextBox" Text="{Binding DeliveryUntil, TargetNullValue='00:00', FallbackValue='00:00'}"/>
+            <TextBox x:Name="DeliveryUntilTextBox" Text="{Binding DeliveryUntil, TargetNullValue='00:00', FallbackValue='00:00'}" Cursor="IBeam"/>
             <!-- Hier wäre eine ListView für die Bearbeitung der OrderItems -->
             <Label Content="Bestellartikel" Foreground="#FFFFFEFE"/>
-            <ListView x:Name="BestellungenListView" ItemsSource="{Binding _localOrderItems}" Background="#FF5F6269" Foreground="#FF606065">
+            <ListView x:Name="BestellungenListView" ItemsSource="{Binding _localOrderItems}" Background="#FF5F6269" Foreground="#FF606065" Cursor="IBeam">
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Neues Gericht anlegen" Click="AddNewOrderItem_Click"/>

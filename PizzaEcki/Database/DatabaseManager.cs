@@ -577,7 +577,7 @@ namespace PizzaEcki.Database
                     OrderItems.Gesamt,
                     OrderItems.Uhrzeit,
                     OrderItems.LieferungsArt,
-                    COALESCE(Drivers.Id, -1) AS DriverId,  // Wenn DriverId NULL ist, gib -1 zurück
+                    COALESCE(Drivers.Id, -1) AS DriverId, 
                     COALESCE(Drivers.Name, 'Nicht zugewiesen') AS DriverName,
                     Drivers.PhoneNumber AS DriverPhoneNumber
                 FROM Orders
