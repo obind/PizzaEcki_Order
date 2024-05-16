@@ -163,7 +163,7 @@ public class ApiService
         }
         catch (HttpRequestException ex)
         {
-            MessageBox.Show($"Fehler bei der HTTP-Anfrage: {ex.Message}");
+          
             return null;
         }
         catch (Exception ex)
