@@ -10,7 +10,7 @@
         <ComboBox x:Name="tablesComboBox" 
           SelectionChanged="TablesComboBox_SelectionChanged"
           Margin="10" VerticalAlignment="Top"
-          FontSize="12" Height="30" Padding="5,0,5,0" 
+          FontSize="12" Height="30" Padding="5,0,5,0" Text="- Wähle Tabelle -" 
             Background="#FF5F6269" Foreground="#FF5F6269" BorderBrush="#FF5F6269" VerticalContentAlignment="Center">
             <ComboBox.Resources>
                 <!-- Anpassung des Hintergrunds für das Dropdown -->

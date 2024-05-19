@@ -94,22 +94,33 @@ namespace PizzaEcki.Pages
                     }
                     else
                     {
-
+                        // Hole das ausgewählte Pizza-Objekt
                         Dish selectedItem = PizzaComboBox.SelectedItem as Dish;
                         if (selectedItem != null)
                         {
-                            selectedPizzas.Add(selectedItem);
-                            selectedPizzasListBox.Items.Add(selectedItem);
-                            PizzaComboBox.Text = string.Empty; // ComboBox leeren
-                            UpdatePrice();
+                            // Prüfe, ob die maximale Anzahl von Pizzen bereits erreicht ist
+                            if (selectedPizzas.Count >= 6)
+                            {
+                                MessageBox.Show("Es können maximal 6 Pizzen ausgewählt werden.");
+                            }
+                            else
+                            {
+                                // Füge die ausgewählte Pizza hinzu und aktualisiere die UI
+                                selectedPizzas.Add(selectedItem);
+                                selectedPizzasListBox.Items.Add(selectedItem);
+                                PizzaComboBox.Text = string.Empty; // Leere die ComboBox
+
+                                UpdatePrice(); // Aktualisiere den Preis
+                            }
                         }
                         else
                         {
                             MessageBox.Show("Bitte wähle eine gültige Pizza aus.");
                         }
-                        e.Handled = true;
+
+                        e.Handled = true; // Verhindere weitere Event-Handler
                     }
-                    e.Handled = true; // Verhindert weitere Handler
+                e.Handled = true; // Verhindert weitere Handler
                 
                 PizzaComboBox.Focus(); // Setzt den Fokus zurück auf die ComboBox
             }

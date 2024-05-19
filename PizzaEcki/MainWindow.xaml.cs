@@ -921,7 +921,7 @@ namespace PizzaEcki
             }
             //Zeige die Tagesübersicht
 
-            if (e.Key == Key.F4)
+            if (e.Key == Key.F4 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
             {
                 DailyEarnings dailyEarnings = new DailyEarnings();
                 dailyEarnings.ShowDialog();

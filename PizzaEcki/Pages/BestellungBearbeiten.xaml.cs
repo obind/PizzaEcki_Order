@@ -130,5 +130,33 @@ namespace PizzaEcki.Pages
                 }
             }
         }
+
+        private async void Loeschen_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentOrder == null)
+            {
+                MessageBox.Show("Es wurde keine Bestellung ausgewählt.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show("Möchten Sie diese Bestellung wirklich löschen?", "Bestellung löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                bool deleteSuccess = await databaseManager.DeleteOrderAsync(_currentOrder.OrderId);
+                if (deleteSuccess)
+                {
+                    MessageBox.Show("Die Bestellung wurde erfolgreich gelöscht.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Aktualisiere die UI oder schließe das Fenster, falls nötig
+                    OrderUpdated?.Invoke(); // Benachrichtige andere Teile der Anwendung, dass eine Aktualisierung nötig ist
+                    this.Close(); // Optional: Schließe das Fenster nach dem Löschen
+                }
+                else
+                {
+                    MessageBox.Show("Fehler beim Löschen der Bestellung.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
     }
 }

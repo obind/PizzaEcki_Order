@@ -495,7 +495,7 @@ namespace PizzaKitchenClient
                 }
 
                 BestellungenFenster bestellungenFenster = new BestellungenFenster(updatedOrders);
-                bestellungenFenster.Show();
+                bestellungenFenster.ShowDialog();
             }
             catch (Exception ex)
             {
