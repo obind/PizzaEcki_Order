@@ -47,6 +47,12 @@
                     <Setter Property="Background" Value="#FF5F6269"/>
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF5F6269" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="BorderBrush" Value="#ff602c" />
+                </Trigger>
+
             </Style.Triggers>
         </Style>
     </Window.Resources>
@@ -56,8 +62,17 @@
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                     <Style.Triggers>
-                     
-                    
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FF5F6269" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="#ff602c" />
+                        </Trigger>
+
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#FF5F6269" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="#ff602c" />
+                        </Trigger>
                     </Style.Triggers>
                 </Style>
             </ListView.ItemContainerStyle>
@@ -124,13 +139,13 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>-->
                     
-                    <GridViewColumn Header="Gerichte" Width="500">
+                    <GridViewColumn Header="Gerichte" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ListView ItemsSource="{Binding OrderItems}" Background="#FF1D1E20" Foreground="White" BorderBrush="White" SelectionMode="Single" IsEnabled="False">
                                     <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Width="120">
+                                        <GridView ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                            <GridViewColumn Width="Auto">
                                                 <GridViewColumn.HeaderTemplate>
                                                     <DataTemplate>
                                                         <TextBlock Text="Artikel" Foreground="White" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" Padding="5"/>

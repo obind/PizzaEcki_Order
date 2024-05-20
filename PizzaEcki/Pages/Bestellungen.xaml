@@ -59,7 +59,12 @@
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                     <Style.Triggers>
-                    
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FF5F6269" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="#ff602c" />
+                        </Trigger>
+
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="#FF5F6269" />
                             <Setter Property="Foreground" Value="White" />
@@ -69,7 +74,7 @@
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.View>
-                <GridView>
+                <GridView >
                     <GridViewColumn Header="Bon Nr" Width="50">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -160,12 +165,12 @@
                   </GridViewColumn.CellTemplate>
               </GridViewColumn>-->
 
-                    <GridViewColumn Header="Gerichte">
+                    <GridViewColumn Header="Gerichte" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ListView ItemsSource="{Binding OrderItems}" Background="#FF1D1E20" Foreground="White" BorderBrush="White" SelectionMode="Single" IsEnabled="False">
                                     <ListView.View>
-                                        <GridView>
+                                        <GridView ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                             <GridViewColumn>
                                                 <GridViewColumn.HeaderTemplate>
                                                     <DataTemplate>

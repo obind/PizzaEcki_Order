@@ -56,6 +56,7 @@
                     <Setter Property="Background" Value="#FF5F6269"/>
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
+                
             </Style.Triggers>
         </Style>
     </Window.Resources>
@@ -69,10 +70,23 @@
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-  
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FF5F6269" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="#ff602c" />
+                        </Trigger>
+
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#FF5F6269" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="BorderBrush" Value="#ff602c" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.View>
+                
                 <GridView>
                     <GridViewColumn Header="Bon Nr" Width="50">
                         <GridViewColumn.CellTemplate>
