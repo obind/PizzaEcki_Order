@@ -25,7 +25,7 @@
             <!-- Hinzugefügter Hover-Effekt -->
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="#FF003399"/>
+              
                     <!-- Farbe des Randes beim Hover -->
                 </Trigger>
             </Style.Triggers>

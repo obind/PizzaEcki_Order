@@ -19,7 +19,7 @@
                 </DrawingImage.Drawing>
             </DrawingImage>
 
-            
+
             <Style x:Key="FocusedComboBoxStyle" TargetType="{x:Type ComboBox}">
                 <Setter Property="FocusVisualStyle">
                     <Setter.Value>
@@ -106,7 +106,7 @@
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="true">
                                     <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
-                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                                    
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="false">
                                     <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
@@ -145,7 +145,7 @@
             </Grid.ColumnDefinitions>
             <!--<Button Grid.Column="0" Content="Erfassung" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FF602C" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>-->
             <!--<Button Name="TestButton" Grid.Column="3" Content="Reset Bon Number Test" Click="ResetBonNumberButton_Click" />-->
-                <!--<Button Grid.Column="2" Content="Logbuch" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FF602C" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
+            <!--<Button Grid.Column="2" Content="Logbuch" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FF602C" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
 
 
             <Border Grid.Column="0" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
@@ -197,19 +197,19 @@
                 <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,10,0" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
                 <Border x:Name="SaveButtonBorder"  Grid.Row="6" Grid.Column="1" Background="#FF602C" CornerRadius="10" HorizontalAlignment="Right"  Margin="0,0,10,2" Visibility="Collapsed">
                     <Button x:Name="SaveButton" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}"         >
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Border.CornerRadius" Value="50"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#E54B3C"/>
-                                    <!-- Etwas dunklere Farbe bei MouseOver -->
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style> 
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Border.CornerRadius" Value="50"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#E54B3C"/>
+                                        <!-- Etwas dunklere Farbe bei MouseOver -->
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
                     </Button>
-                </Border> 
+                </Border>
             </Grid>
         </Border>
         <Border Background="#FF3D4248" Margin="5,5,20,5" Grid.Row="1" Grid.Column="1" CornerRadius="10,10,10,10">
@@ -253,7 +253,7 @@
                     VerticalContentAlignment="Center" 
                     Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
                     IsEditable="True" TabIndex="6" 
-                    Text="1" MinWidth="40" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand">   
+                    Text="1" MinWidth="40" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand">
                     <ComboBoxItem>1</ComboBoxItem>
                     <ComboBoxItem>2</ComboBoxItem>
                     <ComboBoxItem>3</ComboBoxItem>
@@ -288,7 +288,7 @@
                     <Label Content="Bestellung" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
                 </Border>
 
-                <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top"  FontWeight="Bold" BorderBrush="{x:Null}">
+                <DataGrid x:Name="myDataGrid" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top"  FontWeight="Bold" BorderBrush="{x:Null}">
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#3d4248"/>
@@ -299,7 +299,7 @@
                     </DataGrid.ColumnHeaderStyle>
                     <DataGrid.Columns>
                         <!-- Nr. Spalte -->
-                        <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}"  Foreground="White">
+                        <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}"  Foreground="White"  IsReadOnly="True" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -307,7 +307,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Gericht Spalte -->
-                        <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" Foreground="White">
+                        <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" Foreground="White"  IsReadOnly="True" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -315,7 +315,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Größe Spalte -->
-                        <DataGridTextColumn Width="0.15*" Header="Größe" Binding="{Binding Größe}" Foreground="White">
+                        <DataGridTextColumn Width="0.15*" Header="Größe" Binding="{Binding Größe}" Foreground="White"  IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -323,15 +323,24 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Extras Spalte -->
-                        <DataGridTextColumn Width="0.25*" Header="Extras" Binding="{Binding Extras}" Foreground="White">
+                        <DataGridTextColumn Width="0.25*" Header="Extras" Binding="{Binding Extras}" IsReadOnly="False">
+                         
                             <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="{x:Type TextBlock}">
+                                <Style TargetType="TextBlock">
                                     <Setter Property="Background" Value="#5f6269"/>
+                                    <Setter Property="Foreground" Value="White"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                    <!-- Setze hier die gewünschte Hintergrundfarbe während der Bearbeitung -->
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
                         <!-- Menge Spalte -->
-                        <DataGridTextColumn Width="0.10*" Header="Menge" Binding="{Binding Menge}" Foreground="White">
+                        <DataGridTextColumn Width="0.10*" Header="Menge" Binding="{Binding Menge}" Foreground="White"  IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -339,7 +348,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Epreis Spalte -->
-                        <DataGridTextColumn Width="0.10*" Header="Epreis" Binding="{Binding Epreis, StringFormat={}{0:F2} €}" Foreground="White">
+                        <DataGridTextColumn Width="0.10*" Header="Epreis" Binding="{Binding Epreis, StringFormat={}{0:F2} €}" Foreground="White"  IsReadOnly="True" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -347,7 +356,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Gesamt Spalte -->
-                        <DataGridTextColumn Width="0.10*" Header="Gesamt" Binding="{Binding Gesamt, StringFormat={}{0:F2} €}" Foreground="White">
+                        <DataGridTextColumn Width="0.10*" Header="Gesamt" Binding="{Binding Gesamt, StringFormat={}{0:F2} €}" Foreground="White"  IsReadOnly="True" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -382,28 +391,26 @@
                 <Label Grid.Row="1" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock x:Name="MitnehmerTextBlock" Text="Mitnehmer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="MitnehmerLabel_MouseDown" Cursor="Hand"/>
                 </Label>
-               
+
                 <Label x:Name="MitnehmerLabel" Grid.Row="1" Grid.Column="1" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,10,0" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="MitnehmerLabel_MouseDown"/>
-              
-                
+
+
                 <Label Grid.Row="2" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    
+
                     <TextBlock x:Name="SelbstabholerTextBlock" Text="Selbstabholer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="SelbstabholerLabel_MouseDown" Cursor="Hand"/>
-               
+
                 </Label>
-                
-                
+
+
                 <Label x:Name="SelbstabholerLabel" Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" MouseDown="SelbstabholerLabel_MouseDown"/>
 
-                
+
                 <Label Grid.Row="3" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                
-                    
+
                     <TextBlock x:Name="AuslieferungTextBlock" Text="Auslieferung" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="AuslieferungLabel_MouseDown" Cursor="Hand"/>
-               
-                    
+
                 </Label>
-                
+
                 <Label x:Name="AuslieferungLabel" Grid.Row="3" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Column="1" Padding="5,5,5,5" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="AuslieferungLabel_MouseDown"/>
 
                 <Label Grid.Column="2" Grid.Row="1" Content="Bon" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
@@ -418,7 +425,7 @@
                 </ComboBox>
                 <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10">
                     <Button x:Name="btn_zuordnen"  Style="{DynamicResource ButtonStyle1}" Padding="5,0,5,0" Content="Zuordnen" Foreground="White" FontWeight="Bold" Click="Btn_zuordnen_Click" BorderThickness="0" Background="{x:Null}" Cursor="Hand">
-                       
+
                     </Button>
                 </Border>
                 <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Left" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10">
@@ -470,10 +477,10 @@
                 <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
 
                     <Button x:Name="btn_paypal" Style="{DynamicResource ButtonStyle1}" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" BorderBrush="{x:Null}" Cursor="Hand" >
-                    <!-- Icon für PayPal (Beispiel) -->
-                    <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"/>
+                        <!-- Icon für PayPal (Beispiel) -->
+                        <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"/>
                     </Button>
-                </Border> 
+                </Border>
             </StackPanel>
         </Grid>
 

@@ -658,8 +658,8 @@ namespace PizzaEcki
             // Fügen Sie das tempOrderItem zur Liste hinzu
             tempOrderItem.Nr = orderItems.Count + 1;
             orderItems.Add(tempOrderItem);
-            myDataGrid.ItemsSource = null;
-            myDataGrid.ItemsSource = orderItems;
+            
+                myDataGrid.ItemsSource = orderItems;
 
             CalculateTotal(orderItems);
 
@@ -717,7 +717,7 @@ namespace PizzaEcki
         }
         private void myDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Back || e.Key == Key.Delete)
+            if (e.Key == Key.Delete)
             {
                 // Ausgewählte Zeile holen
                 var selectedRow = myDataGrid.SelectedItem as OrderItem;
