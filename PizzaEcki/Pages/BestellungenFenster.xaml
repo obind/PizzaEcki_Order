@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:services="clr-namespace:PizzaEcki.Services" 
 
-        Title="Bestellungen anzeigen" Height="450" Width="1240"
+        Title="Bestellungen anzeigen" Height="450" Width="Auto"  ResizeMode="NoResize"
         MinWidth="1240"  MinHeight="300" KeyDown="Window_KeyDown"
         
 >
@@ -12,7 +12,8 @@
 
         <services:PhoneNumberToTextConverter x:Key="PhoneNumberToTextConverter"/>
         <services:PhoneNumberToVisibilityConverter x:Key="PhoneNumberToVisibilityConverter"/>
-
+        <services:StringToDateTimeConverter x:Key="StringToDateTimeConverter"/>
+        <services:TextToColorConverter x:Key="TextToColorConverter"/>
         <!-- Button-Style für orange Hintergrund -->
         <Style x:Key="OrangeButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#FF602C"/>
@@ -56,7 +57,7 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    <Grid>
+    <Grid >
         <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
@@ -78,22 +79,33 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Bon Nr" Width="50">
+                    <GridViewColumn Header="Bon Nr" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding BonNumber}" Foreground="White" FontSize="14" HorizontalAlignment="Center" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
+                    <GridViewColumn Header="Telefonnummer" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" 
+                                           Foreground="{Binding CustomerPhoneNumber, Converter={StaticResource TextToColorConverter}}" FontSize="14" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Kunde" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Customer.Name}" Foreground="White" FontSize="14" HorizontalAlignment="Center"
+                                <TextBlock Text="{Binding Customer.Name}" 
+                       FontSize="14" 
+                       HorizontalAlignment="Center"
+                      
                        Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
 
                     <GridViewColumn Header="Adresse" Width="200">
                         <GridViewColumn.CellTemplate>
@@ -105,14 +117,15 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
-                    <GridViewColumn Header="Telefonnummer" Width="100">
+                    <GridViewColumn Header="Offen seit" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding Timestamp, Converter={StaticResource StringToDateTimeConverter}}" HorizontalAlignment="Center" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
+
 
 
                     <GridViewColumn Header="Lieferung Bis" Width="100">

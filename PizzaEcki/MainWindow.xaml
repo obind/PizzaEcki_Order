@@ -135,7 +135,7 @@
 
         </Grid.RowDefinitions>
 
-        <Grid x:Name="F1Grid" VerticalAlignment="Top" Height="35" Margin="20,0,0,0"  Visibility="Hidden" >
+        <Grid x:Name="F1Grid" VerticalAlignment="Top" Height="35" Margin="20,0,0,0"  Visibility="Collapsed" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -196,18 +196,8 @@
                 <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="10,0,0,2"/>
                 <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,10,0" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
                 <Border x:Name="SaveButtonBorder"  Grid.Row="6" Grid.Column="1" Background="#FF602C" CornerRadius="10" HorizontalAlignment="Right"  Margin="0,0,10,2" Visibility="Collapsed">
-                    <Button x:Name="SaveButton" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}"         >
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Border.CornerRadius" Value="50"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#E54B3C"/>
-                                        <!-- Etwas dunklere Farbe bei MouseOver -->
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
+                    <Button x:Name="SaveButton"  Style="{DynamicResource ButtonStyle1}" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}"         >
+                        
                     </Button>
                 </Border>
             </Grid>
@@ -285,7 +275,7 @@
                 </Grid.RowDefinitions>
                 <Border Grid.Row="0" Grid.ColumnSpan="2"  Padding="5,0,5,2" Background="#FF602C" CornerRadius="10">
                     <!-- CornerRadius für abgerundete Ecken -->
-                    <Label Content="Bestellung" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
+                    <Label Content="Gerichte" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
                 </Border>
 
                 <DataGrid x:Name="myDataGrid" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top"  FontWeight="Bold" BorderBrush="{x:Null}">

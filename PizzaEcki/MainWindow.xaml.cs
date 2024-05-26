@@ -30,7 +30,6 @@ namespace PizzaEcki
     {
         private StringBuilder extrasStringBuilder = new StringBuilder();
         public ObservableCollection<Driver> Drivers { get; set; }
-
         private DatabaseManager _databaseManager;
         private List<Dish> dishesList;
         private List<Extra> extrasList;
@@ -40,8 +39,8 @@ namespace PizzaEcki
         private List<string> selectedExtras = new List<string>();
 
         public string SelectedPaymentMethod { get; private set; }
-
         public string _customerNr;
+        private string _currentBestellungsTyp;
         private string _pickupType = "";
 
         private int currentReceiptNumber = 0;
@@ -55,7 +54,6 @@ namespace PizzaEcki
         private bool secretPrintTriggered = false;
 
         private BestellungenFenster _bestellungenFenster;
-        private string _currentBestellungsTyp;
 
         private DispatcherTimer _reloadTimer;
 
@@ -76,10 +74,9 @@ namespace PizzaEcki
             StartServer();
 
             dishesList = _databaseManager.GetAllDishes();
-            DishComboBox.ItemsSource = dishesList;
-
-   
             extrasList = _databaseManager.GetExtras();
+        
+            DishComboBox.ItemsSource = dishesList;   
             ExtrasComboBox.ItemsSource = extrasList;
 
             TimePickermein.Value = null;
@@ -111,8 +108,7 @@ namespace PizzaEcki
             {
                 // Pfad zur Server-EXE relativ zum aktuellen Ausführungsverzeichnis
                 string serverExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PizzaServer.exe");
-
-                // Überprüfen Sie, ob die EXE vorhanden ist
+         
                 if (File.Exists(serverExePath))
                 {
                     Process serverProcess = new Process();
@@ -128,8 +124,7 @@ namespace PizzaEcki
                 }
             }
             catch (Exception ex)
-            {
-                // Fehlerbehandlung
+            {          
                 MessageBox.Show("Der Server konnte nicht gestartet werden: " + ex.Message);
             }
         }
@@ -149,8 +144,7 @@ namespace PizzaEcki
         }
 
         private void ReloadTimer_Tick(object sender, EventArgs e)
-        {
-            // Rufe deine Methode hier auf
+        {     
             ReloadeUnassignedOrders();
         }
         private void PhoneNumberTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -163,6 +157,7 @@ namespace PizzaEcki
                 {
                     if (_customerNr == "1")
                     {
+                        SaveButton.Visibility = Visibility.Collapsed;
                         isDelivery = false;
                         Selbstabholer++;
                         _pickupType = "Selbstabholer";
@@ -170,6 +165,7 @@ namespace PizzaEcki
                     }
                     else if (_customerNr == "2")
                     {
+                        SaveButton.Visibility = Visibility.Collapsed;
                         isDelivery = false;
                         Mitnehmer++;
                         _pickupType = "Mitnehmer";
@@ -177,8 +173,9 @@ namespace PizzaEcki
                     }
                     else
                     {
+                        SaveButton.Visibility = Visibility.Collapsed;
                         Customer customer = _databaseManager.GetCustomerByPhoneNumber(_customerNr);
-                        if (customer != null) // Kunde gefunden
+                        if (customer != null)
                         {
                             SetCustomerDataToFields(customer);
                             DishComboBox.Focus();
@@ -226,6 +223,11 @@ namespace PizzaEcki
         }
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
         {
+            if(string.IsNullOrEmpty(NameTextBox.Text))
+            {
+                MessageBox.Show("Bitte geben Sie einen Namen ein.");
+                return;
+            }
             Customer customer = new Customer
             {
                 PhoneNumber = PhoneNumberTextBox.Text,
@@ -574,6 +576,7 @@ namespace PizzaEcki
             if (!tempOrderItem.Gericht.StartsWith("Party Pizza") && dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
             {
                 MessageBox.Show("Bitte gebe ein Gericht an.");
+                DishComboBox.Focus();
                 return;
             }
 
@@ -658,7 +661,7 @@ namespace PizzaEcki
             // Fügen Sie das tempOrderItem zur Liste hinzu
             tempOrderItem.Nr = orderItems.Count + 1;
             orderItems.Add(tempOrderItem);
-            
+            myDataGrid.ItemsSource = null;
                 myDataGrid.ItemsSource = orderItems;
 
             CalculateTotal(orderItems);
@@ -736,9 +739,8 @@ namespace PizzaEcki
         private void CompleteOrder(string paymentMethod)
         {
             if (!orderItems.Any())
-            {
-                MessageBox.Show("Es wurden keine Order-Items hinzugefügt. Bitte füge mindestens ein Order-Item hinzu, bevor du die Bestellung abschließt.");
-                return; // Verlasse die Methode frühzeitig
+            {           
+                return;
             }
 
             string totalPriceString = TotalPriceLabel.Content.ToString();
@@ -753,25 +755,24 @@ namespace PizzaEcki
 
             if (PhoneNumberTextBox.Text != "")
             {
-                // Erstelle ein neues Receipt Objekt und fülle es mit den OrderItems und der ReceiptNumber
+            
                 Receipt receipt = new Receipt
                 {
-                    ReceiptNumber = GetNextReceiptNumber(),
-                    //OrderItems = GetCurrentOrderItems(),
+                    ReceiptNumber = GetNextReceiptNumber(),             
                 };
 
                 var deliveryUntilStr = TimePickermein.Value.HasValue
                      ? TimePickermein.Value.Value.ToString("HH:mm")
-                     : string.Empty; // Leer, wenn kein Wert vorhanden
+                     : string.Empty; 
 
 
                 var order = new Order
                 {
                     OrderId = Guid.NewGuid(),
-                    BonNumber = ++currentBonNumber, // Erhöhen und zuweisen
+                    BonNumber = ++currentBonNumber, 
                     IsDelivery = isDelivery,
                     OrderItems = orderItems,
-                    PaymentMethod = paymentMethod, // Zuweisen der Zahlungsmethode
+                    PaymentMethod = paymentMethod,
                     CustomerPhoneNumber = _customerNr,
                     Timestamp = DateTime.Now.ToString("HH:mm"),
                     DeliveryUntil = deliveryUntilStr
@@ -781,7 +782,7 @@ namespace PizzaEcki
                 _databaseManager.UpdateCurrentBonNumber(currentBonNumber);
 
                 _databaseManager.SaveOrder(order);
-                SendOrderItems(order);
+               
                 ReloadeUnassignedOrders();
 
                 if (PhoneNumberTextBox.Text != "1" && PhoneNumberTextBox.Text != "2")
@@ -794,9 +795,7 @@ namespace PizzaEcki
                     PrintReceipt(order, null);
                 }
 
-                // Leeren Sie die Bestellliste
                 orderItems.Clear();
-
                 PhoneNumberTextBox.Text = string.Empty;
                 NameTextBox.Text = string.Empty;
                 StreetTextBox.Text = string.Empty;
@@ -806,13 +805,9 @@ namespace PizzaEcki
                 TimePickermein.Value = null;
                 TotalPriceLabel.Content = $"0.00 €";
 
-                // Aktualisieren Sie die DataGrid-Ansicht, wenn Sie die Liste direkt an die ItemsSource gebunden haben
+              
                 myDataGrid.Items.Refresh();
-                PhoneNumberTextBox.Focus();
-                //Aktualisiere Lieferungsart
-                //AuslieferungLabel.Content = Lieferung;
-                //MitnehmerLabel.Content = Mitnehmer;
-                //SelbstabholerLabel.Content = Selbstabholer;
+                PhoneNumberTextBox.Focus();             
             }
             else
             {
@@ -823,8 +818,7 @@ namespace PizzaEcki
         {
             return ++currentReceiptNumber;
         }
-        //Zeigt das Vertecke Menü für Admins
-
+   
         private void ShowPasswordDialogAndCheck()
         {
             PasswordInputDialog dialog = new PasswordInputDialog();
@@ -844,8 +838,7 @@ namespace PizzaEcki
         }
 
         private string DecryptPassword(string encryptedPassword)
-        {
-            // Hier sollte die Entschlüsselungslogik stehen, passend zur Verschlüsselung
+        {      
             byte[] data = Convert.FromBase64String(encryptedPassword);
             return Encoding.UTF8.GetString(data);
         }
@@ -861,9 +854,7 @@ namespace PizzaEcki
         {
             string encryptedPassword = EncryptPassword(password);
             Properties.Settings.Default.EncryptedPassword = encryptedPassword;
-            Properties.Settings.Default.Save();
-
-          
+            Properties.Settings.Default.Save();    
         }
 
         private void SetDefaultpassword() {
@@ -878,103 +869,84 @@ namespace PizzaEcki
 
 
         private string EncryptPassword(string password)
-        {
-            // Eine einfache Verschlüsselungsmethode (nur als Beispiel, für echte Anwendungen stärkere Methoden verwenden)
-            // Ersetzen Sie dies durch Ihre bevorzugte Verschlüsselungsmethode
+        {        
             byte[] data = Encoding.UTF8.GetBytes(password);
-            // Verwenden Sie hier Ihre Verschlüsselungslogik
             return Convert.ToBase64String(data);
         }
+
         private void MainWindowEcki_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F2 && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
             {
                 if (F1Grid.Visibility == Visibility.Hidden)
                 {
-                    ShowPasswordDialogAndCheck(); // Dialog anzeigen und Passwort überprüfen
+                    ShowPasswordDialogAndCheck();
                 }
                 else
                 {
-                    F1Grid.Visibility = Visibility.Hidden; // F1Grid verbergen
+                    F1Grid.Visibility = Visibility.Hidden;
                 }
-                e.Handled = true; // Ereignis als behandelt markieren
-                return; // Beende die Verarbeitung weiterer Aktionen
-            }
-
-            // Überprüfung für F1 ohne weitere Modifikatoren
-            if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
-            {
-                ShowHelpDialog();
-                e.Handled = true; // Ereignis als behandelt markieren
+                e.Handled = true;
                 return;
             }
 
-            // Überprüfung für F2 ohne weitere Modifikatoren
+          
+            if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
+            {
+                ShowHelpDialog();
+                e.Handled = true; 
+                return;
+            }
+
+           
             if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 if (SaveButton.Visibility == Visibility.Visible)
                 {
                     OnSaveButtonClicked(this, new RoutedEventArgs());
-                    e.Handled = true; // Ereignis als behandelt markieren
+                    e.Handled = true; 
                 }
                 return;
             }
-            //Zeige die Tagesübersicht
-
+       
             if (e.Key == Key.F4 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
             {
                 DailyEarnings dailyEarnings = new DailyEarnings();
                 dailyEarnings.ShowDialog();
 
             }
-            //Gratis gericht 
-     
-                if (e.Key == Key.F5)
-                {
-                    // Überprüfen, ob ein Gericht im DataGrid ausgewählt ist
-                    var selectedItem = myDataGrid.SelectedItem as OrderItem;
-                    if (selectedItem != null)
-                    {
-                        // Setze den Preis des ausgewählten Gerichts auf 0
-                        selectedItem.Epreis = 0.00;
-                         selectedItem.Gesamt = 0.00;
-
-                        // Update the row in DataGrid
-                        myDataGrid.Items.Refresh();
-
-                        // Optional: Berechne erneut den Gesamtpreis, falls nötig
-                        CalculateTotal(orderItems);
-                    }
+               
+            if (e.Key == Key.F5)
+            {                  
+                var selectedItem = myDataGrid.SelectedItem as OrderItem;
+                if (selectedItem != null)
+                {                   
+                    selectedItem.Epreis = 0.00;
+                    selectedItem.Gesamt = 0.00;        
+                    myDataGrid.Items.Refresh();
+                    CalculateTotal(orderItems);
                 }
+            }
            
 
             if (e.Key == Key.F7)
-            {
-                // Stelle sicher, dass die Liste nicht leer ist
+            {             
                 if (orderItems.Any())
-                {
-                    // Entferne das letzte Gericht aus der Liste
-                    orderItems.RemoveAt(orderItems.Count - 1);
-
-                    // Aktualisiere das DataGrid
+                {                
+                    orderItems.RemoveAt(orderItems.Count - 1);               
                     myDataGrid.ItemsSource = null;
-                    myDataGrid.ItemsSource = orderItems;
-
-                    // Aktualisiere den Gesamtpreis
-                    CalculateTotal(orderItems);
-
-                    // Weitere UI-Updates, falls erforderlich
+                    myDataGrid.ItemsSource = orderItems;                 
+                    CalculateTotal(orderItems);               
                 }
             }
-            //F8 Löschen der Bestellung
-            //Ist im anderen Fenster
+            
             if (e.Key == Key.F11)
             {
                 BestellungenAnzeigen("alle");
             }
             if (e.Key == Key.F12)
             {
-                BarzahlungBtn(null, null); // Du kannst null für sender und RoutedEventArgs übergeben, da sie in deiner Methode nicht verwendet werden
+                BarzahlungBtn(null, null);
             }
             if (e.Key == Key.F8)
             {
@@ -988,7 +960,7 @@ namespace PizzaEcki
             string helpText = "F1: Zeige Hotkeys.\n" +
                               "F2: Kunde speichern.\n" +
                               "F4: Tagesumsatz Anzeigen.\n" +
-                              "F5: Markiert das aktuelle Gericht als gratis.\n" +
+                              "F5: Das markierte Gericht wird gratis.\n" +
                               "F7: Letztes Gericht löschen.\n" +
                               //"F8: Küchen Druck.\n" +
                               "F11: Alle Bestellungen anzeigen.\n" +
