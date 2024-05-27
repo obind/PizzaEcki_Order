@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -844,8 +845,8 @@ namespace PizzaEcki
         {
             return ++currentReceiptNumber;
         }
-   
-        private void ShowPasswordDialogAndCheck()
+
+        private void ShowPasswordDialogAndCheckForF1Grid()
         {
             PasswordInputDialog dialog = new PasswordInputDialog();
             if (dialog.ShowDialog() == true)
@@ -899,14 +900,29 @@ namespace PizzaEcki
             byte[] data = Encoding.UTF8.GetBytes(password);
             return Convert.ToBase64String(data);
         }
-
-        private void MainWindowEcki_KeyDown(object sender, KeyEventArgs e)
+        private bool ShowPasswordDialogAndCheck()
+        {
+            PasswordInputDialog dialog = new PasswordInputDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                if (IsPasswordCorrect(dialog.Password))
+                {
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Das Passwort ist nicht korrekt.");
+                }
+            }
+            return false;
+        }
+        private async void MainWindowEcki_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F2 && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
             {
                 if (F1Grid.Visibility == Visibility.Hidden)
                 {
-                    ShowPasswordDialogAndCheck();
+                    ShowPasswordDialogAndCheckForF1Grid();
                 }
                 else
                 {
@@ -916,56 +932,64 @@ namespace PizzaEcki
                 return;
             }
 
-          
             if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 ShowHelpDialog();
-                e.Handled = true; 
+                e.Handled = true;
                 return;
             }
 
-           
             if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 if (SaveButton.Visibility == Visibility.Visible)
                 {
                     OnSaveButtonClicked(this, new RoutedEventArgs());
-                    e.Handled = true; 
+                    e.Handled = true;
                 }
                 return;
+            }
+
+            if (e.Key == Key.F3 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                var passwordCorrect = ShowPasswordDialogAndCheck();
+                if (passwordCorrect)
+                {
+                    var deletedOrders = await _databaseManager.GetDeletedOrdersWithItems();
+                    var deletedOrdersWindow = new GelöschteBestellungen(deletedOrders);
+                    deletedOrdersWindow.ShowDialog();
+                    e.Handled = true;
+                    return;
+                }
             }
 
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F4)
             {
                 DailyEarnings dailyEarnings = new DailyEarnings();
                 dailyEarnings.ShowDialog();
-
             }
-               
+
             if (e.Key == Key.F5)
-            {                  
+            {
                 var selectedItem = myDataGrid.SelectedItem as OrderItem;
                 if (selectedItem != null)
-                {                   
+                {
                     selectedItem.Epreis = 0.00;
-                    selectedItem.Gesamt = 0.00;        
+                    selectedItem.Gesamt = 0.00;
                     myDataGrid.Items.Refresh();
                     CalculateTotal(orderItems);
                 }
             }
-           
 
             if (e.Key == Key.F7)
-            {             
+            {
                 if (orderItems.Any())
-                {                
-                    orderItems.RemoveAt(orderItems.Count - 1);               
+                {
+                    orderItems.RemoveAt(orderItems.Count - 1);
                     myDataGrid.ItemsSource = null;
-                    myDataGrid.ItemsSource = orderItems;                 
-                    CalculateTotal(orderItems);               
+                    myDataGrid.ItemsSource = orderItems;
+                    CalculateTotal(orderItems);
                 }
             }
-
 
             if (e.Key == Key.F11)
             {
@@ -980,7 +1004,6 @@ namespace PizzaEcki
                 secretPrintTriggered = true;
                 BarzahlungBtn(null, null);
             }
-             
         }
 
         private void OpenPaymentPopup()
