@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         xmlns:services="clr-namespace:PizzaEcki.Services" 
         mc:Ignorable="d"
-        Title="Bestellungen" Height="450" Width="1225">
+        Title="Bestellungen" Height="450" Width="Auto" ResizeMode="NoResize">
     <Window.Resources>
 
         <services:PhoneNumberToTextConverter x:Key="PhoneNumberToTextConverter"/>

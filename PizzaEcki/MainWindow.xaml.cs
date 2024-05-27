@@ -934,8 +934,8 @@ namespace PizzaEcki
                 }
                 return;
             }
-       
-            if (e.Key == Key.F4 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F4)
             {
                 DailyEarnings dailyEarnings = new DailyEarnings();
                 dailyEarnings.ShowDialog();
@@ -1615,7 +1615,7 @@ namespace PizzaEcki
                     _bestellungenFenster = null;
                     _currentBestellungsTyp = null; // Setze den Bestellungstyp zurück, wenn das Fenster geschlossen wird
                 };
-                _bestellungenFenster.Show();
+                _bestellungenFenster.ShowDialog();
             }
             else
             {
@@ -1669,7 +1669,7 @@ namespace PizzaEcki
                 }
 
                 Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, true);
-                bestellungenFenster.Show();
+                bestellungenFenster.ShowDialog();
             }
             catch (Exception ex)
             {
@@ -1683,5 +1683,15 @@ namespace PizzaEcki
             BestellungenAnzeigen("alle");
         }
 
+        private void MainWindowEcki_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window != this)
+                {
+                    window.Close();
+                }
+            }
+        }
     }
 }

@@ -6,7 +6,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Order Mate" KeyDown="MainWindowEcki_KeyDown"
-       MinWidth="1000" MinHeight="580" Cursor="Arrow" >
+       MinWidth="1000" MinHeight="580" Cursor="Arrow" Closing="MainWindowEcki_Closing" >
 
 
     <Window.Resources>
