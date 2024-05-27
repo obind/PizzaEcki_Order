@@ -102,13 +102,18 @@ namespace PizzaEcki
             SetDefaultpassword();
         }
 
+
+
         private void StartServer()
         {
             try
             {
+                // Zuerst überprüfen, ob der Prozess bereits läuft und ihn beenden
+                EndTaskIfRunning("PizzaServer");
+
                 // Pfad zur Server-EXE relativ zum aktuellen Ausführungsverzeichnis
                 string serverExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PizzaServer.exe");
-         
+
                 if (File.Exists(serverExePath))
                 {
                     Process serverProcess = new Process();
@@ -124,8 +129,29 @@ namespace PizzaEcki
                 }
             }
             catch (Exception ex)
-            {          
+            {
                 MessageBox.Show("Der Server konnte nicht gestartet werden: " + ex.Message);
+            }
+        }
+
+        private void EndTaskIfRunning(string processName)
+        {
+            try
+            {
+                var processes = Process.GetProcessesByName(processName);
+                if (processes.Any())
+                {
+                    foreach (var process in processes)
+                    {
+                        process.Kill();
+                        process.WaitForExit();
+                    }
+                   
+                }
+
+            }
+            catch (Exception ex)
+            {
             }
         }
 
@@ -939,7 +965,8 @@ namespace PizzaEcki
                     CalculateTotal(orderItems);               
                 }
             }
-            
+
+
             if (e.Key == Key.F11)
             {
                 BestellungenAnzeigen("alle");
@@ -955,6 +982,16 @@ namespace PizzaEcki
             }
              
         }
+
+        private void OpenPaymentPopup()
+        {
+            BezahlPopup popup = new BezahlPopup();
+            if (popup.ShowDialog() == true)
+            {
+                string paymentMethod = popup.SelectedPaymentMethod;
+                CompleteOrder(paymentMethod);
+            }
+        }
         private void ShowHelpDialog()
         {
             string helpText = "F1: Zeige Hotkeys.\n" +
@@ -962,7 +999,7 @@ namespace PizzaEcki
                               "F4: Tagesumsatz Anzeigen.\n" +
                               "F5: Das markierte Gericht wird gratis.\n" +
                               "F7: Letztes Gericht löschen.\n" +
-                              //"F8: Küchen Druck.\n" +
+                              "F8: Küchen Druck.\n" +
                               "F11: Alle Bestellungen anzeigen.\n" +
                               "F12: Bestellung abschließen und drucken.";
 
@@ -1022,7 +1059,6 @@ namespace PizzaEcki
 
         private void PrintReceipt(Order order, Customer customer)
         {
-           
 
             PrintDocument printDoc = new PrintDocument();
 
@@ -1236,6 +1272,166 @@ namespace PizzaEcki
         }
 
 
+        private void PrintToNetworkPrinter(Order order, Customer customer)
+        {
+            // Erstellen des PrintDocument-Objekts
+            PrintDocument printDoc = new PrintDocument();
+            // Setzen des Druckers auf den Netzwerkdrucker
+            string networkPrinter = PizzaEcki.Properties.Settings.Default.NetworkPrinter;
+            if (!string.IsNullOrEmpty(networkPrinter))
+            {
+                printDoc.PrinterSettings.PrinterName = networkPrinter;
+            }
+            // Überprüfen, ob der Drucker verfügbar ist
+            if (!printDoc.PrinterSettings.IsValid)
+            {
+                MessageBox.Show("Der Netzwerkdrucker ist nicht verfügbar.");
+                return;
+            }
+            printDoc.DefaultPageSettings.PaperSize = new PaperSize("Receipt", 300, 10000);
+            printDoc.PrintPage += (sender, e) =>
+            {
+                Graphics graphics = e.Graphics;
+                // Fonts
+                Font regularFont = new Font("Segoe UI", 16, System.Drawing.FontStyle.Bold);
+                Font boldFont = new Font("Segoe UI", 14, System.Drawing.FontStyle.Bold);
+                Font titleFont = new Font("Segoe UI", 24, System.Drawing.FontStyle.Bold);
+                float yOffset = 10;  // Initial offset
+                string sloagan = "Internationale Spezialitäten";
+                float sloaganWidth = graphics.MeasureString(sloagan, regularFont).Width;
+                graphics.DrawString(sloagan, regularFont, Brushes.Black, (e.PageBounds.Width - sloaganWidth) / 2, yOffset);
+                yOffset += regularFont.GetHeight();
+                // Title
+                string title = "PIZZA ECKI";
+                float titleWidth = graphics.MeasureString(title, titleFont).Width;
+                graphics.DrawString(title, titleFont, Brushes.Black, (e.PageBounds.Width - titleWidth) / 2, yOffset);
+                yOffset += titleFont.GetHeight();
+                // Adresse
+                SizeF addressSize = graphics.MeasureString("Woerdener Str. 4 · 33803 Steinhagen", regularFont);
+                float addressX = (e.PageBounds.Width - addressSize.Width) / 2;
+                graphics.DrawString("Woerdener Str. 4 · 33803 Steinhagen", regularFont, Brushes.Black, addressX, yOffset);
+                yOffset += addressSize.Height;  // 10 pixels Abstand
+                // Datum und Uhrzeit
+                string dateStr = DateTime.Now.ToString("dd.MM.yyyy");
+                string timeStr = DateTime.Now.ToString("HH:mm");
+                graphics.DrawString(dateStr, regularFont, Brushes.Black, 0, yOffset);
+                SizeF timeSize = graphics.MeasureString(timeStr, regularFont);
+                graphics.DrawString(timeStr, regularFont, Brushes.Black, e.PageBounds.Width - timeSize.Width - 15, yOffset);
+                // 10 pixels Abstand
+                Pen blackPen = new Pen(Color.Black, 1);
+                // Zeichne eine Trennlinie nach der Überschrift
+                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
+                yOffset += regularFont.GetHeight() + 10;
+                if (isDelivery && customer != null)  // Überprüfen, ob es sich um eine Lieferung handelt
+                {
+                    string addressStr = "Tel: " + customer.PhoneNumber + "\r\n" + customer.Name + "\r\n" + customer.Street + "\r\n" + customer.City + "\r\n" + customer.AdditionalInfo;
+                    graphics.DrawString(addressStr, boldFont, Brushes.Black, 0, yOffset);
+                    // Hier ändern wir den yOffset, um zwei Zeilenhöhen hinzuzufügen, eine für jede Zeile der Adresse.
+                    yOffset += boldFont.GetHeight() * 6;  // Anpassen für den Zeilenumbruch in der Adresse
+                }
+                string bonNumberStr = $"Bon Nummer: {order.BonNumber}";
+                SizeF bonNumberSize = graphics.MeasureString(bonNumberStr, boldFont);
+                float bonNumberX = (e.PageBounds.Width - bonNumberSize.Width) / 2;
+                graphics.DrawString(bonNumberStr, boldFont, Brushes.Black, bonNumberX, yOffset);
+                yOffset += bonNumberSize.Height + 5;
+                if (!string.IsNullOrEmpty(_pickupType))
+                {
+                    string pickupTypeStr = _pickupType; // "Selbstabholer" oder "Mitnehmer"
+                    graphics.DrawString(pickupTypeStr, boldFont, Brushes.Black, 0, yOffset);
+                    yOffset += boldFont.GetHeight() + 10;
+                }
+                var deliveryUntilStr = TimePickermein.Value.HasValue
+                    ? TimePickermein.Value.Value.ToString("HH:mm")
+                    : string.Empty; // Leer, wenn kein Wert vorhanden
+                if (isDelivery && !string.IsNullOrEmpty(deliveryUntilStr))
+                {
+                    string deliveryTimeStr = "Lieferung bis: " + deliveryUntilStr;
+                    graphics.DrawString(deliveryTimeStr, boldFont, Brushes.Black, 0, yOffset);
+                    yOffset += regularFont.GetHeight() + 5;
+                }
+                else if (!string.IsNullOrEmpty(deliveryUntilStr))
+                {
+                    string deliveryTimeStr = "Abholung bis: " + deliveryUntilStr;
+                    graphics.DrawString(deliveryTimeStr, boldFont, Brushes.Black, 0, yOffset);
+                    yOffset += regularFont.GetHeight() + 5;
+                }
+                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
+                yOffset += 5;
+                // Tabellenüberschrift
+                string headerAnz = "Anz  ";
+                string headerNr = "Nr  ";
+                string headerGericht = "Gericht  ";
+                string headerGr = "Gr.  ";
+                string headerPreis = "Preis";
+                // Definiere die Positionen der Spaltenköpfe
+                float headerAnzPosition = 0;
+                float headerNrPosition = 45;  // 
+                float headerGerichtPosition = 80;  // Angenommene Position, anpassen nach Bedarf
+                float headerGrPosition = 15;  // Angenommene Position, anpassen nach Bedarf
+                                              // Preis rechtsbündig, Abstand vom rechten Rand
+                float headerPreisPosition = e.PageBounds.Width - graphics.MeasureString(headerPreis, regularFont).Width;
+                // Zeichne die Tabellenüberschrift#
+                graphics.DrawString(headerAnz, regularFont, Brushes.Black, headerAnzPosition, yOffset);
+                graphics.DrawString(headerNr, regularFont, Brushes.Black, headerNrPosition, yOffset);
+                graphics.DrawString(headerGericht, regularFont, Brushes.Black, headerGerichtPosition, yOffset);
+                graphics.DrawString(headerGr, regularFont, Brushes.Black, headerGrPosition, yOffset);
+                graphics.DrawString(headerPreis, regularFont, Brushes.Black, headerPreisPosition, yOffset);
+                // Zeichne eine Trennlinie nach der Überschrift
+                yOffset += regularFont.GetHeight();
+                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
+                yOffset += 3; // Füge einen kleinen Abstand nach der Linie hinzu
+                // Vorhandener Code für Bestellzeilen ...
+                Font extraFont = new Font("Segoe UI", 10);
+                foreach (var item in order.OrderItems)
+                {
+                    string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht}";
+                    string itemSizeStr = $"{item.Größe} h";
+                    string itemPriceStr = $"{item.Gesamt:C}";
+                    // Zeichne die Bestellzeile
+                    graphics.DrawString(itemNameStr, regularFont, Brushes.Black, headerAnzPosition, yOffset);
+                    graphics.DrawString(itemSizeStr, regularFont, Brushes.Black, headerGrPosition, yOffset);
+                    SizeF itemPriceSize = graphics.MeasureString(itemPriceStr, regularFont);
+                    graphics.DrawString(itemPriceStr, regularFont, Brushes.Black, e.PageBounds.Width - itemPriceSize.Width, yOffset);
+                    // Aktualisiere yOffset für die nächste Zeile
+                    yOffset += regularFont.GetHeight();
+                    // Überprüfe, ob es Extras gibt und zeige sie an
+                    if (!string.IsNullOrWhiteSpace(item.Extras))
+                    {
+                        // Bereite den String mit Extras vor
+                        string extrasStr = item.Extras.Trim();
+                        // Stelle sicher, dass der String nicht mit einem Komma endet
+                        if (extrasStr.EndsWith(","))
+                        {
+                            extrasStr = extrasStr.Substring(0, extrasStr.Length - 1);
+                        }
+                        // Zeichne die Extras
+                        graphics.DrawString(extrasStr, extraFont, Brushes.Black, headerGerichtPosition + 10, yOffset);
+                        // Aktualisiere yOffset für die nächste Zeile
+                        yOffset += extraFont.GetHeight();
+                    }
+                    yOffset += 10; // Füge einen kleinen Abstand nach der Linie hinzu
+                }
+                // Zeichne eine abschließende Trennlinie am Ende der
+                // Zeichne eine abschließende Trennlinie am Ende der Bestellliste
+                graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
+                yOffset += 10;  // Füge einen größeren Abstand nach der Linie hinzu, um Platz für den Gesamtpreis zu schaffen
+                // Berechne den Gesamtpreis
+                // Berechne den Gesamtpreis
+                decimal gesamtpreis = order.OrderItems.Sum(item => (decimal)item.Gesamt);
+                // Zeichne den Gesamtpreis
+                string gesamtpreisStr = $"Gesamtpreis: {gesamtpreis:C}";
+                SizeF gesamtpreisSize = graphics.MeasureString(gesamtpreisStr, boldFont);
+                graphics.DrawString(gesamtpreisStr, boldFont, Brushes.Black, e.PageBounds.Width - gesamtpreisSize.Width - 15, yOffset);
+                // Aktualisiere yOffset für möglichen weiteren Inhalt
+                yOffset += boldFont.GetHeight() + 20;
+                // Bezahlmethode
+                string paymentMethodStr = "Bezahlmethode: " + order.PaymentMethod;
+                graphics.DrawString(paymentMethodStr, boldFont, Brushes.Black, 0, yOffset);
+                yOffset += boldFont.GetHeight();  // Weiterer Abstand für die nächste Zeile
+            };
+            // Auslösen des Druckvorgangs
+            printDoc.Print();
+        }
         private void btn_tables_Click(object sender, RoutedEventArgs e)
         {
             TableView tableView = new TableView();

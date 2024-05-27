@@ -210,19 +210,25 @@ namespace PizzaEcki.Pages
         {
             // Lokale Drucker
             LocalPrinterComboBox.Items.Clear();
+            NetworkPrinterComboBox.Items.Clear();
+
             foreach (string printer in PrinterSettings.InstalledPrinters)
             {
                 LocalPrinterComboBox.Items.Add(printer);
+                NetworkPrinterComboBox.Items.Add(printer);
             }
 
-         
+
             // Setzen der aktuell gespeicherten Drucker, falls vorhanden
-            var savedLocalPrinter = PizzaEcki.Properties.Settings.Default.SelectedPrinter;
+            var savedLocalPrinter = Properties.Settings.Default.SelectedPrinter;
+            var savedNetworkPrinter = Properties.Settings.Default.NetworkPrinter;
             if (!string.IsNullOrEmpty(savedLocalPrinter) && LocalPrinterComboBox.Items.Contains(savedLocalPrinter))
             {
                 LocalPrinterComboBox.SelectedItem = savedLocalPrinter;
+                NetworkPrinterComboBox.SelectedItem = savedNetworkPrinter;
             }
         }
+
 
         private void SavePrinterSelectionButton_Click(object sender, RoutedEventArgs e)
         {
@@ -232,7 +238,11 @@ namespace PizzaEcki.Pages
             if (LocalPrinterComboBox.SelectedItem != null)
             {
                 string selectedLocalPrinter = LocalPrinterComboBox.SelectedItem.ToString();
-                PizzaEcki.Properties.Settings.Default.SelectedPrinter = selectedLocalPrinter;
+                string selectedNetworkPrinter = NetworkPrinterComboBox.SelectedItem.ToString();
+
+                Properties.Settings.Default.SelectedPrinter = selectedLocalPrinter;
+                Properties.Settings.Default.NetworkPrinter = selectedNetworkPrinter;
+
             }
             else
             {
