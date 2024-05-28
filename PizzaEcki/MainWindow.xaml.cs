@@ -626,7 +626,6 @@ namespace PizzaEcki
             Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
             string selectedSize = SizeComboBox.SelectedItem.ToString();
             tempOrderItem.Größe = selectedSize;
-            tempOrderItem.Menge = 1;
 
             bool isHappyHour = IsHappyHour();
 
