@@ -1374,7 +1374,7 @@ namespace PizzaEcki.Database
                 try
                 {
                     // Insert OrderHistory
-                    string sql = @"INSERT INTO OrderHistory (OrderId, BonNumber, ,IsDelivery, PaymentMethod, CustomerPhoneNumber, Timestamp, DeliveryUntil, TotalPrice)
+                    string sql = @"INSERT INTO OrderHistory (OrderId, BonNumber, IsDelivery, PaymentMethod, CustomerPhoneNumber, Timestamp, DeliveryUntil, TotalPrice)
                            VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber, @Timestamp, @DeliveryUntil, @TotalPrice)";
                     long orderHistoryId;
                     using (SqliteCommand command = new SqliteCommand(sql, _connection, transaction))
@@ -1893,9 +1893,6 @@ namespace PizzaEcki.Database
                             // Optional: Setze hier die Bonnummer zurück, falls erforderlich
                             // currentBonNumber = 1; // Oder ein anderer Startwert
                         }
-
-
-
                     }
                     else
                     {

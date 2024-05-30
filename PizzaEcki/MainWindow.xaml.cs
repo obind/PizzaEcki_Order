@@ -919,13 +919,13 @@ namespace PizzaEcki
         {
             if (e.Key == Key.F2 && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
             {
-                if (F1Grid.Visibility == Visibility.Hidden)
+                if (F1Grid.Visibility == Visibility.Collapsed)
                 {
                     ShowPasswordDialogAndCheckForF1Grid();
                 }
                 else
                 {
-                    F1Grid.Visibility = Visibility.Hidden;
+                    F1Grid.Visibility = Visibility.Collapsed;
                 }
                 e.Handled = true;
                 return;
@@ -1713,6 +1713,29 @@ namespace PizzaEcki
                 {
                     window.Close();
                 }
+            }
+
+        }
+
+        private void SizeComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox == null)
+            {
+                return;
+            }
+
+            if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+            {
+                int numberPressed = e.Key - Key.NumPad0;
+                amountComboBox.Text = numberPressed.ToString();
+                e.Handled = true;
+            }
+            else if (e.Key >= Key.D0 && e.Key <= Key.D9)
+            {
+                int numberPressed = e.Key - Key.D0;
+                amountComboBox.Text = numberPressed.ToString();
+                e.Handled = true;
             }
         }
     }
