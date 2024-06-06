@@ -600,6 +600,7 @@ namespace PizzaEcki
 
         private void ProcessOrder()
         {
+            UpdateTempOrderItemAmount();
             if (!tempOrderItem.Gericht.StartsWith("Party Pizza") && dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
             {
                 MessageBox.Show("Bitte gebe ein Gericht an.");
@@ -1470,7 +1471,7 @@ namespace PizzaEcki
                 if (selectedOrder != null && selectedDriver != null)
                 {
                     double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
-                    _databaseManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
+                    _databaseManager.SaveOrderAssignmentAsync(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
 
                     cb_bonNummer.SelectedItem = null;
                     cb_cashRegister.SelectedItem = null;
@@ -1684,7 +1685,7 @@ namespace PizzaEcki
                     }
                     else
                     {
-                        order.Name = "Nicht zugewiesen"; // Wenn keine DriverId zugewiesen ist, "Nicht zugewiesen" verwenden
+                        order.Name = "Nicht zugewiesen";
                     }
 
                     updatedOrders.Add(order);
@@ -1737,6 +1738,43 @@ namespace PizzaEcki
                 amountComboBox.Text = numberPressed.ToString();
                 e.Handled = true;
             }
+        }
+
+        private void Zuordnen_Click(object sender, RoutedEventArgs e)
+        {
+            //try
+            //{
+            //    var ordersWithAssignedDrivers = await _databaseManager.GetOrdersWithAssignedDrivers();
+            //    var allDrivers = await _databaseManager.GetAllDriversAsync();
+            //    var updatedOrders = new List<Order>();
+
+            //    foreach (var order in ordersWithAssignedDrivers)
+            //    {
+            //        if (order.DriverId.HasValue && order.DriverId.Value != -1)
+            //        {
+            //            var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
+            //            order.Name = driver?.Name ?? "Nicht zugewiesen";  // Wenn kein passender Fahrer gefunden wird, "Nicht zugewiesen" verwenden
+            //        }
+            //        else
+            //        {
+            //            order.Name = "Nicht zugewiesen";
+            //        }
+
+            //        updatedOrders.Add(order);
+            //    }
+
+            //    Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, true);
+            //    bestellungenFenster.ShowDialog();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
+            //}
+        }
+
+        private void ZuordnenBtn_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

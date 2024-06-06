@@ -140,8 +140,9 @@
 
         </Grid.RowDefinitions>
         <Grid Margin="0,20,0,0"></Grid>
-        <Grid x:Name="F1Grid" VerticalAlignment="Top" Height="35" Margin="10,0,0,0"  Visibility="Collapsed" >
+        <Grid x:Name="F1Grid" VerticalAlignment="Top" Height="35" Margin="20,10,0,10"  Visibility="Collapsed" >
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -160,14 +161,11 @@
                 <Button x:Name="Auswertung_Btn" Content="Leistungsübersicht" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" Style="{DynamicResource ButtonStyle1}"  Click="Auswertung_Btn_Click" BorderBrush="{x:Null}"/>
             </Border>
             <Border Grid.Column="2" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="EinstellungenBtn_Click" BorderBrush="{x:Null}"/>
-            </Border>
-            <Border Grid.Column="3" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
                 <Button x:Name="Bestellungen" Content="Bestellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="Bestellungen_Click" BorderBrush="{x:Null}"/>
             </Border>
-
-
-
+            <Border Grid.Column="3" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
+                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="EinstellungenBtn_Click" BorderBrush="{x:Null}"/>
+            </Border>
         </Grid>
         <Border Background="#FF3D4248" Margin="20,0,5,5" Grid.Row="1" CornerRadius="10,10,10,10">
             <Grid  Grid.Row="1" >
@@ -182,7 +180,7 @@
                     <RowDefinition Height="*" MinHeight="25"/>
                     <RowDefinition Height="*" MinHeight="25"/>
                     <RowDefinition Height="*" MinHeight="25"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" MinHeight="25"/>
 
                 </Grid.RowDefinitions>
                 <Border Background="#FF602C" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="2">

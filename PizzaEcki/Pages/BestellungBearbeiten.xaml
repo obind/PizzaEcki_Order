@@ -78,7 +78,13 @@
             <TextBox Text="{Binding BonNumber}" Padding="5px" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" Cursor="Arrow"/>
 
             <Label Content="Fahrername" Foreground="White"/>
-            <TextBox Text="{Binding Name}" Padding="5px" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" Cursor="Arrow"/>
+            <ComboBox x:Name="DriverComboBox"
+          DisplayMemberPath="Name"
+          SelectedValuePath="Id"
+          ItemsSource="{Binding Drivers}"
+      
+          Padding="5px"
+          Cursor="Arrow"/>
 
             <Label Content="Adresse" Foreground="White"/>
             <!-- Hier könntest du die Adressdetails der Customer-Entität binden -->

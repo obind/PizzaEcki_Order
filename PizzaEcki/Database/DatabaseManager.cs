@@ -1102,43 +1102,44 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-        public void SaveOrderAssignment(string orderId, int driverId, double price)
+        public async Task SaveOrderAssignmentAsync(string orderId, int? driverId, double? price = null)
         {
-            _connection.Open();
+            await _connection.OpenAsync();
             string checkSql = "SELECT COUNT(*) FROM OrderAssignments WHERE OrderId = @OrderId";
             using (SqliteCommand checkCommand = new SqliteCommand(checkSql, _connection))
             {
                 checkCommand.Parameters.AddWithValue("@OrderId", orderId);
-                int count = Convert.ToInt32(checkCommand.ExecuteScalar());
+                int count = Convert.ToInt32(await checkCommand.ExecuteScalarAsync());
                 if (count > 0)
                 {
-                    // Ein Eintrag für die angegebene OrderId existiert bereits, aktualisieren Sie ihn
+                    // Update existing entry
                     string updateSql = "UPDATE OrderAssignments SET DriverId = @DriverId, Price = @Price, Timestamp = @Timestamp WHERE OrderId = @OrderId";
                     using (SqliteCommand updateCommand = new SqliteCommand(updateSql, _connection))
                     {
                         updateCommand.Parameters.AddWithValue("@OrderId", orderId);
                         updateCommand.Parameters.AddWithValue("@DriverId", driverId);
-                        updateCommand.Parameters.AddWithValue("@Price", price);
+                        updateCommand.Parameters.AddWithValue("@Price", price.HasValue ? (object)price : DBNull.Value);
                         updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                        updateCommand.ExecuteNonQuery();
+                        await updateCommand.ExecuteNonQueryAsync();
                     }
                 }
                 else
                 {
-                    // Kein Eintrag für die angegebene OrderId, erstellen Sie einen neuen Eintrag
+                    // Insert new entry
                     string insertSql = "INSERT INTO OrderAssignments (OrderId, DriverId, Price, Timestamp) VALUES (@OrderId, @DriverId, @Price, @Timestamp)";
                     using (SqliteCommand insertCommand = new SqliteCommand(insertSql, _connection))
                     {
                         insertCommand.Parameters.AddWithValue("@OrderId", orderId);
                         insertCommand.Parameters.AddWithValue("@DriverId", driverId);
-                        insertCommand.Parameters.AddWithValue("@Price", price);
+                        insertCommand.Parameters.AddWithValue("@Price", price.HasValue ? (object)price : DBNull.Value);
                         insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                        insertCommand.ExecuteNonQuery();
+                        await insertCommand.ExecuteNonQueryAsync();
                     }
                 }
             }
             _connection.Close();
         }
+ 
         public async Task<bool> DeleteOrderAsync(Guid orderId)
         {
 

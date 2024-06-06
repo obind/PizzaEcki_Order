@@ -238,20 +238,14 @@
                                     </ListView.View>
                                 </ListView>
                                     <TextBlock Text="{Binding OrderItems, Converter={StaticResource ItemsToTotalConverter}, StringFormat='Gesamtpreis: {0:0.00} €'}"
-                                               Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="10,5,10,0"/>
+            Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="10,5,10,0"/>
 
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Lieferung Bis" Width="100">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding DeliveryUntil}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                    
 
                 </GridView>
             </ListView.View>
