@@ -82,9 +82,11 @@
           DisplayMemberPath="Name"
           SelectedValuePath="Id"
           ItemsSource="{Binding Drivers}"
-      
+            
           Padding="5px"
-          Cursor="Arrow"/>
+          Cursor="Arrow">
+               
+            </ComboBox>
 
             <Label Content="Adresse" Foreground="White"/>
             <!-- Hier könntest du die Adressdetails der Customer-Entität binden -->

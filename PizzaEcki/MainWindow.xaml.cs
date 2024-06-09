@@ -101,6 +101,7 @@ namespace PizzaEcki
             _reloadTimer.Tick += ReloadTimer_Tick;
             _reloadTimer.Start();
             SetDefaultpassword();
+            PhoneNumberTextBox.Focus();
         }
 
 
@@ -1438,8 +1439,6 @@ namespace PizzaEcki
                 // Zeichne eine abschließende Trennlinie am Ende der Bestellliste
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += 10;  // Füge einen größeren Abstand nach der Linie hinzu, um Platz für den Gesamtpreis zu schaffen
-                // Berechne den Gesamtpreis
-                // Berechne den Gesamtpreis
                 decimal gesamtpreis = order.OrderItems.Sum(item => (decimal)item.Gesamt);
                 // Zeichne den Gesamtpreis
                 string gesamtpreisStr = $"Gesamtpreis: {gesamtpreis:C}";
@@ -1452,7 +1451,6 @@ namespace PizzaEcki
                 graphics.DrawString(paymentMethodStr, boldFont, Brushes.Black, 0, yOffset);
                 yOffset += boldFont.GetHeight();  // Weiterer Abstand für die nächste Zeile
             };
-            // Auslösen des Druckvorgangs
             printDoc.Print();
         }
         private void btn_tables_Click(object sender, RoutedEventArgs e)
@@ -1476,19 +1474,12 @@ namespace PizzaEcki
                     cb_bonNummer.SelectedItem = null;
                     cb_cashRegister.SelectedItem = null;
 
-                    // Falls ReloadeUnassignedOrders eine asynchrone Operation ist
-                    await ReloadeUnassignedOrders(); // Ändere den Namen der Methode entsprechend, wenn sie asynchron ist.
+                    await ReloadeUnassignedOrders();
                 }
                 else
                 {
-                    // Fehlerbehandlung, falls keine Order oder kein Driver gefunden wurde
                     MessageBox.Show("Es wurde keine Bestellung oder kein Fahrer gefunden.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }
-            else
-            {
-                // Fehlerbehandlung, falls nichts ausgewählt wurde
-                MessageBox.Show("Bitte wählen Sie eine Bonnummer und ein Kassenregister aus.", "Auswahl erforderlich", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -1776,5 +1767,7 @@ namespace PizzaEcki
         {
 
         }
+
+
     }
 }
