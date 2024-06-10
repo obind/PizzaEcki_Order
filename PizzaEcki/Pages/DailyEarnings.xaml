@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="Tagesstatistik" Height="300" Width="400">
+        Title="Tagesstatistik" Height="300" Width="400" ResizeMode="NoResize">
 
     <Window.Resources>
         <!-- Stil für DataGridColumnHeader -->

@@ -5,6 +5,8 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Linq;
+using PizzaEcki.Services;
+using System.Globalization;
 
 namespace PizzaEcki.Pages
 {
@@ -13,6 +15,8 @@ namespace PizzaEcki.Pages
     /// </summary>
     public partial class BestellungBearbeiten : Window
     {
+        public int? SelectedDriverId { get; set; }
+        public ObservableCollection<Driver> Drivers { get; set; } = new ObservableCollection<Driver>();
         public Func<Task> OnSaveCompleted { get; set; }
         public event Action OrderUpdated;
         
@@ -20,17 +24,15 @@ namespace PizzaEcki.Pages
         private Order _currentOrder;
         // Definiere _localOrderItems als ObservableCollection von OrderItem
         private ObservableCollection<OrderItem> _localOrderItems;
-
         public BestellungBearbeiten(Order order)
         {
             InitializeComponent();
             this.DataContext = order;
-            OrderUpdated += ReloadOrderItems;
-            // Initialisiere _localOrderItems mit den OrderItems der übergebenen Bestellung
-            _localOrderItems = new ObservableCollection<OrderItem>(order.OrderItems);
+           OrderUpdated += ReloadOrderItems;
+           _localOrderItems = new ObservableCollection<OrderItem>(order.OrderItems);
             _currentOrder = order;
             BestellungenListView.ItemsSource = _localOrderItems;
-
+            LoadDriversAsync();
             this.Loaded += BestellungBearbeiten_Loaded;
         }
 
@@ -53,8 +55,20 @@ namespace PizzaEcki.Pages
                 MessageBox.Show($"Fehler beim Laden der Bestellungsartikel: {ex.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        private async void LoadDriversAsync()
+        {
+            var driversList = await databaseManager.GetAllDriversAsync();
+            Drivers = new ObservableCollection<Driver>(driversList);
+            DriverComboBox.ItemsSource = Drivers;
+            DriverComboBox.DisplayMemberPath = "Name";  // Zeigt den Namen in der ComboBox an
 
-
+            // Wähle den aktuellen Fahrer basierend auf der DriverId in _currentOrder
+            var selectedDriver = Drivers.FirstOrDefault(d => d.Id == _currentOrder.DriverId);
+            if (selectedDriver != null)
+            {
+                DriverComboBox.SelectedItem = selectedDriver;
+            }
+        }
         private void BestellungBearbeiten_Loaded(object sender, RoutedEventArgs e)
         {
            
@@ -66,10 +80,22 @@ namespace PizzaEcki.Pages
             if (orderToUpdate != null)
             {
                 try
-                {          
-                    orderToUpdate.OrderItems = _localOrderItems.ToList();
-
+                {
+                    // Aktualisiere zuerst die Bestellungsdaten
                     await databaseManager.UpdateOrderAsync(orderToUpdate);
+
+                    // Extrahiere den ausgewählten Fahrer aus der ComboBox
+                    var selectedDriver = DriverComboBox.SelectedItem as Driver;
+
+                    if (selectedDriver != null)
+                    {
+                        // Berechne die Gesamtsumme der OrderItems
+                        double totalPrice = orderToUpdate.OrderItems.Sum(item => item.Gesamt);
+
+                        // Aktualisiere die Zuordnung der Bestellung mit Fahrer und Preis
+                        await databaseManager.SaveOrderAssignmentAsync(orderToUpdate.OrderId.ToString(), selectedDriver.Id, totalPrice);
+                    }
+
                     OrderUpdated?.Invoke();
                     MessageBox.Show("Die Bestellung wurde erfolgreich aktualisiert.", "Erfolg", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -90,6 +116,7 @@ namespace PizzaEcki.Pages
                 MessageBox.Show("Keine Bestellung zum Speichern gefunden.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
 
         private async void AddNewOrderItem_Click(object sender, RoutedEventArgs e)
         {

@@ -101,6 +101,12 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
             }
 
+            sql = @"CREATE TABLE IF NOT EXISTS OrderLog (LogId INTEGER PRIMARY KEY AUTOINCREMENT, OrderId TEXT, Action TEXT, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, 
+             FOREIGN KEY(OrderId) REFERENCES Orders(OrderId))";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
 
             //Zuordnungstabelle
             sql = @"CREATE TABLE IF NOT EXISTS OrderAssignments (OrderId TEXT, DriverId INTEGER,Price REAL,Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- geändert von AssignmentDate zu Timestamp
@@ -129,8 +135,44 @@ namespace PizzaEcki.Database
             {
                 command.ExecuteNonQuery();
             }
+            // OrderHistory Table
+            sql = @"CREATE TABLE IF NOT EXISTS OrderHistory (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                OrderId TEXT,
+                BonNumber INTEGER,
+                IsDelivery BOOLEAN,
+                PaymentMethod TEXT,
+                CustomerPhoneNumber TEXT,
+                Timestamp DATETIME,
+                DeliveryUntil TEXT,
+                TotalPrice REAL
+            )";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            // OrderHistoryItems Table
+            sql = @"CREATE TABLE IF NOT EXISTS OrderHistoryItems (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                OrderId TEXT,
+                OrderHistoryId INTEGER,
+                OrderItemId INTEGER,
+                Gericht TEXT,
+                Größe TEXT,
+                Extras TEXT,
+                Menge INTEGER,
+                Epreis REAL,
+                Gesamt REAL,
+                FOREIGN KEY(OrderHistoryId) REFERENCES OrderHistory(Id)
+            )";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
 
             _connection.Close();
+        
         }
 
 
@@ -455,6 +497,33 @@ namespace PizzaEcki.Database
                 _connection.Close();
             }
         }
+
+        private void LogOrderAction(string orderId, string action)
+        {
+            try
+            {
+                if (_connection.State != System.Data.ConnectionState.Open)
+                    _connection.Open();
+
+                string sql = "INSERT INTO OrderLog (OrderId, Action) VALUES (@OrderId, @Action)";
+                using (SqliteCommand command = new SqliteCommand(sql, _connection))
+                {
+                    command.Parameters.AddWithValue("@OrderId", orderId);
+                    command.Parameters.AddWithValue("@Action", action);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Fehlerbehandlung hier
+                Console.WriteLine("Fehler beim Protokollieren der Bestellung: " + ex.Message);
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
 
         private async Task<bool> HasAssignedOrders(int driverId)
         {
@@ -1033,43 +1102,44 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
-        public void SaveOrderAssignment(string orderId, int driverId, double price)
+        public async Task SaveOrderAssignmentAsync(string orderId, int? driverId, double? price = null)
         {
-            _connection.Open();
+            await _connection.OpenAsync();
             string checkSql = "SELECT COUNT(*) FROM OrderAssignments WHERE OrderId = @OrderId";
             using (SqliteCommand checkCommand = new SqliteCommand(checkSql, _connection))
             {
                 checkCommand.Parameters.AddWithValue("@OrderId", orderId);
-                int count = Convert.ToInt32(checkCommand.ExecuteScalar());
+                int count = Convert.ToInt32(await checkCommand.ExecuteScalarAsync());
                 if (count > 0)
                 {
-                    // Ein Eintrag für die angegebene OrderId existiert bereits, aktualisieren Sie ihn
+                    // Update existing entry
                     string updateSql = "UPDATE OrderAssignments SET DriverId = @DriverId, Price = @Price, Timestamp = @Timestamp WHERE OrderId = @OrderId";
                     using (SqliteCommand updateCommand = new SqliteCommand(updateSql, _connection))
                     {
                         updateCommand.Parameters.AddWithValue("@OrderId", orderId);
                         updateCommand.Parameters.AddWithValue("@DriverId", driverId);
-                        updateCommand.Parameters.AddWithValue("@Price", price);
+                        updateCommand.Parameters.AddWithValue("@Price", price.HasValue ? (object)price : DBNull.Value);
                         updateCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                        updateCommand.ExecuteNonQuery();
+                        await updateCommand.ExecuteNonQueryAsync();
                     }
                 }
                 else
                 {
-                    // Kein Eintrag für die angegebene OrderId, erstellen Sie einen neuen Eintrag
+                    // Insert new entry
                     string insertSql = "INSERT INTO OrderAssignments (OrderId, DriverId, Price, Timestamp) VALUES (@OrderId, @DriverId, @Price, @Timestamp)";
                     using (SqliteCommand insertCommand = new SqliteCommand(insertSql, _connection))
                     {
                         insertCommand.Parameters.AddWithValue("@OrderId", orderId);
                         insertCommand.Parameters.AddWithValue("@DriverId", driverId);
-                        insertCommand.Parameters.AddWithValue("@Price", price);
+                        insertCommand.Parameters.AddWithValue("@Price", price.HasValue ? (object)price : DBNull.Value);
                         insertCommand.Parameters.AddWithValue("@Timestamp", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                        insertCommand.ExecuteNonQuery();
+                        await insertCommand.ExecuteNonQueryAsync();
                     }
                 }
             }
             _connection.Close();
         }
+ 
         public async Task<bool> DeleteOrderAsync(Guid orderId)
         {
 
@@ -1292,7 +1362,176 @@ namespace PizzaEcki.Database
 
             _connection.Close();
         }
-    
+
+
+
+
+        public void AddOrderToHistory(Order order)
+        {
+            _connection.Open();
+
+            using (var transaction = _connection.BeginTransaction())
+            {
+                try
+                {
+                    // Insert OrderHistory
+                    string sql = @"INSERT INTO OrderHistory (OrderId, BonNumber, IsDelivery, PaymentMethod, CustomerPhoneNumber, Timestamp, DeliveryUntil, TotalPrice)
+                           VALUES (@OrderId, @BonNumber, @IsDelivery, @PaymentMethod, @CustomerPhoneNumber, @Timestamp, @DeliveryUntil, @TotalPrice)";
+                    long orderHistoryId;
+                    using (SqliteCommand command = new SqliteCommand(sql, _connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@OrderId", order.OrderId.ToString()); // Ensure Guid is stored as string
+                        command.Parameters.AddWithValue("@BonNumber", order.BonNumber);
+                        command.Parameters.AddWithValue("@DriverId", order.DriverId);
+                        command.Parameters.AddWithValue("@IsDelivery", order.IsDelivery);
+                        command.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
+                        command.Parameters.AddWithValue("@CustomerPhoneNumber", order.CustomerPhoneNumber);
+                        command.Parameters.AddWithValue("@Timestamp", order.Timestamp);
+                        command.Parameters.AddWithValue("@DeliveryUntil", order.DeliveryUntil);
+                        command.Parameters.AddWithValue("@TotalPrice", order.OrderItems.Sum(item => item.Gesamt));
+                        command.ExecuteNonQuery();
+
+                        sql = "SELECT last_insert_rowid()";
+                        command.CommandText = sql;
+                        orderHistoryId = (long)command.ExecuteScalar();
+                    }
+
+                    // Insert OrderHistoryItems
+                    foreach (var item in order.OrderItems)
+                    {
+                        sql = @"INSERT INTO OrderHistoryItems (OrderId, OrderHistoryId, OrderItemId, Gericht, Größe, Extras, Menge, Epreis, Gesamt)
+                        VALUES (@OrderId, @OrderHistoryId, @OrderItemId, @Gericht, @Größe, @Extras, @Menge, @Epreis, @Gesamt)";
+                        using (SqliteCommand command = new SqliteCommand(sql, _connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@OrderId", order.OrderId.ToString()); // Ensure Guid is stored as string
+                            command.Parameters.AddWithValue("@OrderHistoryId", orderHistoryId);
+                            command.Parameters.AddWithValue("@OrderItemId", item.OrderItemId);
+                            command.Parameters.AddWithValue("@Gericht", item.Gericht);
+                            command.Parameters.AddWithValue("@Größe", item.Größe);
+                            command.Parameters.AddWithValue("@Extras", item.Extras);
+                            command.Parameters.AddWithValue("@Menge", item.Menge);
+                            command.Parameters.AddWithValue("@Epreis", item.Epreis);
+                            command.Parameters.AddWithValue("@Gesamt", item.Gesamt);
+                            command.ExecuteNonQuery();
+                        }
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+
+            _connection.Close();
+        }
+
+
+        public async Task<List<Order>> GetDeletedOrdersWithItems()
+        {
+            _connection.Open();
+            List<Order> deletedOrders = new List<Order>();
+
+            string sql = @"
+        SELECT 
+            Orders.OrderId,
+            Orders.BonNumber,
+            Orders.IsDelivery,
+            Orders.PaymentMethod,
+            Orders.CustomerPhoneNumber,
+            Orders.Timestamp,
+            Orders.DeliveryUntil,
+            OrderItems.OrderItemId,
+            OrderItems.Gericht,
+            OrderItems.Extras,
+            OrderItems.Größe,
+            OrderItems.Menge,
+            OrderItems.Epreis,
+            OrderItems.Gesamt,
+            OrderItems.Uhrzeit,
+            OrderItems.LieferungsArt,
+            Drivers.Id AS DriverId,
+            Drivers.Name AS Name,
+            Drivers.PhoneNumber AS DriverPhoneNumber
+        FROM 
+            Orders
+        LEFT JOIN 
+            OrderAssignments ON Orders.OrderId = OrderAssignments.OrderId
+        LEFT JOIN 
+            Drivers ON OrderAssignments.DriverId = Drivers.Id
+        LEFT JOIN 
+            OrderItems ON Orders.OrderId = OrderItems.OrderId";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var orderIdValue = reader["OrderId"].ToString();
+                        if (string.IsNullOrEmpty(orderIdValue))
+                        {
+                            continue;  // Überspringe diesen Datensatz
+                        }
+                        Guid currentOrderId = Guid.Parse(orderIdValue);
+
+                        Order order = deletedOrders.FirstOrDefault(o => o.OrderId == currentOrderId);
+                        if (order == null)
+                        {
+                            try
+                            {
+                                order = new Order
+                                {
+                                    OrderId = currentOrderId,
+                                    BonNumber = reader.IsDBNull(reader.GetOrdinal("BonNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("BonNumber")),
+                                    IsDelivery = reader.IsDBNull(reader.GetOrdinal("IsDelivery")) ? false : reader.GetBoolean(reader.GetOrdinal("IsDelivery")),
+                                    PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? null : reader.GetString(reader.GetOrdinal("PaymentMethod")),
+                                    CustomerPhoneNumber = reader.IsDBNull(reader.GetOrdinal("CustomerPhoneNumber")) ? null : reader.GetString(reader.GetOrdinal("CustomerPhoneNumber")),
+                                    Timestamp = reader.IsDBNull(reader.GetOrdinal("Timestamp")) ? null : reader.GetDateTime(reader.GetOrdinal("Timestamp")).ToString(),
+                                    DeliveryUntil = reader.IsDBNull(reader.GetOrdinal("DeliveryUntil")) ? null : reader.GetString(reader.GetOrdinal("DeliveryUntil")),
+                                    DriverId = reader.IsDBNull(reader.GetOrdinal("DriverId")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("DriverId")),
+                                    Name = reader.IsDBNull(reader.GetOrdinal("Name")) ? null : reader.GetString(reader.GetOrdinal("Name")),
+                                    OrderItems = new List<OrderItem>()
+                                };
+                            }
+                            catch (Exception ex)
+                            {
+                                // Logge den Fehler, z.B. durch Ausgabe auf der Konsole oder in einer Datei
+                                Console.WriteLine("Fehler beim Erstellen des Order-Objekts: " + ex.Message);
+                                throw; // Wirf den Fehler weiter nach oben, damit du weißt, dass etwas schiefgelaufen ist.
+                            }
+                            deletedOrders.Add(order);
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("OrderItemId")))
+                        {
+                            OrderItem orderItem = new OrderItem
+                            {
+                                Nr = reader.GetInt32(reader.GetOrdinal("OrderItemId")),
+                                Gericht = reader.IsDBNull(reader.GetOrdinal("Gericht")) ? null : reader.GetString(reader.GetOrdinal("Gericht")),
+                                Extras = reader.IsDBNull(reader.GetOrdinal("Extras")) ? null : reader.GetString(reader.GetOrdinal("Extras")),
+                                Größe = reader.IsDBNull(reader.GetOrdinal("Größe")) ? null : reader.GetString(reader.GetOrdinal("Größe")),
+                                Menge = reader.IsDBNull(reader.GetOrdinal("Menge")) ? 0 : reader.GetInt32(reader.GetOrdinal("Menge")),
+                                Epreis = reader.IsDBNull(reader.GetOrdinal("Epreis")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Epreis")),
+                                Gesamt = reader.IsDBNull(reader.GetOrdinal("Gesamt")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("Gesamt")),
+                                Uhrzeit = reader.IsDBNull(reader.GetOrdinal("Uhrzeit")) ? null : reader.GetString(reader.GetOrdinal("Uhrzeit")),
+                                LieferungsArt = reader.IsDBNull(reader.GetOrdinal("LieferungsArt")) ? 0 : reader.GetInt32(reader.GetOrdinal("LieferungsArt"))
+                            };
+                            order.OrderItems.Add(orderItem);
+                        }
+                    }
+                }
+            }
+
+            await _connection.CloseAsync();
+
+            return deletedOrders;
+        }
+
+
+
 
         //Customer methoden 
         public Customer GetCustomerByPhoneNumber(string phoneNumber)
@@ -1655,9 +1894,6 @@ namespace PizzaEcki.Database
                             // Optional: Setze hier die Bonnummer zurück, falls erforderlich
                             // currentBonNumber = 1; // Oder ein anderer Startwert
                         }
-
-
-
                     }
                     else
                     {

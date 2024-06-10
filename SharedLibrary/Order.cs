@@ -72,6 +72,8 @@ namespace SharedLibrary
             OrderItems = new List<OrderItem>();
         }
 
+        public double Gesamtpreis => OrderItems.Sum(item => item.Gesamt);
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

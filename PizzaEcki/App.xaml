@@ -31,12 +31,6 @@
             </Style.Triggers>
         </Style>
 
-        <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="#5f6269"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="BorderBrush" Value="Black"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
 
     </Application.Resources>
 </Application>

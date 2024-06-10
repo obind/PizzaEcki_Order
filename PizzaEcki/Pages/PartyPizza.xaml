@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="PartyPizza" Height="300" Width="500" ResizeMode="NoResize">
+        Title="PartyPizza" Height="300" Width="500" ResizeMode="NoResize" KeyDown="Window_KeyDown">
     <Window.Resources>
 
 
