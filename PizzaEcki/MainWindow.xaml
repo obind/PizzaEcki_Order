@@ -6,7 +6,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Order Mate" KeyDown="MainWindowEcki_KeyDown"
-       MinWidth="1000" MinHeight="580" Cursor="Arrow" >
+       MinWidth="1000" MinHeight="580" Cursor="Arrow" Closing="MainWindowEcki_Closing"  >
 
 
     <Window.Resources>
@@ -38,12 +38,17 @@
                 </Setter>
             </Style>
 
+
             <Style x:Key="FocusVisualStyleForComboBox" TargetType="ComboBox">
-                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderBrush" Value="#FF602C"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Style.Triggers>
                     <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                        <Setter Property="BorderBrush" Value="Red"/>
+                        <Setter Property="BorderBrush" Value="#FF602C"/>
+                        <Setter Property="BorderThickness" Value="3"/>
+                    </Trigger>
+                    <Trigger Property="IsFocused"  Value="True">
+                        <Setter Property="BorderBrush" Value="#FF602C"/>
                         <Setter Property="BorderThickness" Value="3"/>
                     </Trigger>
                 </Style.Triggers>
@@ -128,15 +133,16 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.2*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="1.2*"/>
             <RowDefinition Height="1.3*" />
             <RowDefinition Height="1.3*" />
 
         </Grid.RowDefinitions>
-
-        <Grid x:Name="F1Grid" VerticalAlignment="Top" Height="35" Margin="20,0,0,0"  Visibility="Collapsed" >
+        <Grid Margin="0,20,0,0"></Grid>
+        <Grid x:Name="F1Grid" VerticalAlignment="Top" Height="35" Margin="20,10,0,10"  Visibility="Collapsed" >
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -155,19 +161,16 @@
                 <Button x:Name="Auswertung_Btn" Content="Leistungsübersicht" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" Style="{DynamicResource ButtonStyle1}"  Click="Auswertung_Btn_Click" BorderBrush="{x:Null}"/>
             </Border>
             <Border Grid.Column="2" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="EinstellungenBtn_Click" BorderBrush="{x:Null}"/>
-            </Border>
-            <Border Grid.Column="3" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
                 <Button x:Name="Bestellungen" Content="Bestellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="Bestellungen_Click" BorderBrush="{x:Null}"/>
             </Border>
-
-
-
+            <Border Grid.Column="3" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
+                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="EinstellungenBtn_Click" BorderBrush="{x:Null}"/>
+            </Border>
         </Grid>
         <Border Background="#FF3D4248" Margin="20,5,0.5,5" Grid.Row="1" CornerRadius="10,10,10,10">
             <Grid  Grid.Row="1" >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -202,8 +205,8 @@
                 </Border>
             </Grid>
         </Border>
-        <Border Background="#FF3D4248" Margin="5,5,20,5" Grid.Row="1" Grid.Column="1" CornerRadius="10,10,10,10">
-            <Grid Grid.Column="1" Grid.Row="1">
+        <Border Background="#FF3D4248" Margin="5,0,20,5" Grid.Row="1" Grid.Column="1" CornerRadius="10,10,10,10">
+            <Grid x:Name="EingabeGrid" Grid.Column="1" Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="2*"/>
@@ -232,8 +235,9 @@
 
                 <Label Grid.Row="2" Content="Extras" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
                 <ComboBox x:Name="ExtrasComboBox" Grid.Row="2" Margin="0,0,10,0" Padding="5,0,5,0" IsEditable="True" 
-                 VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
-                VerticalAlignment="Center" Grid.Column="1"  TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand" />
+    VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
+    VerticalAlignment="Center" Grid.Column="1" TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" 
+    PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand" />
 
                 <Label Grid.Row="2" Grid.Column="2" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
                 <ComboBox x:Name="amountComboBox" Grid.Row="2" Grid.Column="3" 
@@ -260,7 +264,11 @@
 
 
                 <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
-                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="8" KeyDown="SizeComboBox_KeyDown" MinWidth="40" Cursor="Hand"/>
+                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18"
+          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0"
+          Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="8" KeyDown="SizeComboBox_KeyDown"
+          MinWidth="40" Cursor="Hand" PreviewKeyDown="SizeComboBox_PreviewKeyDown"
+          Style="{StaticResource FocusVisualStyleForComboBox}" />
 
                 <Label Grid.Row="3" Grid.Column="2" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="30,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="5,0,5,0" MinHeight="20" />
                 <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100" Cursor="Hand" />
@@ -287,6 +295,7 @@
                             <!-- Optional: Farbe des Textes im Header -->
                         </Style>
                     </DataGrid.ColumnHeaderStyle>
+                 
                     <DataGrid.Columns>
                         <!-- Nr. Spalte -->
                         <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}"  Foreground="White"  IsReadOnly="True" >
@@ -445,7 +454,7 @@
            Grid.Column="0" FontWeight="Bold"/>
 
             <!-- Zahlungsarten-Buttons -->
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,50,0">
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,20,0">
                 <!-- Barzahlung-Button -->
                 <Border Background="#FF602C" CornerRadius="10">
                     <Button x:Name="btn_cash" Style="{DynamicResource ButtonStyle1}" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" BorderBrush="{x:Null}" Cursor="Hand" >

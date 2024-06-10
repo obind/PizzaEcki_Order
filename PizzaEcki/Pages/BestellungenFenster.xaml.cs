@@ -1,19 +1,9 @@
 ﻿using PizzaEcki.Database;
-using SharedLibrary;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 
 namespace PizzaEcki.Pages
 {
@@ -61,7 +51,9 @@ namespace PizzaEcki.Pages
                 var selectedOrder = BestellungenListView.SelectedItem as SharedLibrary.Order;
                 if (selectedOrder != null)
                 {
+                    _databaseManager.AddOrderToHistory(selectedOrder);
                     bool success = await _databaseManager.DeleteOrderAsync(selectedOrder.OrderId);
+
                     if (success)
                     {
                         _orders.Remove(selectedOrder);

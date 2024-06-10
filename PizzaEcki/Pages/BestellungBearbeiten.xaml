@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="BestellungBearbeiten" Height="450" Width="800">
+        Title="BestellungBearbeiten" Height="450" Width="800" >
     <Window.Resources>
 
         <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
@@ -78,7 +78,15 @@
             <TextBox Text="{Binding BonNumber}" Padding="5px" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" Cursor="Arrow"/>
 
             <Label Content="Fahrername" Foreground="White"/>
-            <TextBox Text="{Binding Name}" Padding="5px" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" Cursor="Arrow"/>
+            <ComboBox x:Name="DriverComboBox"
+          DisplayMemberPath="Name"
+          SelectedValuePath="Id"
+          ItemsSource="{Binding Drivers}"
+            
+          Padding="5px"
+          Cursor="Arrow">
+               
+            </ComboBox>
 
             <Label Content="Adresse" Foreground="White"/>
             <!-- Hier könntest du die Adressdetails der Customer-Entität binden -->

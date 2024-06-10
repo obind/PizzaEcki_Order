@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -100,6 +101,7 @@ namespace PizzaEcki
             _reloadTimer.Tick += ReloadTimer_Tick;
             _reloadTimer.Start();
             SetDefaultpassword();
+            PhoneNumberTextBox.Focus();
         }
 
 
@@ -599,6 +601,7 @@ namespace PizzaEcki
 
         private void ProcessOrder()
         {
+            UpdateTempOrderItemAmount();
             if (!tempOrderItem.Gericht.StartsWith("Party Pizza") && dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht) == null)
             {
                 MessageBox.Show("Bitte gebe ein Gericht an.");
@@ -625,7 +628,6 @@ namespace PizzaEcki
             Dish selectedDish = dishesList.FirstOrDefault(d => d.Name == tempOrderItem.Gericht);
             string selectedSize = SizeComboBox.SelectedItem.ToString();
             tempOrderItem.Größe = selectedSize;
-            tempOrderItem.Menge = 1;
 
             bool isHappyHour = IsHappyHour();
 
@@ -844,8 +846,8 @@ namespace PizzaEcki
         {
             return ++currentReceiptNumber;
         }
-   
-        private void ShowPasswordDialogAndCheck()
+
+        private void ShowPasswordDialogAndCheckForF1Grid()
         {
             PasswordInputDialog dialog = new PasswordInputDialog();
             if (dialog.ShowDialog() == true)
@@ -899,73 +901,96 @@ namespace PizzaEcki
             byte[] data = Encoding.UTF8.GetBytes(password);
             return Convert.ToBase64String(data);
         }
-
-        private void MainWindowEcki_KeyDown(object sender, KeyEventArgs e)
+        private bool ShowPasswordDialogAndCheck()
         {
-            if (e.Key == Key.F2 && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+            PasswordInputDialog dialog = new PasswordInputDialog();
+            if (dialog.ShowDialog() == true)
             {
-                if (F1Grid.Visibility == Visibility.Hidden)
+                if (IsPasswordCorrect(dialog.Password))
                 {
-                    ShowPasswordDialogAndCheck();
+                    return true;
                 }
                 else
                 {
-                    F1Grid.Visibility = Visibility.Hidden;
+                    MessageBox.Show("Das Passwort ist nicht korrekt.");
+                }
+            }
+            return false;
+        }
+        private async void MainWindowEcki_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F2 && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+            {
+                if (F1Grid.Visibility == Visibility.Collapsed)
+                {
+                    ShowPasswordDialogAndCheckForF1Grid();
+                }
+                else
+                {
+                    F1Grid.Visibility = Visibility.Collapsed;
                 }
                 e.Handled = true;
                 return;
             }
 
-          
             if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 ShowHelpDialog();
-                e.Handled = true; 
+                e.Handled = true;
                 return;
             }
 
-           
             if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 if (SaveButton.Visibility == Visibility.Visible)
                 {
                     OnSaveButtonClicked(this, new RoutedEventArgs());
-                    e.Handled = true; 
+                    e.Handled = true;
                 }
                 return;
             }
-       
-            if (e.Key == Key.F4 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+
+            if (e.Key == Key.F3 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                var passwordCorrect = ShowPasswordDialogAndCheck();
+                if (passwordCorrect)
+                {
+                    var deletedOrders = await _databaseManager.GetDeletedOrdersWithItems();
+                    var deletedOrdersWindow = new GelöschteBestellungen(deletedOrders);
+                    deletedOrdersWindow.ShowDialog();
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F4)
             {
                 DailyEarnings dailyEarnings = new DailyEarnings();
                 dailyEarnings.ShowDialog();
-
             }
-               
+
             if (e.Key == Key.F5)
-            {                  
+            {
                 var selectedItem = myDataGrid.SelectedItem as OrderItem;
                 if (selectedItem != null)
-                {                   
+                {
                     selectedItem.Epreis = 0.00;
-                    selectedItem.Gesamt = 0.00;        
+                    selectedItem.Gesamt = 0.00;
                     myDataGrid.Items.Refresh();
                     CalculateTotal(orderItems);
                 }
             }
-           
 
             if (e.Key == Key.F7)
-            {             
+            {
                 if (orderItems.Any())
-                {                
-                    orderItems.RemoveAt(orderItems.Count - 1);               
+                {
+                    orderItems.RemoveAt(orderItems.Count - 1);
                     myDataGrid.ItemsSource = null;
-                    myDataGrid.ItemsSource = orderItems;                 
-                    CalculateTotal(orderItems);               
+                    myDataGrid.ItemsSource = orderItems;
+                    CalculateTotal(orderItems);
                 }
             }
-
 
             if (e.Key == Key.F11)
             {
@@ -980,7 +1005,6 @@ namespace PizzaEcki
                 secretPrintTriggered = true;
                 BarzahlungBtn(null, null);
             }
-             
         }
 
         private void OpenPaymentPopup()
@@ -1415,8 +1439,6 @@ namespace PizzaEcki
                 // Zeichne eine abschließende Trennlinie am Ende der Bestellliste
                 graphics.DrawLine(blackPen, 0, yOffset, e.PageBounds.Width, yOffset);
                 yOffset += 10;  // Füge einen größeren Abstand nach der Linie hinzu, um Platz für den Gesamtpreis zu schaffen
-                // Berechne den Gesamtpreis
-                // Berechne den Gesamtpreis
                 decimal gesamtpreis = order.OrderItems.Sum(item => (decimal)item.Gesamt);
                 // Zeichne den Gesamtpreis
                 string gesamtpreisStr = $"Gesamtpreis: {gesamtpreis:C}";
@@ -1429,7 +1451,6 @@ namespace PizzaEcki
                 graphics.DrawString(paymentMethodStr, boldFont, Brushes.Black, 0, yOffset);
                 yOffset += boldFont.GetHeight();  // Weiterer Abstand für die nächste Zeile
             };
-            // Auslösen des Druckvorgangs
             printDoc.Print();
         }
         private void btn_tables_Click(object sender, RoutedEventArgs e)
@@ -1448,24 +1469,17 @@ namespace PizzaEcki
                 if (selectedOrder != null && selectedDriver != null)
                 {
                     double orderPrice = selectedOrder.OrderItems.Sum(item => item.Gesamt);
-                    _databaseManager.SaveOrderAssignment(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
+                    _databaseManager.SaveOrderAssignmentAsync(selectedOrder.OrderId.ToString(), selectedDriver.Id, orderPrice);
 
                     cb_bonNummer.SelectedItem = null;
                     cb_cashRegister.SelectedItem = null;
 
-                    // Falls ReloadeUnassignedOrders eine asynchrone Operation ist
-                    await ReloadeUnassignedOrders(); // Ändere den Namen der Methode entsprechend, wenn sie asynchron ist.
+                    await ReloadeUnassignedOrders();
                 }
                 else
                 {
-                    // Fehlerbehandlung, falls keine Order oder kein Driver gefunden wurde
                     MessageBox.Show("Es wurde keine Bestellung oder kein Fahrer gefunden.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }
-            else
-            {
-                // Fehlerbehandlung, falls nichts ausgewählt wurde
-                MessageBox.Show("Bitte wählen Sie eine Bonnummer und ein Kassenregister aus.", "Auswahl erforderlich", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -1615,7 +1629,7 @@ namespace PizzaEcki
                     _bestellungenFenster = null;
                     _currentBestellungsTyp = null; // Setze den Bestellungstyp zurück, wenn das Fenster geschlossen wird
                 };
-                _bestellungenFenster.Show();
+                _bestellungenFenster.ShowDialog();
             }
             else
             {
@@ -1662,14 +1676,14 @@ namespace PizzaEcki
                     }
                     else
                     {
-                        order.Name = "Nicht zugewiesen"; // Wenn keine DriverId zugewiesen ist, "Nicht zugewiesen" verwenden
+                        order.Name = "Nicht zugewiesen";
                     }
 
                     updatedOrders.Add(order);
                 }
 
                 Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, true);
-                bestellungenFenster.Show();
+                bestellungenFenster.ShowDialog();
             }
             catch (Exception ex)
             {
@@ -1682,6 +1696,78 @@ namespace PizzaEcki
 
             BestellungenAnzeigen("alle");
         }
+
+        private void MainWindowEcki_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window != this)
+                {
+                    window.Close();
+                }
+            }
+
+        }
+
+        private void SizeComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox == null)
+            {
+                return;
+            }
+
+            if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+            {
+                int numberPressed = e.Key - Key.NumPad0;
+                amountComboBox.Text = numberPressed.ToString();
+                e.Handled = true;
+            }
+            else if (e.Key >= Key.D0 && e.Key <= Key.D9)
+            {
+                int numberPressed = e.Key - Key.D0;
+                amountComboBox.Text = numberPressed.ToString();
+                e.Handled = true;
+            }
+        }
+
+        private void Zuordnen_Click(object sender, RoutedEventArgs e)
+        {
+            //try
+            //{
+            //    var ordersWithAssignedDrivers = await _databaseManager.GetOrdersWithAssignedDrivers();
+            //    var allDrivers = await _databaseManager.GetAllDriversAsync();
+            //    var updatedOrders = new List<Order>();
+
+            //    foreach (var order in ordersWithAssignedDrivers)
+            //    {
+            //        if (order.DriverId.HasValue && order.DriverId.Value != -1)
+            //        {
+            //            var driver = allDrivers.FirstOrDefault(d => d.Id == order.DriverId.Value);
+            //            order.Name = driver?.Name ?? "Nicht zugewiesen";  // Wenn kein passender Fahrer gefunden wird, "Nicht zugewiesen" verwenden
+            //        }
+            //        else
+            //        {
+            //            order.Name = "Nicht zugewiesen";
+            //        }
+
+            //        updatedOrders.Add(order);
+            //    }
+
+            //    Bestellungen bestellungenFenster = new Bestellungen(updatedOrders, true);
+            //    bestellungenFenster.ShowDialog();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show($"Fehler beim Laden der Bestellungen und Fahrer: {ex.Message}");
+            //}
+        }
+
+        private void ZuordnenBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
 
     }
 }

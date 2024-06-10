@@ -184,5 +184,29 @@ namespace PizzaEcki.Pages
                 return pizzaCount > 0 ? totalPrice / pizzaCount : 0;
             }
         }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F7)
+            {
+                RemoveLastPizza();
+            }
+        }
+
+        private void RemoveLastPizza()
+        {
+            if (selectedPizzas.Any())
+            {
+                var lastPizza = selectedPizzas.Last();
+                selectedPizzas.Remove(lastPizza);
+                selectedPizzasListBox.Items.Remove(lastPizza);
+                UpdatePrice();
+                MessageBox.Show($"{lastPizza.Name} wurde entfernt.", "Pizza entfernt", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Keine Pizzen zum Entfernen vorhanden.", "Aktion nicht möglich", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
     }
 }
