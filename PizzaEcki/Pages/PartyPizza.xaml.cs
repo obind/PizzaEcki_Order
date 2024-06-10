@@ -201,7 +201,7 @@ namespace PizzaEcki.Pages
                 selectedPizzas.Remove(lastPizza);
                 selectedPizzasListBox.Items.Remove(lastPizza);
                 UpdatePrice();
-                MessageBox.Show($"{lastPizza.Name} wurde entfernt.", "Pizza entfernt", MessageBoxButton.OK, MessageBoxImage.Information);
+              
             }
             else
             {
