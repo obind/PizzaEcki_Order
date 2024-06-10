@@ -164,7 +164,7 @@
 
 
         </Grid>
-        <Border Background="#FF3D4248" Margin="20,5,5,5" Grid.Row="1" CornerRadius="10,10,10,10">
+        <Border Background="#FF3D4248" Margin="20,5,0.5,5" Grid.Row="1" CornerRadius="10,10,10,10">
             <Grid  Grid.Row="1" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -177,10 +177,10 @@
                     <RowDefinition Height="*" MinHeight="25"/>
                     <RowDefinition Height="*" MinHeight="25"/>
                     <RowDefinition Height="*" MinHeight="25"/>
-                    <RowDefinition Height="*" MinHeight="25"/>
+                    <RowDefinition Height="Auto"/>
 
                 </Grid.RowDefinitions>
-                <Border Background="#FF602C" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="2" Margin="0 0 0 10 ">
+                <Border Background="#FF602C" CornerRadius="10" Padding="5,0,5,0" Grid.ColumnSpan="2" Margin="0,0,0,2">
                     <!-- CornerRadius bestimmt den Radius der Ecken -->
                     <Label Content="Kundendaten" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
                 </Border>
@@ -196,7 +196,7 @@
                 <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="10,0,0,2"/>
                 <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,10,0" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
                 <Border x:Name="SaveButtonBorder"  Grid.Row="6" Grid.Column="1" Background="#FF602C" CornerRadius="10" HorizontalAlignment="Right"  Margin="0,0,10,2" Visibility="Collapsed">
-                    <Button x:Name="SaveButton"  Style="{DynamicResource ButtonStyle1}" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}"         >
+                    <Button x:Name="SaveButton"  Style="{DynamicResource ButtonStyle1}" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}"         >
                         
                     </Button>
                 </Border>
