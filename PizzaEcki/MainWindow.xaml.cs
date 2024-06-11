@@ -1560,7 +1560,7 @@ namespace PizzaEcki
         {
             BestellungenAnzeigen("2");
         }
-        private void BestellungenAnzeigen(string bestellungsTyp)
+        private async void BestellungenAnzeigen(string bestellungsTyp)
         {
             var unassignedOrders = _databaseManager.GetUnassignedOrders();
             List<Order> filteredOrders;
@@ -1581,8 +1581,9 @@ namespace PizzaEcki
             }
             else if (bestellungsTyp == "alle")
             {
+                var ordersWithAssignedDrivers = await _databaseManager.GetOrdersWithAssignedDrivers();
                 // Zeige alle Bestellungen ohne Filterung
-                filteredOrders = unassignedOrders;
+                filteredOrders = ordersWithAssignedDrivers;
             }
             else
             {

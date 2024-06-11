@@ -127,7 +127,7 @@
         </ResourceDictionary>
 
     </Window.Resources>
-    <Grid Background="#FF1D1E20" >
+    <Grid Background="#FF1D1E20" Cursor="Hand" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
@@ -367,7 +367,7 @@
             </Grid>
         </Border>
 
-        <Border Background="#FF3D4248" Margin="20,5,5,20" Grid.Row="3" CornerRadius="10,10,10,10">
+        <Border Background="#FF3D4248" Margin="20,5,2,20" Grid.Row="3" CornerRadius="10,10,10,10">
             <Grid Grid.Row="4" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -380,6 +380,7 @@
                     <!-- Überschrift -->
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
@@ -427,8 +428,8 @@
 
                     </Button>
                 </Border>
-                <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Left" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10">
-                    <Button x:Name="Uebersicht"  Style="{DynamicResource ButtonStyle1}" Padding="5,0,5,0" Content="Übersicht" Foreground="White" FontWeight="Bold" BorderThickness="0" Background="{x:Null}" Cursor="Hand" Click="Uebersicht_Click"/>
+                <Border Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10">
+                    <Button x:Name="Uebersicht"  Style="{DynamicResource ButtonStyle1}" Padding="5,5,5,5" Content="Tagesübersicht " Foreground="White" FontWeight="Bold" BorderThickness="0" Background="{x:Null}" Cursor="Hand" Click="Uebersicht_Click"/>
                 </Border>
 
 

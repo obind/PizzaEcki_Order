@@ -82,7 +82,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Zuordnung" Width="150">
+                    <GridViewColumn Header="Fahrer" Width="150">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding DriverId, Converter={StaticResource DriverIdToNameConverter}}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
