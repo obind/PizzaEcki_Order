@@ -95,14 +95,6 @@ namespace PizzaEcki.Pages
             // Gratis Beilage
             Dish.GratisBeilage = FreeSideCheckBox.IsChecked == true ? 1 : 0;
 
-           
-
-            // Steuersatz
-            if (double.TryParse(TaxRateTextBox.Text, out double steuersatz))
-            {
-                Dish.Steuersatz = steuersatz;
-            }
-
             _dbManager.AddOrUpdateDish(Dish);
             DialogResult = true;
         }

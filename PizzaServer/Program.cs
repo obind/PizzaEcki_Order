@@ -1,7 +1,15 @@
 using Microsoft.AspNetCore.SignalR;
 using PizzaServer;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Configure(builder.Configuration.GetSection("Kestrel"));
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -79,18 +87,32 @@ app.MapGet("/unassignedOrders", async (PizzaDataService service) =>
     }
 });
 
-//app.MapGet("/allOrders", async (PizzaDataService service) =>
-//{
-//    try
-//    {
-//        var orders = await service.GetAllOrdersAsync();
-//        return Results.Ok(orders);
-//    }
-//    catch (Exception ex)
-//    {
-//        return Results.Problem(ex.Message);
-//    }
-//});
+app.MapGet("/orders-with-assigned-drivers", async (PizzaDataService service) =>
+{
+    try
+    {
+        var ordersWithDrivers = await service.GetOrdersWithAssignedDrivers();
+        return Results.Ok(ordersWithDrivers);
+    }
+    catch (Exception ex)
+    {
+       return Results.Problem(ex.Message);
+    }
+});
+
+app.MapGet("/getAllOrders", async (PizzaDataService service) =>
+{
+
+    try
+    {
+        var orders = await service.GetAllOrdersAsync();
+        return Results.Ok(orders);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
 
 
 app.MapDelete("/deleteOrder/{orderId}", async (PizzaDataService service, Guid orderId) =>

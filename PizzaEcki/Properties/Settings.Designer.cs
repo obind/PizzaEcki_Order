@@ -58,5 +58,53 @@ namespace PizzaEcki.Properties {
                 this["SelectedPrinter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HappyHourStartDay {
+            get {
+                return ((string)(this["HappyHourStartDay"]));
+            }
+            set {
+                this["HappyHourStartDay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HappyHourEndDay {
+            get {
+                return ((string)(this["HappyHourEndDay"]));
+            }
+            set {
+                this["HappyHourEndDay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NetworkPrinter {
+            get {
+                return ((string)(this["NetworkPrinter"]));
+            }
+            set {
+                this["NetworkPrinter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string EncryptedPassword {
+            get {
+                return ((string)(this["EncryptedPassword"]));
+            }
+            set {
+                this["EncryptedPassword"] = value;
+            }
+        }
     }
 }

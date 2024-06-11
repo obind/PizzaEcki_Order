@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="TableView" Height="450" Width="800">
+        Title="Tabellen" Height="450" Width="800" ResizeMode="NoResize">
     <Grid Background="#FF1D1E20">
         <ComboBox x:Name="tablesComboBox" 
           SelectionChanged="TablesComboBox_SelectionChanged"
           Margin="10" VerticalAlignment="Top"
-          FontSize="12" Height="30" Padding="5,0,5,0" 
+          FontSize="12" Height="30" Padding="5,0,5,0" Text="- Wähle Tabelle -" 
             Background="#FF5F6269" Foreground="#FF5F6269" BorderBrush="#FF5F6269" VerticalContentAlignment="Center">
             <ComboBox.Resources>
                 <!-- Anpassung des Hintergrunds für das Dropdown -->

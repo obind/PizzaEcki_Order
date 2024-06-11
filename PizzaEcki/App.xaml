@@ -9,7 +9,6 @@
             <Setter Property="Background" Value="#5f6269"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Padding" Value="5"/>
-            <Setter Property="BorderBrush" Value="Black"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -26,18 +25,12 @@
             <!-- Hinzugefügter Hover-Effekt -->
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="#FF003399"/>
+              
                     <!-- Farbe des Randes beim Hover -->
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="#5f6269"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="BorderBrush" Value="Black"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
 
     </Application.Resources>
 </Application>

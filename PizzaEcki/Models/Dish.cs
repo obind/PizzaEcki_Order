@@ -38,7 +38,7 @@ namespace PizzaEcki.Models
         public double Preis_L { get; set; }
         public double Preis_XL { get; set; }
         public DishCategory Kategorie { get; set; }
-        public string Größe { get; set; } // Du könntest dies auch als Enum definieren
+        public string Größe { get; set; }
         public string HappyHour { get; set; }
         public double Steuersatz { get; set; }
         public int GratisBeilage { get; set; }

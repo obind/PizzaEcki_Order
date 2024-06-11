@@ -1,140 +1,254 @@
 ﻿<Window x:Class="PizzaEcki.Pages.BestellungenFenster"
        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Bestellungen anzeigen" Height="450" Width="1240"
-        MinWidth="1240"  MinHeight="300" KeyDown="Window_KeyDown"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:services="clr-namespace:PizzaEcki.Services" 
+        Title="Bestellungen anzeigen" Height="450" Width="Auto"  ResizeMode="NoResize" KeyDown="Window_KeyDown"   
 >
 
     <Window.Resources>
+        <services:ItemsToTotalConverter x:Key="ItemsToTotalConverter"/>
+        <services:PhoneNumberToTextConverter x:Key="PhoneNumberToTextConverter"/>
+        <services:PhoneNumberToVisibilityConverter x:Key="PhoneNumberToVisibilityConverter"/>
+        <services:StringToDateTimeConverter x:Key="StringToDateTimeConverter"/>
+        <services:TextToColorConverter x:Key="TextToColorConverter"/>
         <!-- Button-Style für orange Hintergrund -->
         <Style x:Key="OrangeButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#FFFF5D48"/>
+            <Setter Property="Background" Value="#FF602C"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <!-- ... Weitere Setters und Trigger falls nötig ... -->
         </Style>
         <Style TargetType="GridViewColumnHeader">
-            <Setter Property="Background" Value="#FFFF5D48"/>
+            <Setter Property="Background" Value="#FF602C"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Medium"/>
-            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="5"/>
-            <!-- Weitere Stileinstellungen nach Bedarf -->
-
-
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GridViewColumnHeader">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
+
+
+        <!-- Stil für ListViewItem -->
         <Style TargetType="{x:Type ListViewItem}">
-            <Style.Resources>
-                <!-- Farbe für das ausgewählte Element -->
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF5F6269"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
-                <!-- Farbe für das ausgewählte Element, wenn die ListView nicht fokussiert ist -->
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF5F6269"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
-            </Style.Resources>
+
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="Red"/>
-                    <!-- Roter Hintergrund für deaktivierte ListViewItem -->
+                    <Setter Property="Background" Value="#FF5F6269"/>
                     <Setter Property="Foreground" Value="White"/>
-                    <!-- Weiße Schrift für deaktivierte ListViewItem -->
                 </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF5F6269" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="BorderBrush" Value="#ff602c" />
+                </Trigger>
+
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    <Grid>
-        <ListView x:Name="BestellungenListView"  Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}">
+    <Grid >
+        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <!-- Setze hier weitere Setters für Standard-Style-Eigenschaften -->
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    <!-- Trigger für die Mouseover-Effekte -->
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="#FF5F6269" />
                             <Setter Property="Foreground" Value="White" />
-                            <!-- Weitere Setters für Mouseover-Style-Eigenschaften -->
+                            <Setter Property="BorderBrush" Value="#ff602c" />
                         </Trigger>
+
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="#FF5F6269" />
                             <Setter Property="Foreground" Value="White" />
-                            <!-- Weitere Setters für Auswahl-Style-Eigenschaften -->
+                            <Setter Property="BorderBrush" Value="#ff602c" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Bon Nummer" DisplayMemberBinding="{Binding BonNumber}" Width="100"/>
-                    <GridViewColumn Header="Kunde" DisplayMemberBinding="{Binding Customer.Name}" Width="200"/>
-                    <GridViewColumn Header="Telefonnummer" DisplayMemberBinding="{Binding CustomerPhoneNumber}" Width="100"/>
-                    <!--<GridViewColumn Header="Aufgenommen um" DisplayMemberBinding="{Binding Timestamp}" Width="150">
+                    <GridViewColumn Header="Bon Nr" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Timestamp, StringFormat={}{0:HH:mm}}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>-->
-                    <GridViewColumn Header="Lieferung Bis" DisplayMemberBinding="{Binding DeliveryUntil}" Width="100"/>
-                    <GridViewColumn Header="Bezahlmethode" DisplayMemberBinding="{Binding PaymentMethod}" Width="120"/>
-                    
-                    <!-- Angenommen, du möchtest die Anzahl der OrderItems anzeigen -->
-                    <GridViewColumn Header="Anzahl Artikel" DisplayMemberBinding="{Binding OrderItems.Count}" Width="110"/>
-                    <GridViewColumn Header="Gerichte">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ListView ItemsSource="{Binding OrderItems}" Background="#FF1D1E20" Foreground="White" BorderBrush="White" SelectionMode="Single"  IsEnabled="False" >
-                                    <ListView.ItemContainerStyle>
-                                        <Style TargetType="ListViewItem">
-                                            <!-- Setze hier weitere Setters für Standard-Style-Eigenschaften -->
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                            <!-- Trigger für die Mouseover-Effekte -->
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#FF5F6269" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    <!-- Weitere Setters für Mouseover-Style-Eigenschaften -->
-                                                </Trigger>
-                                                <Trigger Property="IsSelected" Value="True">
-                                                    <Setter Property="Background" Value="#FF5F6269" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    <!-- Weitere Setters für Auswahl-Style-Eigenschaften -->
-                                                </Trigger>
-                                                <!-- Trigger für deaktivierte ListViewItems -->
-                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=IsEnabled}" Value="False">
-                                                    <Setter Property="Background" Value="#FF5F6269" />
-                                                    <!-- Roter Hintergrund für deaktivierte ListViewItem -->
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    <!-- Graue Schrift für deaktivierte ListViewItem -->
-
-                                                    <Setter Property="BorderThickness" Value="0"/>
-                                                    <!-- Kein Rahmen -->
-                                                    <Setter Property="BorderBrush" Value="Transparent"/>
-                                                    <!-- Keine Rahmenfarbe -->
-
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ListView.ItemContainerStyle>
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Header="Artikel" DisplayMemberBinding="{Binding Gericht}" Width="120"/>
-                                            <GridViewColumn Header="Extras" DisplayMemberBinding="{Binding Extras}" Width="120"/>
-                                            <GridViewColumn Header="Größe" DisplayMemberBinding="{Binding Größe}" Width="50"/>
-                                            <GridViewColumn Header="Menge" DisplayMemberBinding="{Binding Menge}" Width="50"/>
-                                            <GridViewColumn Header="Einzelpreis" DisplayMemberBinding="{Binding Epreis}" Width="70"/>
-                                            <GridViewColumn Header="Gesamt" DisplayMemberBinding="{Binding Gesamt}" Width="70"/>
-                                            <!-- Weitere Eigenschaften der OrderItems, falls benötigt -->
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
+                                <TextBlock Text="{Binding BonNumber}" Foreground="White" FontSize="14" HorizontalAlignment="Center" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    <GridViewColumn Header="Telefonnummer" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" 
+                                           Foreground="{Binding CustomerPhoneNumber, Converter={StaticResource TextToColorConverter}}" FontSize="14" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Kunde" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Customer.Name}" 
+                       FontSize="14" 
+                       HorizontalAlignment="Center"
+                      
+                       Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+
+                    <GridViewColumn Header="Adresse" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}">
+                                    <TextBlock Text="{Binding Customer.Street}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Customer.City}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Offen seit" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Timestamp, Converter={StaticResource StringToDateTimeConverter}}" HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+
+
+
+                    <GridViewColumn Header="Lieferung Bis" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DeliveryUntil}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Bezahlmethode" Width="120">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding PaymentMethod}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!--<GridViewColumn Header="Anzahl Artikel" Width="110">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding OrderItems.Count}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>-->
+                    
+                    <GridViewColumn Header="Gerichte" Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    
+                               
+                                <ListView ItemsSource="{Binding OrderItems}" Background="#FF1D1E20" Foreground="White" BorderBrush="White" SelectionMode="Single" IsEnabled="False">
+                                    <ListView.View>
+                                        <GridView ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                            <GridViewColumn Width="Auto">
+                                                <GridViewColumn.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="Artikel" Foreground="White" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" Padding="5"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.HeaderTemplate>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Gericht}" Foreground="White" FontSize="14"  HorizontalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            
+                                            <GridViewColumn Width="120">
+                                                <GridViewColumn.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="Extras" Foreground="White" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" Padding="5"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.HeaderTemplate>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Extras}" Foreground="White" FontSize="14"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="50">
+                                                <GridViewColumn.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="Gr." Foreground="White" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" Padding="5"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.HeaderTemplate>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Größe}" Foreground="White" FontSize="14"  HorizontalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="50">
+                                                <GridViewColumn.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="Mg." Foreground="White" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" Padding="5"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.HeaderTemplate>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Menge}" Foreground="White" FontSize="14"  HorizontalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="70">
+                                                <GridViewColumn.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="Einz." Foreground="White" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" Padding="5"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.HeaderTemplate>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Epreis, StringFormat='{}{0:0.00} €'}" Foreground="White" FontSize="14"  HorizontalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="70">
+                                                <GridViewColumn.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="Gesamt" Foreground="White" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" Padding="5"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.HeaderTemplate>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Gesamt, StringFormat='{}{0:0.00} €'}" Foreground="White" FontSize="14"  />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                    <TextBlock Text="{Binding OrderItems, Converter={StaticResource ItemsToTotalConverter}, StringFormat='Gesamtpreis: {0:0.00} €'}"
+            Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="10,5,0,0"/>
+
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    
+
                 </GridView>
             </ListView.View>
         </ListView>
-
+        
     </Grid>
 </Window>

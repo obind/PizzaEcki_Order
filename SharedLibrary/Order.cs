@@ -1,8 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace SharedLibrary
 {
-    public class Order
+    public class Order : INotifyPropertyChanged
     {
         [JsonPropertyName("orderId")]
         public Guid OrderId { get; set; }
@@ -28,16 +31,54 @@ namespace SharedLibrary
         [JsonPropertyName("deliveryUntil")]
         public string DeliveryUntil { get; set; }
 
+        [JsonPropertyName("driverId")]
+        public int? DriverId { get; set; }
+
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public string LieferStatus
         {
             get { return IsDelivery ? "Lieferung" : "Abholung"; }
         }
 
-        public Customer Customer { get; set; }
+        private Customer _customer;
+        public Customer Customer
+        {
+            get => _customer;
+            set
+            {
+                if (_customer != value)
+                {
+                    _customer = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         public Order()
         {
             OrderItems = new List<OrderItem>();
+        }
+
+        public double Gesamtpreis => OrderItems.Sum(item => item.Gesamt);
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

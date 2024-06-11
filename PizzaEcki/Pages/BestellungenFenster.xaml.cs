@@ -1,19 +1,9 @@
 ﻿using PizzaEcki.Database;
-using SharedLibrary;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 
 namespace PizzaEcki.Pages
 {
@@ -23,35 +13,47 @@ namespace PizzaEcki.Pages
     public partial class BestellungenFenster : Window
     {
         private DatabaseManager _databaseManager;
-        // Verwende ObservableCollection, um die UI automatisch zu aktualisieren
         private ObservableCollection<SharedLibrary.Order> _orders;
 
         public BestellungenFenster(List<SharedLibrary.Order> orders)
         {
             InitializeComponent();
-            _databaseManager = new DatabaseManager(); // Stelle sicher, dass DatabaseManager initialisiert wird
+            _databaseManager = new DatabaseManager();
             _orders = new ObservableCollection<SharedLibrary.Order>(orders);
             BestellungenListView.ItemsSource = _orders;
-        }
 
-        private void LoadOrders(string bestellungsTyp)
-        {
-            // Hier würdest du deine Datenquelle abfragen, um die Bestellungen zu erhalten
-            // Die folgende Zeile ist nur ein Platzhalter für die tatsächliche Datenabfrage
-            //var bestellungen = BestellungenDatenService.GetBestellungenNachTyp(bestellungsTyp);
+            foreach (var order in _orders)
+            {
+                if (order.CustomerPhoneNumber == "1" || order.CustomerPhoneNumber == "2")
+                {
+                    order.Customer = new SharedLibrary.Customer();
+                }
+                else
+                {                 
+                    order.Customer = _databaseManager.GetCustomerByPhoneNumber(order.CustomerPhoneNumber);
+                }
+            }
 
-            // Setze die erhaltenen Bestellungen als ItemsSource für deine ListView
-           // BestellungenListView.ItemsSource = bestellungen;
+            BestellungenListView.ItemsSource = _orders;
         }
 
         private async void Window_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
+            {
+                ShowHelpDialog();
+                e.Handled = true; // Ereignis als behandelt markieren
+                return;
+            }
+
             if (e.Key == Key.F8)
             {
                 var selectedOrder = BestellungenListView.SelectedItem as SharedLibrary.Order;
                 if (selectedOrder != null)
                 {
+                    _databaseManager.AddOrderToHistory(selectedOrder);
                     bool success = await _databaseManager.DeleteOrderAsync(selectedOrder.OrderId);
+
                     if (success)
                     {
                         _orders.Remove(selectedOrder);
@@ -68,5 +70,12 @@ namespace PizzaEcki.Pages
                 }
             }
         }
+        private void ShowHelpDialog()
+        {
+            string helpText = "F8: Ausgewähltes Gericht Löschen.\n" ;
+
+            MessageBox.Show(helpText, "Hilfe zu Tastenkürzeln");
+        }
+
     }
 }

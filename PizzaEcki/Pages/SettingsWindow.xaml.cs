@@ -7,6 +7,8 @@ using System.Windows.Input;
 using PizzaEcki.Database;
 using PizzaEcki.Models;
 using SharedLibrary;
+using System.Printing;
+using System.Text;
 
 namespace PizzaEcki.Pages
 {
@@ -24,10 +26,17 @@ namespace PizzaEcki.Pages
             _dbManager = new DatabaseManager();
             LoadDrivers();
             LoadDishes();
-            PopulatePrinterComboBox();
+          
+            PopulateDayComboBoxes();
+            LoadHappyHourDaySettings();
 
             HappyHourStartTimePicker.Value = DateTime.Today.Add(Properties.Settings.Default.HappyHourStart);
             HappyHourEndTimePicker.Value = DateTime.Today.Add(Properties.Settings.Default.HappyHourEnd);
+
+            if (LocalPrinterComboBox.Items.Contains(PizzaEcki.Properties.Settings.Default.SelectedPrinter))
+            {
+                LocalPrinterComboBox.SelectedItem = PizzaEcki.Properties.Settings.Default.SelectedPrinter;
+            }
 
         }
 
@@ -130,15 +139,33 @@ namespace PizzaEcki.Pages
                 MessageBox.Show("Bitte wählen Sie ein Gericht aus, das Sie löschen möchten.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+        private void PopulateDayComboBoxes()
+        {
+            string[] days = { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" };
+            foreach (var day in days)
+            {
+                HappyHourStartDayComboBox.Items.Add(day);
+                HappyHourEndDayComboBox.Items.Add(day);
+            }
+        }
+
+        private void LoadHappyHourDaySettings()
+        {
+            // Laden der gespeicherten Wochentage
+            HappyHourStartDayComboBox.SelectedItem = Properties.Settings.Default.HappyHourStartDay;
+            HappyHourEndDayComboBox.SelectedItem = Properties.Settings.Default.HappyHourEndDay;
+        }
+
         private void SaveHappyHourTimesButton_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.HappyHourStart = HappyHourStartTimePicker.Value?.TimeOfDay ?? TimeSpan.Zero;
             Properties.Settings.Default.HappyHourEnd = HappyHourEndTimePicker.Value?.TimeOfDay ?? TimeSpan.Zero;
-            Properties.Settings.Default.Save(); // Sehr wichtig, um die Einstellungen zu speichern
+            Properties.Settings.Default.HappyHourStartDay = HappyHourStartDayComboBox.SelectedItem.ToString();
+            Properties.Settings.Default.HappyHourEndDay = HappyHourEndDayComboBox.SelectedItem.ToString();
+            Properties.Settings.Default.Save();
 
-            MessageBox.Show("Happy Hour Zeiten wurden gespeichert.");
+            MessageBox.Show("Happy Hour Zeiten und Tage wurden gespeichert.");
         }
-
 
 
         public static class ApplicationSettings
@@ -156,11 +183,17 @@ namespace PizzaEcki.Pages
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    _dbManager.UnassignDriverFromOrders(selectedDriver.Id);
-                    _dbManager.DeleteDriver(selectedDriver.Id);
+                    bool deleteSuccessful = _dbManager.DeleteDriver(selectedDriver.Id);
 
-                    // Hier müsstest du die Liste der Fahrer aktualisieren, zum Beispiel:
-                    LoadDrivers();
+                    if (deleteSuccessful)
+                    {
+                        // Aktualisiere die Liste der Fahrer
+                        LoadDrivers();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Der Fahrer konnte nicht gelöscht werden, da er zugewiesene Bestellungen hat.", "Löschen fehlgeschlagen", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
             else
@@ -168,30 +201,99 @@ namespace PizzaEcki.Pages
                 MessageBox.Show("Bitte wählen Sie einen Fahrer zum Löschen aus.");
             }
         }
-        private void PopulatePrinterComboBox()
+
+
+
+
+
+        private void PopulatePrinterComboBoxes()
         {
+            // Lokale Drucker
+            LocalPrinterComboBox.Items.Clear();
+            NetworkPrinterComboBox.Items.Clear();
+
             foreach (string printer in PrinterSettings.InstalledPrinters)
             {
-                PrinterComboBox.Items.Add(printer);
+                LocalPrinterComboBox.Items.Add(printer);
+                NetworkPrinterComboBox.Items.Add(printer);
             }
 
-            // Optional: Wähle den aktuell eingestellten Drucker aus, wenn einer gespeichert ist
-            // PrinterComboBox.SelectedItem = Properties.Settings.Default.SelectedPrinter;
+
+            // Setzen der aktuell gespeicherten Drucker, falls vorhanden
+            var savedLocalPrinter = Properties.Settings.Default.SelectedPrinter;
+            var savedNetworkPrinter = Properties.Settings.Default.NetworkPrinter;
+            if (!string.IsNullOrEmpty(savedLocalPrinter) && LocalPrinterComboBox.Items.Contains(savedLocalPrinter))
+            {
+                LocalPrinterComboBox.SelectedItem = savedLocalPrinter;
+                NetworkPrinterComboBox.SelectedItem = savedNetworkPrinter;
+            }
         }
+
+
         private void SavePrinterSelectionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (PrinterComboBox.SelectedItem != null)
-            {
-                string selectedPrinter = PrinterComboBox.SelectedItem.ToString();
-                PizzaEcki.Properties.Settings.Default.SelectedPrinter = selectedPrinter;
-                PizzaEcki.Properties.Settings.Default.Save();
+            bool saveSuccessful = true;
 
-                MessageBox.Show("Drucker wurde gespeichert: " + selectedPrinter);
+            // Speichern des lokalen Druckers
+            if (LocalPrinterComboBox.SelectedItem != null)
+            {
+                string selectedLocalPrinter = LocalPrinterComboBox.SelectedItem.ToString();
+                string selectedNetworkPrinter = NetworkPrinterComboBox.SelectedItem.ToString();
+
+                Properties.Settings.Default.SelectedPrinter = selectedLocalPrinter;
+                Properties.Settings.Default.NetworkPrinter = selectedNetworkPrinter;
+
             }
             else
             {
-                MessageBox.Show("Bitte wählen Sie einen Drucker aus der Liste.");
+                MessageBox.Show("Bitte wählen Sie einen lokalen Drucker aus der Liste.");
+                saveSuccessful = false;
+            }
+
+            
+
+            if (saveSuccessful)
+            {
+                PizzaEcki.Properties.Settings.Default.Save();
+                MessageBox.Show("Drucker wurden gespeichert.");
             }
         }
+
+        private void TabItem_Loaded(object sender, RoutedEventArgs e)
+        {
+            PopulatePrinterComboBoxes();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Überprüfe, ob die Passwörter übereinstimmen
+            if (NewPasswordInput.Password == ConfirmPasswordInput.Password)
+            {
+                SaveEncryptedPassword(NewPasswordInput.Password);
+                MessageBox.Show("Passwort wurde gesetzt.");
+                this.DialogResult = true;
+            }
+            else
+            {
+                MessageBox.Show("Die Passwörter stimmen nicht überein.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
+        private void SaveEncryptedPassword(string password)
+        {
+            string encryptedPassword = EncryptPassword(password);
+            Properties.Settings.Default.EncryptedPassword = encryptedPassword;
+            Properties.Settings.Default.Save(); // Speichern der Änderungen
+        }
+        private string EncryptPassword(string password)
+        {
+            // Eine einfache Verschlüsselungsmethode (nur als Beispiel, für echte Anwendungen stärkere Methoden verwenden)
+            // Ersetzen Sie dies durch Ihre bevorzugte Verschlüsselungsmethode
+            byte[] data = Encoding.UTF8.GetBytes(password);
+            // Verwenden Sie hier Ihre Verschlüsselungslogik
+            return Convert.ToBase64String(data);
+        }
+
     }
 }

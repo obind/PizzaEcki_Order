@@ -9,6 +9,7 @@ using System.Windows;
 using System;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
+using System.Windows.Controls;
 
 public class ApiService
 {
@@ -54,12 +55,38 @@ public class ApiService
         return orders;
     }
 
+    public async Task<List<Order>> GetAllOrders()
+    {
+        var response = await _httpClient.GetAsync($"{_apiBaseUrl}/getAllOrders");
+
+        // Prüfe, ob der Statuscode erfolgreich ist
+        if (!response.IsSuccessStatusCode)
+        {
+            // Behandle den Fall, dass der Statuscode nicht erfolgreich ist
+            // Du kannst hier eine detaillierte Fehlermeldung anzeigen oder loggen
+            throw new HttpRequestException($"Error: {response.StatusCode}");
+        }
+
+        string responseContent = await response.Content.ReadAsStringAsync();
+        var orders = JsonSerializer.Deserialize<List<Order>>(responseContent);
+        return orders;
+    }
+
+    public async Task<List<Order>> GetOrdersWithAssignedDriversAsync()
+    {
+        var response = await _httpClient.GetAsync($"{_apiBaseUrl}/orders-with-assigned-drivers");
+        response.EnsureSuccessStatusCode();
+        string responseContent = await response.Content.ReadAsStringAsync();
+        var orders = JsonSerializer.Deserialize<List<Order>>(responseContent);
+        return orders;
+    }
+
     [HttpDelete("deleteOrder")]
     public async Task<bool> DeleteOrderAsync(Guid orderId)
     {
         try
         {
-           //http://localhost:5062/deleteOrder/{6cd0145c-c47a-4844-8613-d3a01c9d7c40}
+          
             var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/deleteOrder/{orderId}");
 
             if (response.IsSuccessStatusCode)
@@ -136,7 +163,7 @@ public class ApiService
         }
         catch (HttpRequestException ex)
         {
-            MessageBox.Show($"Fehler bei der HTTP-Anfrage: {ex.Message}");
+          
             return null;
         }
         catch (Exception ex)
@@ -149,4 +176,10 @@ public class ApiService
 
 
 
+}
+public class OrderWithAssignedDriver
+{
+    public string OrderId { get; set; }
+    public string AssignedDriverName { get; set; }
+    // Füge weitere Eigenschaften hinzu, die du anzeigen möchtest
 }

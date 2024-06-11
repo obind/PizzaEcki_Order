@@ -6,7 +6,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Order Mate" KeyDown="MainWindowEcki_KeyDown"
-       MinWidth="1000" MinHeight="580" >
+       MinWidth="1000" MinHeight="580" Cursor="Arrow" Closing="MainWindowEcki_Closing"  >
 
 
     <Window.Resources>
@@ -18,50 +18,159 @@
                     </DrawingGroup>
                 </DrawingImage.Drawing>
             </DrawingImage>
+
+
+            <Style x:Key="FocusedComboBoxStyle" TargetType="{x:Type ComboBox}">
+                <Setter Property="FocusVisualStyle">
+                    <Setter.Value>
+                        <Style>
+                            <Setter Property="Control.Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border BorderBrush="#FF602C" BorderThickness="2">
+                                            <AdornedElementPlaceholder />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <Style x:Key="FocusVisualStyleForComboBox" TargetType="ComboBox">
+                <Setter Property="BorderBrush" Value="#FF602C"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Style.Triggers>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter Property="BorderBrush" Value="#FF602C"/>
+                        <Setter Property="BorderThickness" Value="3"/>
+                    </Trigger>
+                    <Trigger Property="IsFocused"  Value="True">
+                        <Setter Property="BorderBrush" Value="#FF602C"/>
+                        <Setter Property="BorderThickness" Value="3"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="FocusedTextBoxStyle">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border BorderBrush="Blue" BorderThickness="2">
+                                <AdornedElementPlaceholder />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="FocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+            <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+            <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#ff3300   "/>
+            <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+            <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+            <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+            <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+            <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+            <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+            <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+                <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="1"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true" CornerRadius="5">
+                                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsDefaulted" Value="true">
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true" >
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                                    <Setter TargetName="border" Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect Color="Black" Direction="320" ShadowDepth="7" BlurRadius="5" Opacity="0.5"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="true">
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                    
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                    <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
         </ResourceDictionary>
 
     </Window.Resources>
-    <Grid Background="#FF1D1E20">
+    <Grid Background="#FF1D1E20" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.2*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="1.2*"/>
             <RowDefinition Height="1.3*" />
             <RowDefinition Height="1.3*" />
 
         </Grid.RowDefinitions>
-
-        <Grid x:Name="F1Grid" VerticalAlignment="Top" Height="35" Margin="20,0,0,0"  Visibility="Hidden" >
+        <Grid Margin="0,20,0,0"></Grid>
+        <Grid x:Name="F1Grid" VerticalAlignment="Top" Height="35" Margin="20,10,0,10"  Visibility="Collapsed" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <!--<Button Grid.Column="0" Content="Erfassung" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>-->
+            <!--<Button Grid.Column="0" Content="Erfassung" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FF602C" Foreground="White" FontWeight="Bold" Padding="1,5,1,5"/>-->
             <!--<Button Name="TestButton" Grid.Column="3" Content="Reset Bon Number Test" Click="ResetBonNumberButton_Click" />-->
-                <!--<Button Grid.Column="2" Content="Logbuch" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FFFF5D48" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
-            <Border Grid.Column="0" Background="#FFFF5D48" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="btn_tables" Content="Tabellen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}" Click="btn_tables_Click"/>
-            </Border>
-            <Border Grid.Column="1" Background="#FFFF5D48" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="Auswertung_Btn" Content="Auswertung" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}" Click="Auswertung_Btn_Click"/>
-            </Border>
-            <Border Grid.Column="2" Background="#FFFF5D48" CornerRadius="10" Margin="0,2,5,0">
-                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}" Click="EinstellungenBtn_Click"/>
-            </Border>
+            <!--<Button Grid.Column="2" Content="Logbuch" HorizontalAlignment="Center" VerticalAlignment="Center" Height="35" Width="160" Margin="0,0,5,0" Background="#FF602C" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" />-->
 
 
-
+            <Border Grid.Column="0" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
+                <Button x:Name="btn_tables" Padding="20,0,20,0" Content="Tabellen" Foreground="White"  FontWeight="Bold"  Style="{DynamicResource ButtonStyle1}" Click="btn_tables_Click" BorderBrush="{x:Null}" Background="{x:Null}"/>
+            </Border>
+            <Border Grid.Column="1" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
+                <Button x:Name="Auswertung_Btn" Content="Leistungsübersicht" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}" Style="{DynamicResource ButtonStyle1}"  Click="Auswertung_Btn_Click" BorderBrush="{x:Null}"/>
+            </Border>
+            <Border Grid.Column="2" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
+                <Button x:Name="Bestellungen" Content="Bestellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="Bestellungen_Click" BorderBrush="{x:Null}"/>
+            </Border>
+            <Border Grid.Column="3" Background="#FF602C" CornerRadius="10" Margin="0,2,5,0">
+                <Button x:Name="EinstellungenBtn" Content="Einstellungen" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="{x:Null}"  Style="{DynamicResource ButtonStyle1}" Click="EinstellungenBtn_Click" BorderBrush="{x:Null}"/>
+            </Border>
         </Grid>
-        <Border Background="#FF3D4248" Margin="20,5,5,5" Grid.Row="1" CornerRadius="10,10,10,10">
+        <Border Background="#FF3D4248" Margin="20,5,0.5,5" Grid.Row="1" CornerRadius="10,10,10,10">
             <Grid  Grid.Row="1" >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -71,47 +180,38 @@
                     <RowDefinition Height="*" MinHeight="25"/>
                     <RowDefinition Height="*" MinHeight="25"/>
                     <RowDefinition Height="*" MinHeight="25"/>
-                    <RowDefinition Height="*" MinHeight="25"/>
+                    <RowDefinition Height="Auto"/>
 
                 </Grid.RowDefinitions>
-                <Border Background="#FFFF5D48" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="2">
+                <Border Background="#FF602C" CornerRadius="10" Padding="5,0,5,0" Grid.ColumnSpan="2" Margin="0,0,0,2">
                     <!-- CornerRadius bestimmt den Radius der Ecken -->
                     <Label Content="Kundendaten" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
                 </Border>
 
-                <Label Content="KundenNR." VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Row="1" MinHeight="20" Padding="5,0,5,0" Margin="0,0,0,2" />
-                <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,2,10,2" FontSize="16" VerticalContentAlignment="Center" KeyDown="PhoneNumberTextBox_KeyDown" TabIndex="0" Padding="5,0,5,0"/>
-                <Label Content="Name" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Grid.Row="2" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-                <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="16" TabIndex="1" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-                <Label Grid.Row="3" Content="Straße" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-                <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="2" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-                <Label Grid.Row="4" Content="Ort" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-                <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,2,10,2" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-                <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="0,0,0,2"/>
-                <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,2,10,2" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0"/>
-                <Border x:Name="SaveButtonBorder"  Grid.Row="6" Grid.Column="1" Background="#FFFF5D48" CornerRadius="10" HorizontalAlignment="Right"  Margin="0,0,10,2" Visibility="Collapsed">
-                    <Button x:Name="SaveButton" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}"        >
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Border.CornerRadius" Value="50"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#E54B3C"/>
-                                    <!-- Etwas dunklere Farbe bei MouseOver -->
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style> 
+                <Label Content="Kunden Nr." VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Row="1" MinHeight="20" Padding="5,0,5,0" Margin="10,0,0,2" />
+                <TextBox x:Name="PhoneNumberTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="16" VerticalContentAlignment="Center" KeyDown="PhoneNumberTextBox_KeyDown" TabIndex="0" Padding="5,0,5,0" Background="White" Foreground="Black"/>
+                <Label Content="Name" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Grid.Row="2" Padding="5,0,5,0" MinHeight="20" Margin="10,0,0,2"/>
+                <TextBox x:Name="NameTextBox"  Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="16" TabIndex="1" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
+                <Label Grid.Row="3" Content="Straße" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="10,0,0,2"/>
+                <TextBox x:Name="StreetTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,10,0" TabIndex="2" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
+                <Label Grid.Row="4" Content="Ort" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Padding="5,0,5,0" MinHeight="20" Margin="10,0,0,2"/>
+                <TextBox x:Name="CityTextBox" Grid.Row="4" Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" TabIndex="3" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
+                <Label Grid.Row="5" Content="Zusatz" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" Padding="5,0,5,0" MinHeight="20" Margin="10,0,0,2"/>
+                <TextBox x:Name="AdditionalInfoTextBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,10,0" TabIndex="4" TextChanged="OnTextChanged" Padding="5,0,5,0" Background="White" Foreground="Black"/>
+                <Border x:Name="SaveButtonBorder"  Grid.Row="6" Grid.Column="1" Background="#FF602C" CornerRadius="10" HorizontalAlignment="Right"  Margin="0,0,10,2" Visibility="Collapsed">
+                    <Button x:Name="SaveButton"  Style="{DynamicResource ButtonStyle1}" Content="Speichern" Foreground="White" Click="OnSaveButtonClicked" HorizontalContentAlignment="Right" Padding="10,2,10,2" Visibility="Collapsed" FontWeight="Bold" Background="{x:Null}" BorderBrush="{x:Null}"         >
+                        
                     </Button>
-                </Border> 
+                </Border>
             </Grid>
         </Border>
-        <Border Background="#FF3D4248" Margin="5,5,20,5" Grid.Row="1" Grid.Column="1" CornerRadius="10,10,10,10">
-            <Grid Grid.Column="1" Grid.Row="1">
+        <Border Background="#FF3D4248" Margin="5,0,20,5" Grid.Row="1" Grid.Column="1" CornerRadius="10,10,10,10">
+            <Grid x:Name="EingabeGrid" Grid.Column="1" Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="*"/>
 
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -121,33 +221,57 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Border Background="#FFFF5D48" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="3" VerticalAlignment="Top" Margin="0,0,0,0">
+                <Border Background="#FF602C" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="4" VerticalAlignment="Top" Margin="0,0,0,-20">
                     <Label Content="Eingabe" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center"/>
                 </Border>
                 <Label Grid.Row="1" Content="Gericht" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" FontStretch="ExtraCondensed" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
-                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" IsEditable="True" SelectionChanged ="DishComboBox_TextChanged"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown" VerticalContentAlignment="Center" FontSize="18" VerticalAlignment="Bottom" Grid.Column="1" Padding="5,0,5,0" Grid.IsSharedSizeScope="True" TabIndex="5" Background="#FF5F6269" BorderBrush="#FF5F6269" />
+                <ComboBox x:Name="DishComboBox" Grid.Row="1" Margin="0,0,10,0" 
+                          SelectionChanged ="DishComboBox_SelectionChanged"
+                          IsEditable="True"  PreviewKeyDown="DishComboBox_AutocompleteKeyDown"
+                          VerticalContentAlignment="Center" FontSize="18" 
+                          Grid.Column="1" Padding="5,0,5,0" TabIndex="5"
+                          Background="#FF5F6269" BorderBrush="#FF5F6269"
+                          VerticalAlignment="Bottom" Cursor="Hand" />
 
                 <Label Grid.Row="2" Content="Extras" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
                 <ComboBox x:Name="ExtrasComboBox" Grid.Row="2" Margin="0,0,10,0" Padding="5,0,5,0" IsEditable="True" 
-                 VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
-                VerticalAlignment="Center" Grid.Column="1"  TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" />
+    VerticalContentAlignment="Center" FontSize="18" AllowDrop="True" 
+    VerticalAlignment="Center" Grid.Column="1" TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" 
+    PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand" />
 
-                <Label Grid.Row="2" Grid.Column="3" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
+                <Label Grid.Row="2" Grid.Column="2" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
                 <ComboBox x:Name="amountComboBox" Grid.Row="2" Grid.Column="3" 
-                  VerticalAlignment="Center" FontSize="18" 
-                  KeyDown="amountComboBox_KeyDown" 
-                  HorizontalContentAlignment="Stretch" 
-                  VerticalContentAlignment="Center" 
-                   Margin="80,0,10,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
-                  IsEditable="True" TabIndex="8" 
-                Text="1" />
+                    VerticalAlignment="Center" FontSize="18" 
+                    KeyDown="amountComboBox_KeyDown" 
+                    HorizontalContentAlignment="Stretch" 
+                    VerticalContentAlignment="Center" 
+                    Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
+                    IsEditable="True" TabIndex="6" 
+                    Text="1" MinWidth="40" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand">
+                    <ComboBoxItem>1</ComboBoxItem>
+                    <ComboBoxItem>2</ComboBoxItem>
+                    <ComboBoxItem>3</ComboBoxItem>
+                    <ComboBoxItem>4</ComboBoxItem>
+                    <ComboBoxItem>5</ComboBoxItem>
+                    <ComboBoxItem>6</ComboBoxItem>
+                    <ComboBoxItem>7</ComboBoxItem>
+                </ComboBox>
+
+                <ScrollViewer Grid.Row="3" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0 0 10 10">
+                    <TextBlock x:Name="extraShowLabel" Background="LightGray" Foreground="Black" TextWrapping="Wrap" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ScrollViewer}}, Mode=OneWay}" FontSize="14" />
+                </ScrollViewer>
 
 
-                <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
-                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" FontSize="18" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="80,0,10,0" Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="6" KeyDown="SizeComboBox_KeyDown" />
 
-                <Label Grid.Row="3" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Center" Padding="5,0,5,0" MinHeight="20"/>
-                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,10,0" Padding="5,0,5,0" Grid.Column="1" HorizontalContentAlignment="Left" TabIndex="9"/>
+                <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
+                <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18"
+          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="0,0,20,0"
+          Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="8" KeyDown="SizeComboBox_KeyDown"
+          MinWidth="40" Cursor="Hand" PreviewKeyDown="SizeComboBox_PreviewKeyDown"
+          Style="{StaticResource FocusVisualStyleForComboBox}" />
+
+                <Label Grid.Row="3" Grid.Column="2" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="30,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="5,0,5,0" MinHeight="20" />
+                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100" Cursor="Hand" />
 
             </Grid>
         </Border>
@@ -157,12 +281,12 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*" MinHeight="25"/>
                 </Grid.RowDefinitions>
-                <Border Grid.Row="0" Grid.ColumnSpan="2"  Padding="5,0,5,2" Background="#FFFF5D48" CornerRadius="10">
+                <Border Grid.Row="0" Grid.ColumnSpan="2"  Padding="5,0,5,2" Background="#FF602C" CornerRadius="10">
                     <!-- CornerRadius für abgerundete Ecken -->
-                    <Label Content="Bestellung" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
+                    <Label Content="Gerichte" Foreground="White" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
                 </Border>
 
-                <DataGrid x:Name="myDataGrid" AutoGenerateColumns="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" IsReadOnly="True" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top" BorderBrush="{x:Null}" FontWeight="Bold">
+                <DataGrid x:Name="myDataGrid" CanUserAddRows="False" AutoGenerateColumns="False" IsReadOnly="False" Background="#474747" Foreground="Black" GridLinesVisibility="All" FontSize="18" AlternationCount="3" Grid.Row="1" MinHeight="30" VerticalContentAlignment="Stretch" PreviewKeyDown="myDataGrid_PreviewKeyDown" VerticalAlignment="Top"  FontWeight="Bold" BorderBrush="{x:Null}">
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#3d4248"/>
@@ -171,9 +295,10 @@
                             <!-- Optional: Farbe des Textes im Header -->
                         </Style>
                     </DataGrid.ColumnHeaderStyle>
+                 
                     <DataGrid.Columns>
                         <!-- Nr. Spalte -->
-                        <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}"  Foreground="White">
+                        <DataGridTextColumn Width="0.10*" Header="Nr." Binding="{Binding Nr}"  Foreground="White"  IsReadOnly="True" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -181,7 +306,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Gericht Spalte -->
-                        <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" Foreground="White">
+                        <DataGridTextColumn Width="0.25*" Header="Gericht" Binding="{Binding Gericht}" Foreground="White"  IsReadOnly="True" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -189,7 +314,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Größe Spalte -->
-                        <DataGridTextColumn Width="0.25*" Header="Größe" Binding="{Binding Größe}" Foreground="White">
+                        <DataGridTextColumn Width="0.15*" Header="Größe" Binding="{Binding Größe}" Foreground="White"  IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -197,15 +322,24 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Extras Spalte -->
-                        <DataGridTextColumn Width="0.25*" Header="Extras" Binding="{Binding Extras}" Foreground="White">
+                        <DataGridTextColumn Width="0.25*" Header="Extras" Binding="{Binding Extras}" IsReadOnly="False">
+                         
                             <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="{x:Type TextBlock}">
+                                <Style TargetType="TextBlock">
                                     <Setter Property="Background" Value="#5f6269"/>
+                                    <Setter Property="Foreground" Value="White"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Background" Value="#5f6269"/>
+                                    <!-- Setze hier die gewünschte Hintergrundfarbe während der Bearbeitung -->
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
                         <!-- Menge Spalte -->
-                        <DataGridTextColumn Width="0.10*" Header="Menge" Binding="{Binding Menge}" Foreground="White">
+                        <DataGridTextColumn Width="0.10*" Header="Menge" Binding="{Binding Menge}" Foreground="White"  IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -213,7 +347,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Epreis Spalte -->
-                        <DataGridTextColumn Width="0.10*" Header="Epreis" Binding="{Binding Epreis, StringFormat={}{0:F2} €}" Foreground="White">
+                        <DataGridTextColumn Width="0.10*" Header="Epreis" Binding="{Binding Epreis, StringFormat={}{0:F2} €}" Foreground="White"  IsReadOnly="True" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -221,7 +355,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <!-- Gesamt Spalte -->
-                        <DataGridTextColumn Width="0.10*" Header="Gesamt" Binding="{Binding Gesamt, StringFormat={}{0:F2} €}" Foreground="White">
+                        <DataGridTextColumn Width="0.10*" Header="Gesamt" Binding="{Binding Gesamt, StringFormat={}{0:F2} €}" Foreground="White"  IsReadOnly="True" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Background" Value="#5f6269"/>
@@ -249,52 +383,52 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Grid.ColumnSpan="4" Background="#FFFF5D48" CornerRadius="10"  Padding="5,0,5,2" Height="42" VerticalAlignment="Center">
+                <Border Grid.Row="0" Grid.ColumnSpan="4" Background="#FF602C" CornerRadius="10"  Padding="5,0,5,2" Height="42" VerticalAlignment="Center">
                     <Label Content="Offene Bestellung" Foreground="White" FontSize="18" FontWeight="Bold" VerticalContentAlignment="Center"/>
                 </Border>
 
-                <Label Content="Mitnehmer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Margin="50,0,0,0" />
+                <Label Grid.Row="1" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock x:Name="MitnehmerTextBlock" Text="Mitnehmer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="MitnehmerLabel_MouseDown" Cursor="Hand"/>
+                </Label>
+
                 <Label x:Name="MitnehmerLabel" Grid.Row="1" Grid.Column="1" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,10,0" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="MitnehmerLabel_MouseDown"/>
 
-                <Label Grid.Row="2" Content="Selbstabholer" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="50,0,0,0"/>
+
+                <Label Grid.Row="2" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+                    <TextBlock x:Name="SelbstabholerTextBlock" Text="Selbstabholer" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="SelbstabholerLabel_MouseDown" Cursor="Hand"/>
+
+                </Label>
+
+
                 <Label x:Name="SelbstabholerLabel" Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" MouseDown="SelbstabholerLabel_MouseDown"/>
 
-                <Label Grid.Column="0" Grid.Row="3" Content="Auslieferung" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="50,0,0,0"/>
+
+                <Label Grid.Row="3" Margin="50,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+                    <TextBlock x:Name="AuslieferungTextBlock" Text="Auslieferung" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MouseEnter="TextBlock_MouseEnter" MouseLeave="TextBlock_MouseLeave" MouseDown="AuslieferungLabel_MouseDown" Cursor="Hand"/>
+
+                </Label>
+
                 <Label x:Name="AuslieferungLabel" Grid.Row="3" Margin="0,0,10,0" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Grid.Column="1" Padding="5,5,5,5" VerticalContentAlignment="Center" VerticalAlignment="Center" MouseDown="AuslieferungLabel_MouseDown"/>
 
                 <Label Grid.Column="2" Grid.Row="1" Content="Bon" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
-                <ComboBox x:Name="cb_bonNummer" Grid.Column="3" Grid.Row="1" Margin="0,7,10,7" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="Black" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.5,0.5"/>
+                <ComboBox x:Name="cb_bonNummer" Grid.Column="3" Grid.Row="1" Margin="0,7,10,7" FontSize="18" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="Black" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.5,0.5" Cursor="Hand"/>
 
 
 
                 <Label Grid.Column="2" Grid.Row="2" Content="Kasse" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Height="42"/>
-                <ComboBox x:Name="cb_cashRegister" Grid.Column="3" Grid.Row="2" Margin="0,2,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" FontSize="18" DisplayMemberPath="Name" >
+                <ComboBox x:Name="cb_cashRegister" Grid.Column="3" Grid.Row="2" Margin="0,2,10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Padding="5,5,5,5" FontSize="18" DisplayMemberPath="Name" Cursor="Hand" >
                     <ComboBoxItem Content="Theke" />
                     <ComboBoxItem Content="Kasse1" />
                 </ComboBox>
-                <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" Margin="0,5,10,5" Background="#FFFF5D48" CornerRadius="10" Padding="5,0,5,0">
-                    <Button x:Name="btn_zuordnen" Content="Zuordnen" Foreground="White" FontWeight="Bold" Click="Btn_zuordnen_Click" BorderThickness="0" Background="{x:Null}">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="border" Property="CornerRadius" Value="5"/>
-                                                    <Setter TargetName="border" Property="Background" Value="#E54B3C"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Background" Value="{x:Null}"/>
-                            </Style>
-                        </Button.Style>
+                <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10">
+                    <Button x:Name="btn_zuordnen"  Style="{DynamicResource ButtonStyle1}" Padding="5,0,5,0" Content="Zuordnen" Foreground="White" FontWeight="Bold" Click="Btn_zuordnen_Click" BorderThickness="0" Background="{x:Null}" Cursor="Hand">
+
                     </Button>
+                </Border>
+                <Border Grid.Row="3" Grid.Column="3" HorizontalAlignment="Left" Margin="0,5,10,5" Background="#FF602C" CornerRadius="10">
+                    <Button x:Name="Uebersicht"  Style="{DynamicResource ButtonStyle1}" Padding="5,0,5,0" Content="Übersicht" Foreground="White" FontWeight="Bold" BorderThickness="0" Background="{x:Null}" Cursor="Hand" Click="Uebersicht_Click"/>
                 </Border>
 
 
@@ -312,40 +446,40 @@
 
             <!-- Label für den Gesamtpreis -->
             <Label x:Name="TotalPriceLabel" 
-           Content="00.00€" 
+           Content="00.00 €" 
            FontSize="36" 
-           Foreground="#ff5d48" 
+           Foreground="#FF602C" 
            VerticalAlignment="Top" 
            HorizontalAlignment="Right"
            Grid.Column="0" FontWeight="Bold"/>
 
             <!-- Zahlungsarten-Buttons -->
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,50,0">
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,5,20,0">
                 <!-- Barzahlung-Button -->
-                <Border Background="#FFFF5D48" CornerRadius="10">
-                    <Button x:Name="btn_cash" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" BorderBrush="{x:Null}">
+                <Border Background="#FF602C" CornerRadius="10">
+                    <Button x:Name="btn_cash" Style="{DynamicResource ButtonStyle1}" Width="50" Height="50"  Foreground="#FFFFFBFB"  Background="Transparent"  Click="BarzahlungBtn" BorderBrush="{x:Null}" Cursor="Hand" >
                         <!-- Icon für Barzahlung (Beispiel) -->
-                        <TextBlock Text="💵" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="Bar" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"/>
                     </Button>
 
                 </Border>
 
                 <!-- Kartenzahlung-Button -->
-                <Border Background="#FFFF5D48" CornerRadius="10" Margin="0,10,0,0">
-                    <Button x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" BorderBrush="{x:Null}" >
+                <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
+                    <Button Style="{DynamicResource ButtonStyle1}" x:Name="btn_card" Width="50" Height="50" Background="{x:Null}" Foreground="#FFFFFBFB" Click="KartenzahlungBtn" BorderBrush="{x:Null}" Cursor="Hand"  >
                         <!-- Icon für Kartenzahlung (Beispiel) -->
-                        <TextBlock Text="💳" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="Karte" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"/>
                     </Button>
                 </Border>
 
                 <!-- PayPal-Button -->
-                <Border Background="#FFFF5D48" CornerRadius="10" Margin="0,10,0,0">
+                <Border Background="#FF602C" CornerRadius="10" Margin="0,10,0,0">
 
-                    <Button x:Name="btn_paypal" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" BorderBrush="{x:Null}">
-                    <!-- Icon für PayPal (Beispiel) -->
-                    <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button x:Name="btn_paypal" Style="{DynamicResource ButtonStyle1}" Width="50" Height="50" Background="Transparent" Foreground="#FFFFFBFB" Click="PaypalBtn" BorderBrush="{x:Null}" Cursor="Hand" >
+                        <!-- Icon für PayPal (Beispiel) -->
+                        <TextBlock Text="PayPal" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"/>
                     </Button>
-                </Border> 
+                </Border>
             </StackPanel>
         </Grid>
 
