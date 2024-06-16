@@ -950,7 +950,7 @@ namespace PizzaEcki
                 return;
             }
 
-            if (e.Key == Key.F3 && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F3)
             {
                 var passwordCorrect = ShowPasswordDialogAndCheck();
                 if (passwordCorrect)
@@ -965,8 +965,12 @@ namespace PizzaEcki
 
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F4)
             {
-                DailyEarnings dailyEarnings = new DailyEarnings();
-                dailyEarnings.ShowDialog();
+                var passwordCorrect = ShowPasswordDialogAndCheck();
+                if (passwordCorrect)
+                {
+                    DailyEarnings dailyEarnings = new DailyEarnings();
+                    dailyEarnings.ShowDialog();
+                }
             }
 
             if (e.Key == Key.F5)
@@ -1005,6 +1009,10 @@ namespace PizzaEcki
                 secretPrintTriggered = true;
                 BarzahlungBtn(null, null);
             }
+            if (e.Key == Key.Escape)
+            {
+                ClearOrder();
+            }
         }
 
         private void OpenPaymentPopup()
@@ -1019,8 +1027,7 @@ namespace PizzaEcki
         private void ShowHelpDialog()
         {
             string helpText = "F1: Zeige Hotkeys.\n" +
-                              "F2: Kunde speichern.\n" +
-                              "F4: Tagesumsatz Anzeigen.\n" +
+                              "F2: Kunde speichern.\n" +                 
                               "F5: Das markierte Gericht wird gratis.\n" +
                               "F7: Letztes Gericht löschen.\n" +
                               "F8: Küchen Druck.\n" +
@@ -1045,7 +1052,7 @@ namespace PizzaEcki
             List<Driver> driversFromDb = dbManager.GetAllDrivers();
 
             // Filtere nur 'Theke' und 'Kasse1'
-            var driversForCounter = driversFromDb.Where(d => d.Name == "Theke" || d.Name == "Kasse1").ToList();
+            var driversForCounter = driversFromDb.Where(d => d.Name == "Theke" || d.Name == "Kasse").ToList();
 
             cb_cashRegister.Items.Clear();
             cb_cashRegister.ItemsSource = driversForCounter;
@@ -1732,6 +1739,22 @@ namespace PizzaEcki
             }
         }
 
+        private void ClearOrder()
+        {
+            orderItems.Clear();
+            PhoneNumberTextBox.Text = string.Empty;
+            NameTextBox.Text = string.Empty;
+            StreetTextBox.Text = string.Empty;
+            CityTextBox.Text = string.Empty;
+            AdditionalInfoTextBox.Text = string.Empty;
+            SaveButton.Visibility = Visibility.Collapsed;
+            TimePickermein.Value = null;
+            TotalPriceLabel.Content = $"0.00 €";
+
+
+            myDataGrid.Items.Refresh();
+            PhoneNumberTextBox.Focus();
+        }
         private void Zuordnen_Click(object sender, RoutedEventArgs e)
         {
             //try
@@ -1770,5 +1793,13 @@ namespace PizzaEcki
         }
 
 
+        private void cb_cashRegister_Loaded(object sender, RoutedEventArgs e)
+        {            ComboBox comboBox = sender as ComboBox;
+            if (comboBox != null && comboBox.Items.Count > 0)
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
+        
     }
 }

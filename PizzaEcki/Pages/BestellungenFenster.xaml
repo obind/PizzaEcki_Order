@@ -4,7 +4,7 @@
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:services="clr-namespace:PizzaEcki.Services" 
-        Title="Bestellungen anzeigen" Height="450" Width="Auto"  ResizeMode="NoResize" KeyDown="Window_KeyDown"   
+        Title="Bestellungen anzeigen" Height="450" Width="Auto"  KeyDown="Window_KeyDown"   
 >
 
     <Window.Resources>
@@ -41,7 +41,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#FF5F6269"/>
+                    <Setter Property="Background" Value="#ff602c"/>
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -73,7 +73,7 @@
 
 
     </Window.Resources>
-    <Grid >
+    <Grid Width="Auto" >
         <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" >
 
             
@@ -136,6 +136,7 @@
                                            FontSize="14" 
                                            HorizontalAlignment="Center"
                                            Margin="5,0"
+                                           
                                            Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

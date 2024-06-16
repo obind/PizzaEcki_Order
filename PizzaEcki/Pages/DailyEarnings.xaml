@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="Tagesstatistik" Height="300" Width="400" ResizeMode="NoResize">
+        Title="Tagesstatistik" Height="300" Width="400" ResizeMode="NoResize" Background="#FF1D1E20">
 
     <Window.Resources>
         <!-- Stil für DataGridColumnHeader -->
         <Style TargetType="{x:Type DataGridColumnHeader}">
-            <Setter Property="Background" Value="#FFFF5D48"/>
+            <Setter Property="Background" Value="#FF602C"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -30,7 +30,7 @@
 
         <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
         <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
-        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#ff3300   "/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FF602C   "/>
         <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
         <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
         <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
@@ -81,8 +81,8 @@
 
     </Window.Resources>
 
-    <Grid>
-        <DataGrid x:Name="DailySalesDataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" >
+    <Grid Margin="10 10 10 10" Background="#FF1D1E20">
+        <DataGrid x:Name="DailySalesDataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" FontSize="16" >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Bestellungen" Binding="{Binding OrderType}" Width="*"/>
                 <DataGridTextColumn Header="Anzahl" Binding="{Binding Count}" Width="Auto"/>
@@ -92,12 +92,12 @@
         <!-- Fußzeile für die Summe -->
         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Height="Auto">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <TextBlock Text="Summe: " FontWeight="Bold" Padding="10,5" HorizontalAlignment="Left" Foreground="White"/>
+                <TextBlock Text="Summe: " FontWeight="Bold" Padding="10,5" HorizontalAlignment="Left" Foreground="White" FontSize="16"/>
                 <TextBlock x:Name="TotalAmountTextBlock" 
                            Text="{Binding TotalSum, StringFormat=' {0:F2} €'}" 
                            Padding="10,5" 
                            HorizontalAlignment="Right" 
-                           Foreground="White"/>
+                           Foreground="White" FontSize="16"/>
             </StackPanel>
             <Button x:Name="CloseDayButton" Content="Tag abschließen" HorizontalAlignment="Right" Margin="0,5,10,10"
          Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="#FF602C"  Style="{DynamicResource ButtonStyle1}" Click="CloseDayButton_Click"/>

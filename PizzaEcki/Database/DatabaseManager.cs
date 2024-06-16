@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Globalization;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
 
 namespace PizzaEcki.Database
 {
@@ -1654,25 +1655,29 @@ namespace PizzaEcki.Database
 
 
         //Admin Methoden
-        public List<DailySalesInfo> GetDailySales(DateTime date)
+
+
+        // DatabaseManager.cs
+        public List<DailySalesInfo> GetDailySalesByDriver(DateTime date)
         {
             _connection.Open();
             List<DailySalesInfo> dailySalesInfoList = new List<DailySalesInfo>();
 
-            // SQL-Query, um die täglichen Umsätze abzurufen
             string sql = @"
-            SELECT
-                IFNULL(Drivers.Name, 'Theke') as Name,
-                SUM(OrderAssignments.Price) as DailySales
-            FROM
-                OrderAssignments
-            LEFT JOIN
-                Drivers ON OrderAssignments.DriverId = Drivers.Id
-            WHERE
-                date(OrderAssignments.Timestamp) = date(@Date)
-            GROUP BY
-                IFNULL(Drivers.Name, 'Theke');
-            ";
+    SELECT
+        IFNULL(d.Name, 'Theke') as Name,
+        o.PaymentMethod as PaymentMethod, 
+        SUM(oi.Gesamt) as DailySales
+    FROM
+        OrderAssignments oa
+    LEFT JOIN Drivers d ON oa.DriverId = d.Id
+    INNER JOIN Orders o ON oa.OrderId = o.OrderId
+    INNER JOIN OrderItems oi ON o.OrderId = oi.OrderId
+    WHERE
+        date(oa.Timestamp) = date(@Date)
+    GROUP BY
+        IFNULL(d.Name, 'Theke'), o.PaymentMethod;
+    ";
 
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -1685,7 +1690,8 @@ namespace PizzaEcki.Database
                         DailySalesInfo dailySalesInfo = new DailySalesInfo
                         {
                             Name = reader.GetString(0),
-                            DailySales = reader.IsDBNull(1) ? 0 : reader.GetDouble(1)  // Überprüfung auf NULL
+                            PaymentMethod = reader.GetString(1),
+                            DailySales = reader.GetDouble(2)
                         };
                         dailySalesInfoList.Add(dailySalesInfo);
                     }
@@ -1694,6 +1700,49 @@ namespace PizzaEcki.Database
             _connection.Close();
             return dailySalesInfoList;
         }
+
+        public List<PaymentMethodSummary> GetDailySales(DateTime date)
+        {
+            _connection.Open();
+            List<PaymentMethodSummary> paymentMethodSummaries = new List<PaymentMethodSummary>();
+
+            string sql = @"
+    SELECT
+        o.PaymentMethod,
+        COUNT(*) as OrderCount,
+        SUM(oi.Gesamt) as TotalSales
+    FROM
+        OrderAssignments oa
+    INNER JOIN Orders o ON oa.OrderId = o.OrderId
+    INNER JOIN OrderItems oi ON o.OrderId = oi.OrderId
+    WHERE
+        date(oa.Timestamp) = date(@Date)
+    GROUP BY
+        o.PaymentMethod;
+    ";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        PaymentMethodSummary summary = new PaymentMethodSummary
+                        {
+                            PaymentMethod = reader.GetString(0),
+                            OrderCount = reader.GetInt32(1),
+                            TotalSales = reader.GetDouble(2)
+                        };
+                        paymentMethodSummaries.Add(summary);
+                    }
+                }
+            }
+            _connection.Close();
+            return paymentMethodSummaries;
+        }
+
         public async Task DeleteDailyOrdersAsync()
         {
             // Öffnen Sie die Verbindung zur Datenbank
@@ -1928,6 +1977,48 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+
+        public List<DailySalesInfo> GetSalesByPaymentMethod(DateTime date)
+        {
+            List<DailySalesInfo> paymentMethodSales = new List<DailySalesInfo>();
+            string sql = @"
+        SELECT 
+            o.PaymentMethod, 
+            SUM(i.Gesamt) AS DailySales
+        FROM 
+            Orders o
+        JOIN 
+            OrderItems i ON o.OrderId = i.OrderId
+        WHERE 
+            DATE(o.Timestamp) = @Date
+        GROUP BY 
+            o.PaymentMethod;
+    ";
+
+            using (var command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+                _connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var method = new DailySalesInfo
+                        {
+                            Name = reader["PaymentMethod"].ToString() + " Zahlung",
+                            DailySales = reader.IsDBNull(reader.GetOrdinal("DailySales")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("DailySales"))
+                        };
+                        paymentMethodSales.Add(method);
+                    }
+                }
+                _connection.Close();
+            }
+
+            return paymentMethodSales;
+        }
+
+
+
         public void Dispose()
         {
             _connection?.Close();

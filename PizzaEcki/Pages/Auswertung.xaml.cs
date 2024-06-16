@@ -34,11 +34,22 @@ namespace PizzaEcki.Pages
 
         private void LoadDailySales(DateTime date)
         {
-            var dailySalesInfoList = _dbManager.GetDailySales(date);
-            DailySalesInfoList = new ObservableCollection<DailySalesInfo>(dailySalesInfoList);
-            DailySalesDataGrid.ItemsSource = DailySalesInfoList;
-            TotalSalesTextBlock.Text = $"{CalculateTotalSales(dailySalesInfoList):C}";  // Formatierung als Währung
+            // Fahrer-bezogene Tagesumsätze (altes DataGrid)
+            var driverSalesInfoList = _dbManager.GetDailySalesByDriver(date); // Neue Methode für Fahrerumsätze
+
+            DailySalesInfoList = new ObservableCollection<DailySalesInfo>(driverSalesInfoList);
+            DailySalesDataGrid.ItemsSource = DailySalesInfoList
+                .GroupBy(info => info.Name)
+                .SelectMany(g => g.OrderBy(info => info.PaymentMethod));
+
+            TotalSalesTextBlock.Text = $"{CalculateTotalSales(driverSalesInfoList):C}";
+
+            // Zahlungsmethoden-Zusammenfassung (neues DataGrid)
+            var paymentMethodSummaries = _dbManager.GetDailySales(date);
+            PaymentMethodSummaryDataGrid.ItemsSource = paymentMethodSummaries;
         }
+
+
 
         private double CalculateTotalSales(IEnumerable<DailySalesInfo> dailySalesInfoList)
         {
@@ -49,6 +60,7 @@ namespace PizzaEcki.Pages
             }
             return totalSales;
         }
+
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
