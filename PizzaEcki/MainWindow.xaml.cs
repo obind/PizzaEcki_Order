@@ -64,7 +64,7 @@ namespace PizzaEcki
             InitializeComponent();
             InitializeApplication();
             NameTextBox.TextChanged += OnCustomerDataChanged;
-            StreetTextBox.TextChanged += OnCustomerDataChanged;
+            CustomerStreetComboBox.SelectionChanged += OnCustomerDataChanged2;
             CityTextBox.TextChanged += OnCustomerDataChanged;
             AdditionalInfoTextBox.TextChanged += OnCustomerDataChanged;
         }
@@ -236,7 +236,7 @@ namespace PizzaEcki
             {
                 PhoneNumberTextBox.Text = string.Empty;
                 NameTextBox.Text = string.Empty;
-                StreetTextBox.Text = string.Empty;
+                CustomerStreetComboBox.Text = string.Empty;
                 CityTextBox.Text = string.Empty;
                 AdditionalInfoTextBox.Text = string.Empty;
                 SaveButton.Visibility = Visibility.Collapsed;
@@ -248,7 +248,182 @@ namespace PizzaEcki
             {
                 SaveButton.Visibility = Visibility.Visible; 
             }
+
+          
+
         }
+        private void NameTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                // Lösche den Text der CustomerStreetComboBox
+                CustomerStreetComboBox.Text = string.Empty;
+
+                // Setze den Fokus auf die TextBox innerhalb der ComboBox
+                CustomerStreetComboBox.Focus();
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    var textBox = (TextBox)CustomerStreetComboBox.Template.FindName("PART_EditableTextBox", CustomerStreetComboBox);
+                    if (textBox != null)
+                    {
+                        textBox.Focus();
+                        textBox.Text = string.Empty; // Stelle sicher, dass der Text leer ist
+                        textBox.SelectionStart = textBox.Text.Length; // Setze den Cursor ans Ende
+                    }
+                }), System.Windows.Threading.DispatcherPriority.Input);
+            }
+        }
+
+        private bool _firstClick = true;
+        private List<string> _allStreets;
+
+        private void CustomerStreetComboBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+
+            string input = (CustomerStreetComboBox.Text + e.Text).Trim('\n');
+
+
+            // Speichere den aktuellen Text und die Cursor-Position
+            string currentText = CustomerStreetComboBox.Text + e.Text;
+            int currentCaretIndex = currentText.Length;
+
+        
+                List<string> suggestions = _databaseManager.GetStreetsStartingWith(currentText);
+            suggestions = suggestions.Select(ExtractStreetName).Distinct().Take(7).ToList(); // Duplikate entfernen
+            UpdateComboBoxItems(suggestions, currentText, currentCaretIndex);
+                CustomerStreetComboBox.IsDropDownOpen = true;
+                if (suggestions.Count > 0)
+                {
+                    CustomerStreetComboBox.SelectedIndex = 0; 
+                }
+
+
+            // Verhindert doppeltes Tippen
+            e.Handled = true;
+        }
+        private string ExtractStreetName(string streetWithNumber)
+        {
+            // Angenommen, die Hausnummer ist durch ein Leerzeichen vom Straßennamen getrennt
+            int index = streetWithNumber.LastIndexOf(' ');
+            if (index > 0)
+            {
+                return streetWithNumber.Substring(0, index);
+            }
+            return streetWithNumber; // Wenn keine Hausnummer gefunden wurde, den gesamten String zurückgeben
+        }
+
+        private void UpdateComboBoxItems(IEnumerable<string> items, string currentText, int currentCaretIndex)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                CustomerStreetComboBox.ItemsSource = items;
+
+                // Finde die TextBox in der ComboBox und setze den Text und die Cursor-Position
+                var textBox = (TextBox)CustomerStreetComboBox.Template.FindName("PART_EditableTextBox", CustomerStreetComboBox);
+                if (textBox != null)
+                {
+                    textBox.Text = currentText;
+                    textBox.SelectionStart = currentCaretIndex;
+                    textBox.SelectionLength = textBox.Text.Length - currentCaretIndex; // Hervorhebung ab der aktuellen Cursor-Position
+
+                }
+            });
+        }
+
+        private void CityTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Key.Enter == e.Key)
+            {
+                AdditionalInfoTextBox.Focus();
+            }
+        }
+
+
+
+        private void CustomerStreetComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            _allStreets = _databaseManager.GetAllStreets();
+            CustomerStreetComboBox.ItemsSource = _allStreets;
+            CustomerStreetComboBox.ClearValue(ComboBox.TextProperty);
+        }
+        private async void CustomerStreetComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                e.Handled = true;
+
+               if (CustomerStreetComboBox.SelectedItem == null)
+                {
+                    CityTextBox.Focus();
+                    return;
+                   
+                }
+                
+                    string selectedStreet = CustomerStreetComboBox.SelectedItem.ToString();
+                    CustomerStreetComboBox.Text = selectedStreet;
+
+                    TextBox editableTextBox = CustomerStreetComboBox.Template.FindName("PART_EditableTextBox", CustomerStreetComboBox) as TextBox;
+                    if (editableTextBox != null)
+                    {
+                        editableTextBox.SelectionStart = selectedStreet.Length;
+                    }
+
+                    // Ort automatisch setzen (falls gewünscht)
+                    string city = await _databaseManager.GetCityForStreet(selectedStreet);
+                    CityTextBox.Text = city;
+               
+                if(CityTextBox.Text == "")
+                {
+                    CityTextBox.Focus();
+                }
+                else
+                {
+                    AdditionalInfoTextBox.Focus();
+                }   
+            }
+            else if (e.Key == Key.Down || e.Key == Key.Up)
+            {
+                // Standard-Verhalten beibehalten, um durch die ComboBox-Elemente zu navigieren
+                CustomerStreetComboBox.IsDropDownOpen = true;
+            }
+        }
+        private async void CustomerStreetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CustomerStreetComboBox.SelectedItem != null)
+            {
+                string selectedStreet = CustomerStreetComboBox.SelectedItem.ToString();
+                CustomerStreetComboBox.Text = selectedStreet;
+
+                // Finde die TextBox in der ComboBox und setze den Text und die Cursor-Position
+                var textBox = (TextBox)CustomerStreetComboBox.Template.FindName("PART_EditableTextBox", CustomerStreetComboBox);
+                if (textBox != null)
+                {
+                    textBox.Text = selectedStreet;
+                    textBox.SelectionStart = selectedStreet.Length;
+                }
+
+                // Ort automatisch setzen
+                string city = await _databaseManager.GetCityForStreet(selectedStreet);
+                CityTextBox.Text = city;
+            }
+        }
+        private void AdditionalInfoTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Key.Enter == e.Key && SaveButton.Visibility == Visibility.Visible)
+            {
+                OnSaveButtonClicked(sender, e);
+            }
+            else
+            {
+                if (Key.Enter == e.Key)
+                {
+                    DishComboBox.Focus();
+                
+                }
+            }
+
+        }
+
         private void OnSaveButtonClicked(object sender, RoutedEventArgs e)
         {
             if(string.IsNullOrEmpty(NameTextBox.Text))
@@ -260,7 +435,7 @@ namespace PizzaEcki
             {
                 PhoneNumber = PhoneNumberTextBox.Text,
                 Name = NameTextBox.Text,
-                Street = StreetTextBox.Text,
+                Street = CustomerStreetComboBox.Text,
                 City = CityTextBox.Text,
                 AdditionalInfo = AdditionalInfoTextBox.Text
             };
@@ -274,7 +449,7 @@ namespace PizzaEcki
         {
             isProgrammaticChange = true;
             NameTextBox.Text = customer.Name;
-            StreetTextBox.Text = customer.Street;
+            CustomerStreetComboBox.Text = customer.Street;
             CityTextBox.Text = customer.City;
             AdditionalInfoTextBox.Text = customer.AdditionalInfo;
             isProgrammaticChange = false;
@@ -288,8 +463,25 @@ namespace PizzaEcki
             }
         }
 
-        //Gerichte
-        private void DishComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnCustomerDataChanged2(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox != null && comboBox.SelectedItem != null)
+            {
+                if (comboBox == CustomerStreetComboBox)
+                {
+                    string selectedStreet = comboBox.SelectedItem.ToString();
+                    string city = "";// _databaseManager.GetCityForStreet(selectedStreet);
+                    CityTextBox.Text = city;
+                }
+                else
+                {
+                    // Logik für andere ComboBoxen
+                }
+            }
+        }
+            //Gerichte
+            private void DishComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Prüfe, ob ein Gericht ausgewählt ist
             if (DishComboBox.SelectedItem == null)
@@ -826,7 +1018,7 @@ namespace PizzaEcki
                 orderItems.Clear();
                 PhoneNumberTextBox.Text = string.Empty;
                 NameTextBox.Text = string.Empty;
-                StreetTextBox.Text = string.Empty;
+                CustomerStreetComboBox.Text = string.Empty;
                 CityTextBox.Text = string.Empty;
                 AdditionalInfoTextBox.Text = string.Empty;
                 SaveButton.Visibility = Visibility.Collapsed;
@@ -1744,7 +1936,7 @@ namespace PizzaEcki
             orderItems.Clear();
             PhoneNumberTextBox.Text = string.Empty;
             NameTextBox.Text = string.Empty;
-            StreetTextBox.Text = string.Empty;
+            CustomerStreetComboBox.Text = string.Empty;
             CityTextBox.Text = string.Empty;
             AdditionalInfoTextBox.Text = string.Empty;
             SaveButton.Visibility = Visibility.Collapsed;
@@ -1800,6 +1992,7 @@ namespace PizzaEcki
                 comboBox.SelectedIndex = 0;
             }
         }
-        
+
+      
     }
 }

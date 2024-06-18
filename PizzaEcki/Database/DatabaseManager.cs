@@ -344,6 +344,103 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+        //straßen  Methoden
+
+        private List<string> _allStreets;
+
+        public List<string> GetStreetsStartingWith(string input)
+        {
+            _connection.Open();
+            List<string> streets = new List<string>();
+
+            string sql = "SELECT DISTINCT Street FROM Addresses WHERE Street LIKE @Input || '%'"; // DISTINCT hinzugefügt
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Input", input);
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string streetWithNumber = reader.GetString(0);
+                        string streetWithoutNumber = ExtractStreetName(streetWithNumber); // Hausnummer entfernen
+                        streets.Add(streetWithoutNumber);
+                    }
+                }
+            }
+            _connection.Close();
+            return streets.Distinct().ToList(); // Duplikate entfernen
+        }
+
+        public List<string> GetAllStreets()
+        {
+            if (_allStreets == null) // Nur einmal laden, wenn noch nicht im Cache
+            {
+                _connection.Open();
+                _allStreets = new List<string>();
+
+                string sql = "SELECT Street FROM Addresses";
+
+                using (SqliteCommand command = new SqliteCommand(sql, _connection))
+                {
+                    using (SqliteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (!reader.IsDBNull(0))
+                            {
+                                string streetWithNumber = reader.GetString(0);
+                                string streetWithoutNumber = ExtractStreetName(streetWithNumber);
+                                _allStreets.Add(streetWithoutNumber);
+                            }
+                        }
+                    }
+                }
+                _connection.Close();
+                _allStreets = _allStreets.Distinct().ToList(); // Duplikate entfernen
+            }
+
+            return _allStreets;
+        }
+
+        // Hilfsmethode zum Extrahieren des Straßennamens ohne Hausnummer
+        private string ExtractStreetName(string streetWithNumber)
+        {
+            // Angenommen, die Hausnummer ist durch ein Leerzeichen vom Straßennamen getrennt
+            int index = streetWithNumber.LastIndexOf(' ');
+            if (index > 0)
+            {
+                return streetWithNumber.Substring(0, index);
+            }
+            return streetWithNumber; // Wenn keine Hausnummer gefunden wurde, den gesamten String zurückgeben
+        }
+
+        public async Task<string> GetCityForStreet(string street)
+        {
+            string city = string.Empty;
+
+          
+                _connection.Open();
+
+                string sql = "SELECT City FROM Addresses WHERE Street LIKE @street";
+                using (var command = new SqliteCommand(sql, _connection))
+                {
+                    command.Parameters.AddWithValue("@street", street + "%");
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read() && !reader.IsDBNull(0))
+                        {
+                            city = reader.GetString(0);
+                        }
+                    }
+                }
+
+                _connection.Close();
+            
+
+            return city;
+        }
+
 
 
         //Fahrer Methoden
@@ -1635,23 +1732,7 @@ namespace PizzaEcki.Database
             _connection.Close();
             return cities;
         }
-        public List<string> GetAllStreets()
-        {
-
-            List<string> streets = new List<string>();
-            string sql = "SELECT DISTINCT Street FROM Addresses";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        streets.Add(reader.GetString(0));
-                    }
-                }
-            }
-            return streets;
-        }
+      
 
 
         //Admin Methoden
