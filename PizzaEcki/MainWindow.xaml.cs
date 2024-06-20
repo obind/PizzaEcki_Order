@@ -239,6 +239,7 @@ namespace PizzaEcki
                 CustomerStreetComboBox.Text = string.Empty;
                 CityTextBox.Text = string.Empty;
                 AdditionalInfoTextBox.Text = string.Empty;
+
                 SaveButton.Visibility = Visibility.Collapsed;
             }
         }
@@ -480,18 +481,17 @@ namespace PizzaEcki
                 }
             }
         }
-            //Gerichte
-            private void DishComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //Gerichte
+        private void DishComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Prüfe, ob ein Gericht ausgewählt ist
             if (DishComboBox.SelectedItem == null)
             {
                 SizeComboBox.ItemsSource = null;
+                PriceLabel.Content = "";
                 tempOrderItem.Gericht = "";
                 tempOrderItem.Nr = 0;
                 return;
             }
-            SizeComboBox.SelectedItem = "L";
 
             Dish selectedDish = (Dish)DishComboBox.SelectedItem;
             tempOrderItem.Gericht = selectedDish.Name.ToString();
@@ -502,16 +502,39 @@ namespace PizzaEcki
             }
 
             var sizes = DishSizeManager.CategorySizes[selectedDish.Kategorie];
-
             SizeComboBox.ItemsSource = sizes;
 
-            if (sizes.Count == 1)
+            if (sizes.Contains("L"))
             {
-                SizeComboBox.SelectedIndex = 0;
+                SizeComboBox.SelectedItem = "L";
+            }
+            else if (sizes.Count > 0)
+            {
+                SizeComboBox.SelectedIndex = 0; // Automatisch den ersten Eintrag auswählen
             }
 
             tempOrderItem.Extras = "";
         }
+
+        private void SizeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SizeComboBox.SelectedItem != null)
+            {
+                string selectedSize = SizeComboBox.SelectedItem.ToString();
+                Dish selectedDish = (Dish)DishComboBox.SelectedItem;
+
+                double price = GetPriceForSelectedSize(selectedDish, selectedSize);
+                PriceLabel.Content = $"{price:F2} €";
+                tempOrderItem.Epreis = price;
+            }
+            else
+            {
+                PriceLabel.Content = "";
+                tempOrderItem.Epreis = 0;
+            }
+        }
+
+
 
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)
         {
@@ -871,6 +894,7 @@ namespace PizzaEcki
                 }
 
                 // Berechne den Gesamtpreis für das Gericht
+                
                 tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
             }
 
@@ -1942,7 +1966,10 @@ namespace PizzaEcki
             SaveButton.Visibility = Visibility.Collapsed;
             TimePickermein.Value = null;
             TotalPriceLabel.Content = $"0.00 €";
-
+            DishComboBox.Text = string.Empty;
+            ExtrasComboBox.Text = string.Empty;
+            selectedExtras.Clear();
+            extraShowLabel.Text = string.Empty;
 
             myDataGrid.Items.Refresh();
             PhoneNumberTextBox.Focus();
@@ -1993,6 +2020,6 @@ namespace PizzaEcki
             }
         }
 
-      
+
     }
 }

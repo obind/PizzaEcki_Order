@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         xmlns:services="clr-namespace:PizzaEcki.Services" 
         mc:Ignorable="d"
-        Title="Bestellungen" Height="450" Width="Auto" ResizeMode="NoResize">
+        Title="Bestellungen" Height="450" Width="Auto" ResizeMode="CanResizeWithGrip">
     <Window.Resources>
 
         <services:ItemsToTotalConverter x:Key="ItemsToTotalConverter"/>
@@ -68,8 +68,8 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    <Grid>
-        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" MouseDoubleClick="BestellungenListView_MouseDoubleClick">
+    <Grid Background="#FF1D1E20">
+        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" MouseDoubleClick="BestellungenListView_MouseDoubleClick" FontSize="16" Margin="0,0,10,0">
   
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
@@ -101,14 +101,14 @@
                     </GridViewColumn>
 
 
-                    <GridViewColumn Header="Telefonnummer" Width="Auto"  DisplayMemberBinding="{Binding CustomerPhoneNumber}">
+                    <!--<GridViewColumn Header="Telefonnummer" Width="Auto"  DisplayMemberBinding="{Binding CustomerPhoneNumber}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" 
                        Foreground="{Binding CustomerPhoneNumber, Converter={StaticResource TextToColorConverter}}" FontSize="14" HorizontalAlignment="Center"  Margin="5,0"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                    </GridViewColumn>-->
                     <GridViewColumn Header="Fahrer" Width="150" DisplayMemberBinding="{ Binding DriverId, Converter={StaticResource DriverIdToNameConverter} }">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -266,7 +266,7 @@
                                         </ListView.View>
                                     </ListView>
                                     <TextBlock Text="{Binding OrderItems, Converter={StaticResource ItemsToTotalConverter}, StringFormat='Gesamtpreis: {0:0.00} €'}"
-                                               Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="10,5,0,0"/>
+                                               Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="10,5,9,0"/>
 
                               </StackPanel>
                             </DataTemplate>

@@ -238,10 +238,16 @@ namespace PizzaEcki.Pages
             if (LocalPrinterComboBox.SelectedItem != null)
             {
                 string selectedLocalPrinter = LocalPrinterComboBox.SelectedItem.ToString();
-                string selectedNetworkPrinter = NetworkPrinterComboBox.SelectedItem.ToString();
+                if(NetworkPrinterComboBox.SelectedItem != null)
+                {
+
+                    string selectedNetworkPrinter = NetworkPrinterComboBox.SelectedItem.ToString();
+                    Properties.Settings.Default.NetworkPrinter = selectedNetworkPrinter;
+                }
+              
 
                 Properties.Settings.Default.SelectedPrinter = selectedLocalPrinter;
-                Properties.Settings.Default.NetworkPrinter = selectedNetworkPrinter;
+                
 
             }
             else
