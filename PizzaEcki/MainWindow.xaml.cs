@@ -57,7 +57,7 @@ namespace PizzaEcki
         private BestellungenFenster _bestellungenFenster;
 
         private DispatcherTimer _reloadTimer;
-
+        private Dish _selectedDish;
         public List<Order> orders;
         public MainWindow()
         {
@@ -482,7 +482,7 @@ namespace PizzaEcki
             }
         }
         //Gerichte
-        private void DishComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void DishComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DishComboBox.SelectedItem == null)
             {
@@ -493,32 +493,42 @@ namespace PizzaEcki
                 return;
             }
 
-            Dish selectedDish = (Dish)DishComboBox.SelectedItem;
-            tempOrderItem.Gericht = selectedDish.Name.ToString();
-            tempOrderItem.OrderItemId = selectedDish.Id;
-            if (tempOrderItem.OrderItemId == 700)
-            {
+            _selectedDish = (Dish)DishComboBox.SelectedItem;
+            tempOrderItem.Gericht = _selectedDish.Name.ToString();
+            tempOrderItem.OrderItemId = _selectedDish.Id;
+            if(tempOrderItem.OrderItemId == 700)
+    {
                 ShowPartyPizzaPopup(); // Methode zum Anzeigen des Popups
             }
 
-            var sizes = DishSizeManager.CategorySizes[selectedDish.Kategorie];
-            SizeComboBox.ItemsSource = sizes;
-
-            if (sizes.Contains("L"))
+            else
             {
-                SizeComboBox.SelectedItem = "L";
-            }
-            else if (sizes.Count > 0)
-            {
-                SizeComboBox.SelectedIndex = 0; // Automatisch den ersten Eintrag auswählen
+                var sizes = DishSizeManager.CategorySizes[_selectedDish.Kategorie];
+                SizeComboBox.ItemsSource = sizes;
+
+                if (sizes.Contains("L") && tempOrderItem.OrderItemId != 700)
+                {
+                    SizeComboBox.SelectedItem = "L";
+                }
+                
+                else if (sizes.Count > 0)
+                {
+                    SizeComboBox.SelectedIndex = 0; // Automatisch den ersten Eintrag auswählen
+                }
+
+                tempOrderItem.Extras = "";
             }
 
-            tempOrderItem.Extras = "";
         }
 
         private void SizeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (SizeComboBox.SelectedItem != null)
+            if(_selectedDish.Id == 700)
+            {
+              PriceLabel.Content = $"{tempOrderItem.Gesamt:F2} €";
+            }
+
+            if (SizeComboBox.SelectedItem != null && _selectedDish.Id != 700)
             {
                 string selectedSize = SizeComboBox.SelectedItem.ToString();
                 Dish selectedDish = (Dish)DishComboBox.SelectedItem;
@@ -527,11 +537,7 @@ namespace PizzaEcki
                 PriceLabel.Content = $"{price:F2} €";
                 tempOrderItem.Epreis = price;
             }
-            else
-            {
-                PriceLabel.Content = "";
-                tempOrderItem.Epreis = 0;
-            }
+           
         }
 
 
@@ -579,10 +585,14 @@ namespace PizzaEcki
                 {
                     string formattedTotalPrice = totalPrice.ToString("F2");
                     string formattedPricePerPizza = averagePricePerPizza.ToString("F2");
+                    var sizes = DishSizeManager.CategorySizes[_selectedDish.Kategorie];
+                    SizeComboBox.ItemsSource = sizes;
                     tempOrderItem.Gericht = popup.DescriptionOfSelectedPizzas;
                     tempOrderItem.Epreis = averagePricePerPizza;
+                    tempOrderItem.Gesamt = averagePricePerPizza;
                     SizeComboBox.SelectedItem = "XL";
                     tempOrderItem.Größe = "XL"; 
+       
                 }
                
             }
@@ -834,8 +844,7 @@ namespace PizzaEcki
 
             bool isHappyHourNow = IsHappyHour();
 
-
-           if(tempOrderItem.OrderItemId != 700)
+            if(tempOrderItem.OrderItemId != 700)
             {
                 tempOrderItem.Epreis = 0;
             }
