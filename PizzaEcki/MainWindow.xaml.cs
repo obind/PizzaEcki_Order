@@ -1350,7 +1350,7 @@ namespace PizzaEcki
                 float yOffset = 10; 
                 // Fonts
                 Font smallFont = new Font("Segoe UI", 10, System.Drawing.FontStyle.Regular);
-                Font regularFont = new Font("Segoe UI Semibold", 14, System.Drawing.FontStyle.Bold);
+                Font regularFont = new Font("Segoe UI Semibold", 13, System.Drawing.FontStyle.Regular);
                 Font boldFont = new Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
                 Font titleFont = new Font("Segoe UI", 24, System.Drawing.FontStyle.Bold);
 
@@ -1458,7 +1458,7 @@ namespace PizzaEcki
                 Font extraFont = new Font("Segoe UI Semibold", 10);
                 foreach (var item in order.OrderItems)
                 {
-                    string itemNameStr = $"{item.Menge}  x {item.OrderItemId} {item.Gericht} ";
+                    string itemNameStr = $" {item.Menge} x  {item.OrderItemId}  {item.Gericht}";
                     string itemSizeStr = $" {item.Größe}";
                     string itemPriceStr = $"{item.Gesamt:C}";
 

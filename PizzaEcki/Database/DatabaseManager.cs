@@ -1732,7 +1732,7 @@ namespace PizzaEcki.Database
             _connection.Close();
             return cities;
         }
-      
+
 
 
         //Admin Methoden
@@ -1745,19 +1745,20 @@ namespace PizzaEcki.Database
             List<DailySalesInfo> dailySalesInfoList = new List<DailySalesInfo>();
 
             string sql = @"
-    SELECT
-        IFNULL(d.Name, 'Theke') as Name,
-        o.PaymentMethod as PaymentMethod, 
-        SUM(oi.Gesamt) as DailySales
-    FROM
-        OrderAssignments oa
-    LEFT JOIN Drivers d ON oa.DriverId = d.Id
-    INNER JOIN Orders o ON oa.OrderId = o.OrderId
-    INNER JOIN OrderItems oi ON o.OrderId = oi.OrderId
-    WHERE
-        date(oa.Timestamp) = date(@Date)
-    GROUP BY
-        IFNULL(d.Name, 'Theke'), o.PaymentMethod;
+        SELECT
+            IFNULL(d.Name, 'Theke') as Name,
+            o.PaymentMethod as PaymentMethod, 
+            COUNT(oa.OrderId) as OrderCount, -- Anzahl der Fahrten
+            SUM(oi.Gesamt) as DailySales
+        FROM
+            OrderAssignments oa
+        LEFT JOIN Drivers d ON oa.DriverId = d.Id
+        INNER JOIN Orders o ON oa.OrderId = o.OrderId
+        INNER JOIN OrderItems oi ON o.OrderId = oi.OrderId
+        WHERE
+            date(oa.Timestamp) = date(@Date)
+        GROUP BY
+            IFNULL(d.Name, 'Theke'), o.PaymentMethod;
     ";
 
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
@@ -1772,7 +1773,8 @@ namespace PizzaEcki.Database
                         {
                             Name = reader.GetString(0),
                             PaymentMethod = reader.GetString(1),
-                            DailySales = reader.GetDouble(2)
+                            Count = reader.GetInt32(2), // Anzahl der Fahrten
+                            DailySales = reader.GetDouble(3)
                         };
                         dailySalesInfoList.Add(dailySalesInfo);
                     }

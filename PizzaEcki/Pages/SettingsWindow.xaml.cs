@@ -42,7 +42,7 @@ namespace PizzaEcki.Pages
 
         private void LoadDrivers()
         {
-            DriversList.ItemsSource = _dbManager.GetDrivers();
+            DriversListView.ItemsSource = _dbManager.GetDrivers();
         }
 
         private void LoadDishes()
@@ -75,7 +75,7 @@ namespace PizzaEcki.Pages
 
         private void EditDriverButton_Click()
         {
-            Driver selectedDriver = DriversList.SelectedItem as Driver;
+            Driver selectedDriver = DriversListView.SelectedItem as Driver;
             if (selectedDriver != null)
             {
                 DriverDialog dialog = new DriverDialog(selectedDriver);
@@ -176,7 +176,7 @@ namespace PizzaEcki.Pages
 
         private void DeleteDriverButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedDriver = DriversList.SelectedItem as Driver;
+            var selectedDriver = DriversListView.SelectedItem as Driver;
             if (selectedDriver != null)
             {
                 MessageBoxResult result = MessageBox.Show("Sind Sie sicher, dass Sie diesen Fahrer löschen möchten?", "Fahrer löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
