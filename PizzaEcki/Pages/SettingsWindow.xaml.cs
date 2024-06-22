@@ -9,6 +9,9 @@ using PizzaEcki.Models;
 using SharedLibrary;
 using System.Printing;
 using System.Text;
+using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace PizzaEcki.Pages
 {
@@ -18,6 +21,11 @@ namespace PizzaEcki.Pages
         public ObservableCollection<Dish> Dishes { get; set; }
         public TimeSpan HappyHourStartTime { get; private set; }
         public TimeSpan HappyHourEndTime { get; private set; }
+        private GridViewColumnHeader _lastHeaderClicked = null;
+        private ListSortDirection _lastDirection = ListSortDirection.Ascending;
+        public bool IsEditEnabled { get; set; }
+
+
 
 
         public SettingsWindow()
@@ -39,7 +47,48 @@ namespace PizzaEcki.Pages
             }
 
         }
+        private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+        {
+            var headerClicked = e.OriginalSource as GridViewColumnHeader;
+            ListSortDirection direction;
 
+            if (headerClicked != null)
+            {
+                if (headerClicked != _lastHeaderClicked)
+                {
+                    direction = ListSortDirection.Ascending;
+                }
+                else
+                {
+                    direction = _lastDirection == ListSortDirection.Ascending
+                        ? ListSortDirection.Descending
+                        : ListSortDirection.Ascending;
+                }
+
+                var columnBinding = headerClicked.Column.DisplayMemberBinding as Binding;
+                var sortBy = columnBinding?.Path.Path ?? headerClicked.Column.Header as string;
+
+                // Überprüfe, ob nach der Straße sortiert werden soll
+                if (sortBy == "Adresse")
+                {
+                    sortBy = "Customer.Street";
+                }
+
+                Sort(sortBy, direction);
+
+                _lastHeaderClicked = headerClicked;
+                _lastDirection = direction;
+            }
+        }
+        private void Sort(string sortBy, ListSortDirection direction)
+        {
+            ICollectionView dataView = CollectionViewSource.GetDefaultView(DishListView.ItemsSource);
+
+            dataView.SortDescriptions.Clear();
+            SortDescription sd = new SortDescription(sortBy, direction);
+            dataView.SortDescriptions.Add(sd);
+            dataView.Refresh();
+        }
         private void LoadDrivers()
         {
             DriversListView.ItemsSource = _dbManager.GetDrivers();

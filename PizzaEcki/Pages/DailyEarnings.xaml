@@ -100,7 +100,7 @@
                            Foreground="White" FontSize="16"/>
             </StackPanel>
             <Button x:Name="CloseDayButton" Content="Tag abschließen" HorizontalAlignment="Right" Margin="0,5,10,10"
-         Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="#FF602C"  Style="{DynamicResource ButtonStyle1}" Click="CloseDayButton_Click"/>
+         Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="#FF602C"  Style="{DynamicResource ButtonStyle1}" Click="CloseDayButton_Click" BorderBrush="{x:Null}"/>
 
         </StackPanel>
     </Grid>

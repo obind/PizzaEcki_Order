@@ -73,32 +73,32 @@
         </Style>
     </Window.Resources>
     <ScrollViewer Background="#FF1D1E20" Foreground="White">
-        <StackPanel Margin="10">
-            <Label Content="Bon Nummer" Foreground="White"/>
-            <TextBox Text="{Binding BonNumber}" Padding="5px" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" Cursor="Arrow"/>
+        <StackPanel Margin="10,-7,10,10">
+            <Label Content="Bon Nummer" Foreground="White" FontSize="16"/>
+            <TextBox Text="{Binding BonNumber}" Padding="5px" IsReadOnly="True" Style="{StaticResource TransparentTextBoxStyle}" Cursor="Arrow" FontSize="14"/>
 
-            <Label Content="Fahrername" Foreground="White"/>
+            <Label Content="Fahrername" Foreground="White" FontSize="16"/>
             <ComboBox x:Name="DriverComboBox"
           DisplayMemberPath="Name"
           SelectedValuePath="Id"
           ItemsSource="{Binding Drivers}"
             
           Padding="5px"
-          Cursor="Arrow">
+          Cursor="Arrow" FontSize="14">
                
             </ComboBox>
 
-            <Label Content="Adresse" Foreground="White"/>
+            <Label Content="Adresse" Foreground="White" FontSize="16"/>
             <!-- Hier könntest du die Adressdetails der Customer-Entität binden -->
-            <TextBox Text="{Binding Customer.Street}" Style="{StaticResource TransparentTextBoxStyle}" IsReadOnly="True" Cursor="Arrow" />
-            <TextBox Text="{Binding Customer.City}" Style="{StaticResource TransparentTextBoxStyle}" IsReadOnly="True" Cursor="Arrow"/>
+            <TextBox Text="{Binding Customer.Street}" Style="{StaticResource TransparentTextBoxStyle}" IsReadOnly="True" Cursor="Arrow" FontSize="14" />
+            <TextBox Text="{Binding Customer.City}" Style="{StaticResource TransparentTextBoxStyle}" IsReadOnly="True" Cursor="Arrow" FontSize="14"/>
 
 
-            <Label Content="Lieferung Bis" Foreground="White"/>
-            <TextBox x:Name="DeliveryUntilTextBox" Text="{Binding DeliveryUntil, TargetNullValue='00:00', FallbackValue='00:00'}" Cursor="IBeam"/>
+            <Label Content="Lieferung Bis" Foreground="White" FontSize="16"/>
+            <TextBox x:Name="DeliveryUntilTextBox" Text="{Binding DeliveryUntil, TargetNullValue='00:00', FallbackValue='00:00'}" Cursor="IBeam" FontSize="14"/>
             <!-- Hier wäre eine ListView für die Bearbeitung der OrderItems -->
-            <Label Content="Bestellartikel" Foreground="#FFFFFEFE"/>
-            <ListView x:Name="BestellungenListView" ItemsSource="{Binding _localOrderItems}" Background="#FF5F6269" Foreground="#FF606065" Cursor="IBeam">
+            <Label Content="Bestellartikel" Foreground="#FFFFFEFE" FontSize="16"/>
+            <ListView x:Name="BestellungenListView" ItemsSource="{Binding _localOrderItems}" Background="#FF5F6269" Foreground="#FF606065" Cursor="IBeam" FontSize="14">
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Neues Gericht anlegen" Click="AddNewOrderItem_Click"/>
@@ -127,7 +127,7 @@
                     
                     <GridView>
                         <!-- Füge hier Spalten für die verschiedenen Eigenschaften der OrderItems hinzu -->
-                        <GridViewColumn Header="Artikel">
+                        <GridViewColumn Header="Artikel" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox Text="{Binding Gericht, UpdateSourceTrigger=PropertyChanged}" />
@@ -135,35 +135,35 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Extras">
+                        <GridViewColumn Header="Extras" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox Text="{Binding Extras, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Größe">
+                        <GridViewColumn Header="Größe" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox Text="{Binding Größe, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Mg.">
+                        <GridViewColumn Header="Menge" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox Text="{Binding Menge, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Epreis">
+                        <GridViewColumn Header="Epreis" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox Text="{Binding Epreis, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Gesamt">
+                        <GridViewColumn Header="Gesamt" Width="Auto">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox Text="{Binding Gesamt, UpdateSourceTrigger=PropertyChanged}" />
@@ -175,9 +175,9 @@
                 </ListView.View>
             </ListView>
             <DockPanel HorizontalAlignment="Right" >
-                <Button Content="Bestellung Löschen" Click="Loeschen_Click" Style="{DynamicResource ButtonStyle1}"  Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Margin="0,20,10,0" HorizontalAlignment="Right"/>
+                <Button Content="Bestellung Löschen" Click="Loeschen_Click" Style="{DynamicResource ButtonStyle1}"  Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Margin="0,20,10,0" HorizontalAlignment="Right" BorderBrush="{x:Null}"/>
 
-                <Button Content="Änderungen speichern" Click="Speichern_Click" Style="{DynamicResource ButtonStyle1}"  Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Margin="0,20,0,0" HorizontalAlignment="Right"/>
+                <Button Content="Änderungen speichern" Click="Speichern_Click" Style="{DynamicResource ButtonStyle1}"  Background="#ff602c" Foreground="White" FontWeight="Bold" Padding="1,5,1,5" Margin="0,20,0,0" HorizontalAlignment="Right" BorderBrush="{x:Null}"/>
 
             </DockPanel>
             <!-- Button zum Speichern der Änderungen -->

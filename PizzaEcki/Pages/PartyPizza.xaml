@@ -111,6 +111,6 @@
                 Foreground="White"
                 FontSize="16"
                 Padding="10 5 10 5"
-                Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Right"/>
+                Style="{DynamicResource ButtonStyle1}" HorizontalAlignment="Right" BorderBrush="{x:Null}"/>
     </Grid>
 </Window>

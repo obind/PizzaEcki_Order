@@ -523,15 +523,23 @@ namespace PizzaEcki
 
         private void SizeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(_selectedDish.Id == 700)
+            bool isHappyHour = IsHappyHour();
+            bool isHappyHourNow = IsHappyHour();
+            Dish selectedDish = (Dish)DishComboBox.SelectedItem;
+
+            if (_selectedDish.Id == 700)
             {
               PriceLabel.Content = $"{tempOrderItem.Gesamt:F2} €";
             }
+            // Überprüfe, ob Mittagsangebot anwendbar ist
+            if (isHappyHourNow && IsEligibleForLunchOffer(_selectedDish, "L"))
+            {
 
-            if (SizeComboBox.SelectedItem != null && _selectedDish.Id != 700)
+                PriceLabel.Content = $"9.00 €";// Preis für das Mittagsangebot setzen
+            }
+            else if (SizeComboBox.SelectedItem != null && _selectedDish.Id != 700)
             {
                 string selectedSize = SizeComboBox.SelectedItem.ToString();
-                Dish selectedDish = (Dish)DishComboBox.SelectedItem;
 
                 double price = GetPriceForSelectedSize(selectedDish, selectedSize);
                 PriceLabel.Content = $"{price:F2} €";

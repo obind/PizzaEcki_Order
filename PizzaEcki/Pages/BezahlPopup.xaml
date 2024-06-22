@@ -64,8 +64,8 @@
             <ComboBoxItem Content="Kartenzahlung"/>
             <ComboBoxItem Content="PayPal"/>
         </ComboBox>
-        <Button Content="Bestätigen" Margin="50,60,50,0"  VerticalAlignment="Center" HorizontalAlignment="Right" Background="#FF602C" Foreground="White"  Padding="10,5" Style="{StaticResource ButtonStyle1}"/>
-        <Button Content="Abbrechen" Margin="50,60,50,0"  Padding="10,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="#FF602C" Foreground="White" Style="{StaticResource ButtonStyle1}"/>
+        <Button Content="Bestätigen" Margin="50,60,50,0"  VerticalAlignment="Center" HorizontalAlignment="Right" Background="#FF602C" Foreground="White"  Padding="10,5" Style="{StaticResource ButtonStyle1}" BorderBrush="{x:Null}"/>
+        <Button Content="Abbrechen" Margin="50,60,50,0"  Padding="10,5" VerticalAlignment="Center" HorizontalAlignment="Left" Background="#FF602C" Foreground="White" Style="{StaticResource ButtonStyle1}" BorderBrush="{x:Null}"/>
 
     </Grid>
 </Window>

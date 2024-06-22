@@ -4,7 +4,7 @@
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:services="clr-namespace:PizzaEcki.Services" 
-        Title="Bestellungen anzeigen" Height="450" Width="Auto"  KeyDown="Window_KeyDown"   
+        Title="Bestellungen anzeigen" Height="450" Width="Auto"  KeyDown="Window_KeyDown" 
 >
 
     <Window.Resources>
@@ -27,7 +27,7 @@
             <Setter Property="Background" Value="#FF602C"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontSize" Value="16"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="5"/>
             <Setter Property="Template">
@@ -74,7 +74,7 @@
 
     </Window.Resources>
     <Grid Width="Auto" >
-        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" >
+        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" FontSize="16" >
 
             
 
@@ -108,7 +108,7 @@
                     </GridViewColumn>
 
 
-                    <GridViewColumn Header="Telefonnummer" Width="Auto"  DisplayMemberBinding="{Binding CustomerPhoneNumber}">
+                    <GridViewColumn Header="Telefonnummer" Width="Auto" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" 

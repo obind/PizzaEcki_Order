@@ -7,11 +7,11 @@
         <conv:BoolToJaNeinConverter x:Key="BoolToJaNeinConverter"/>
         <!-- Definiere einen Style für GridViewColumnHeader -->
         <Style TargetType="GridViewColumnHeader">
-            
+             <EventSetter Event="Click" Handler="GridViewColumnHeader_Click"/>
             <Setter Property="Background" Value="#FF602C"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="5"/>
             <Setter Property="Template">
@@ -132,14 +132,14 @@
         
     </Window.Resources>
     <Grid Background="#FF1D1E20">
-        <TabControl Background="#FF1D1E20" Foreground="White">
+        <TabControl Background="#FF1D1E20" Foreground="White" FontSize="14">
             <TabItem Header="Fahrer" Background="#ff602c" Foreground="White" >
                 <Grid Background="#FF1D1E20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <ListView Name="DriversListView" Margin="10" Background="#5f6269" Foreground="White" MouseDoubleClick="DriversList_MouseDoubleClick">
+                    <ListView Name="DriversListView" Margin="10" Background="#5f6269" Foreground="White" MouseDoubleClick="DriversList_MouseDoubleClick" FontSize="16">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -172,7 +172,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <ListView Name="DishListView" MouseDoubleClick="DishListView_MouseDoubleClick" Background="#FF1D1E20" Foreground="White" Margin="10,0,10,0" >
+                    <ListView Name="DishListView" MouseDoubleClick="DishListView_MouseDoubleClick" Background="#FF1D1E20" Foreground="White" Margin="10,0,10,0" FontSize="16" >
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -299,10 +299,10 @@
             <TabItem Header="Passwort" Background="#ff602c" Foreground="White" Loaded="TabItem_Loaded">
                 <Grid Background="#FF1D1E20">
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Label Foreground="White" Content="Neues Passwort eingeben:" FontSize="18"/>
+                        <Label Foreground="White" Content="Neues Passwort eingeben:" FontSize="16"/>
                         <PasswordBox x:Name="NewPasswordInput"/>
 
-                        <Label Foreground="White" Content="Passwort bestätigen:" FontSize="18"/>
+                        <Label Foreground="White" Content="Passwort bestätigen:" FontSize="16"/>
                         <PasswordBox x:Name="ConfirmPasswordInput"/>
 
                         <Button Content="Speichern" Click="SaveButton_Click"  Style="{DynamicResource ButtonStyle1}" Background="#ff602c" Foreground="White"  FontWeight="Bold" Padding="10,5" Margin="0,20,0,0" HorizontalAlignment="Center" BorderBrush="{x:Null}"/>
