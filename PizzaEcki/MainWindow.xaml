@@ -6,7 +6,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Order Mate" KeyDown="MainWindowEcki_KeyDown"
-       MinWidth="1000" MinHeight="580" Cursor="Arrow" Closing="MainWindowEcki_Closing"  
+       MinWidth="1000" MinHeight="600" Cursor="Arrow" Closing="MainWindowEcki_Closing"  
     xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
 
 
@@ -636,7 +636,7 @@
 
             </Grid>
         </Border>
-        <Grid Grid.Row="4" Grid.Column="1" Margin="97,0,0,0" VerticalAlignment="Top">
+        <Grid Grid.Row="4" Grid.Column="1" Margin="97,0,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
