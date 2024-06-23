@@ -91,9 +91,16 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
              
             }
- 
-
+           
+            _connection.Open();
+            sql = "CREATE TABLE IF NOT EXISTS Strassenverzeichnis (Id INTEGER PRIMARY KEY, Strasse Text  ,Ortsteil TEXT, PLZ INTEGER, Vorwahl INTEGER)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+            InitializeStaticDrivers();
             // Initialer Eintrag, falls die Tabelle gerade erstellt wurde
+            _connection.Open();
             sql = "INSERT INTO Settings (LastResetDate, CurrentBonNumber) SELECT @date, @number WHERE NOT EXISTS (SELECT 1 FROM Settings)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -402,6 +409,42 @@ namespace PizzaEcki.Database
 
             return _allStreets;
         }
+
+        public List<StreetSuggestion> GetStreetSuggestions(string suchText)
+        {
+            List<StreetSuggestion> vorschläge = new List<StreetSuggestion>();
+
+            _connection.Open();
+
+            string sql = "SELECT Strasse, Ortsteil FROM Strassenverzeichnis WHERE Strasse LIKE @suchText || '%'";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@suchText", suchText);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (!reader.IsDBNull(0)) // Prüfen, ob die Spalte "Strasse" NULL ist
+                        {
+                            var suggestion = new StreetSuggestion
+                            {
+                                Street = reader.GetString(0),
+                                City = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty // Prüfen, ob die Spalte "Ortsteil" NULL ist
+                            };
+                            vorschläge.Add(suggestion);
+                        }
+                    }
+                }
+            }
+
+            _connection.Close();
+            return vorschläge;
+        }
+
+
+
+
 
         // Hilfsmethode zum Extrahieren des Straßennamens ohne Hausnummer
         private string ExtractStreetName(string streetWithNumber)
