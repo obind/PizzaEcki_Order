@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace PizzaEcki.Models
 {
-    public class DailySalesInfo
+    public class PaymentMethodSummary
     {
-        public string Name { get; set; }
-        public int Count { get; set; }
-
-        public double DailySales { get; set; }
         public string PaymentMethod { get; set; }
+        public int OrderCount { get; set; }
+        public double TotalSales { get; set; }
     }
-
 }

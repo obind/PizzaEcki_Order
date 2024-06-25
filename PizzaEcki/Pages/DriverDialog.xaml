@@ -11,20 +11,22 @@
         </Style>
         <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
         <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
-        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FF602C   "/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#ff3300   "/>
         <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
-        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFFD6540"/>
         <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
         <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
         <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
         <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
         <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
+          
             <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
             <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Padding" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -38,15 +40,15 @@
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true" >
                                 <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
-                                <Setter TargetName="border" Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="Black" Direction="320" ShadowDepth="7" BlurRadius="5" Opacity="0.5"/>
-                                    </Setter.Value>
-                                </Setter>
+                                <!--<Setter TargetName="border" Property="Effect">
+                             <Setter.Value>
+                                 <DropShadowEffect Color="Black" BlurRadius="0" Direction="20" ShadowDepth="1" />
+                             </Setter.Value>
+                         </Setter>-->
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
                                 <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>

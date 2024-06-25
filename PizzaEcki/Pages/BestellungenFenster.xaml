@@ -4,7 +4,7 @@
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:services="clr-namespace:PizzaEcki.Services" 
-        Title="Bestellungen anzeigen" Height="450" Width="Auto"  ResizeMode="NoResize" KeyDown="Window_KeyDown"   
+        Title="Bestellungen anzeigen" Height="450" Width="Auto"  KeyDown="Window_KeyDown" 
 >
 
     <Window.Resources>
@@ -13,6 +13,8 @@
         <services:PhoneNumberToVisibilityConverter x:Key="PhoneNumberToVisibilityConverter"/>
         <services:StringToDateTimeConverter x:Key="StringToDateTimeConverter"/>
         <services:TextToColorConverter x:Key="TextToColorConverter"/>
+        <services:DriverIdToNameConverter x:Key="DriverIdToNameConverter"/>
+
         <!-- Button-Style für orange Hintergrund -->
         <Style x:Key="OrangeButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#FF602C"/>
@@ -21,12 +23,13 @@
             <!-- ... Weitere Setters und Trigger falls nötig ... -->
         </Style>
         <Style TargetType="GridViewColumnHeader">
+            <EventSetter Event="Click" Handler="GridViewColumnHeader_Click"/>
             <Setter Property="Background" Value="#FF602C"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontSize" Value="16"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Padding" Value="5,5,5,5"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="GridViewColumnHeader">
@@ -36,6 +39,18 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#ff602c"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF8A4C " />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="BorderBrush" Value="#ff602c" />
+                </Trigger>
+
+            </Style.Triggers>
         </Style>
 
 
@@ -55,9 +70,11 @@
 
             </Style.Triggers>
         </Style>
+
+
     </Window.Resources>
-    <Grid >
-        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}">
+    <Grid Width="Auto" >
+        <ListView x:Name="BestellungenListView" Background="#FF1D1E20" Foreground="White" BorderBrush="{x:Null}" FontSize="16" >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -78,48 +95,67 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Bon Nr" Width="Auto">
+                    <GridViewColumn Header="Bon Nr" Width="Auto" DisplayMemberBinding="{Binding BonNumber}" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding BonNumber}" Foreground="White" FontSize="14" HorizontalAlignment="Center" />
+                                <TextBlock Text="{Binding BonNumber}" Foreground="White" FontSize="14" HorizontalAlignment="Center" Margin="5,0"/>
+                                  
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Telefonnummer" Width="100">
+
+
+                    <GridViewColumn Header="Kunden Nr." Width="Auto" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" 
-                                           Foreground="{Binding CustomerPhoneNumber, Converter={StaticResource TextToColorConverter}}" FontSize="14" HorizontalAlignment="Center"/>
+                                           Foreground="{Binding CustomerPhoneNumber, Converter={StaticResource TextToColorConverter}}" FontSize="14" HorizontalAlignment="Center"  Margin="5,0"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Kunde" Width="200">
+                    <GridViewColumn Header="Fahrer" Width="150" DisplayMemberBinding="{ Binding DriverId, Converter={StaticResource DriverIdToNameConverter} }">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DriverId}"
+                                           Foreground="White"
+                                           FontSize="14"
+                                           HorizontalAlignment="Center"
+                                           Margin="5,0"
+                                           Visibility="{ Binding DriverId, Converter={StaticResource DriverIdToNameConverter} }"/>
+
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Kunde" Width="200" DisplayMemberBinding="{Binding Customer.Name}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Customer.Name}" 
-                       FontSize="14" 
-                       HorizontalAlignment="Center"
-                      
-                       Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}"/>
+                                           FontSize="14" 
+                                           HorizontalAlignment="Center"
+                                           Margin="5,0"
+                                           
+                                           Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
 
-                    <GridViewColumn Header="Adresse" Width="200">
+                    <GridViewColumn Header="Adresse" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Visibility="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToVisibilityConverter}}">
+                                <StackPanel>
                                     <TextBlock Text="{Binding Customer.Street}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding Customer.City}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Offen seit" Width="100">
+
+
+                    <GridViewColumn Header="Offen seit" Width="Auto" DisplayMemberBinding="{Binding Timestamp, Converter={StaticResource StringToDateTimeConverter}}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Timestamp, Converter={StaticResource StringToDateTimeConverter}}" HorizontalAlignment="Center" />
+                                <TextBlock Text="{Binding Timestamp, Converter={StaticResource StringToDateTimeConverter}}" HorizontalAlignment="Center"  Margin="5,0" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -127,18 +163,18 @@
 
 
 
-                    <GridViewColumn Header="Lieferung Bis" Width="100">
+                    <GridViewColumn Header="Lieferung Bis" Width="Auto" DisplayMemberBinding="{Binding DeliveryUntil}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DeliveryUntil}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding DeliveryUntil}" Foreground="White" FontSize="14" HorizontalAlignment="Center"  Margin="5,0"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Bezahlmethode" Width="120">
+                    <GridViewColumn Header="Bezahlmethode" Width="Auto" DisplayMemberBinding="{Binding PaymentMethod}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding PaymentMethod}" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding PaymentMethod}" Foreground="White" FontSize="14" HorizontalAlignment="Center"  Margin="5,0"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -155,9 +191,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel>
-                                    
-                               
-                                <ListView ItemsSource="{Binding OrderItems}" Background="#FF1D1E20" Foreground="White" BorderBrush="White" SelectionMode="Single" IsEnabled="False">
+                                    <ListView ItemsSource="{Binding OrderItems}" Background="#FF1D1E20" Foreground="White" BorderBrush="White" SelectionMode="Single" IsEnabled="False">
                                     <ListView.View>
                                         <GridView ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                             <GridViewColumn Width="Auto">
@@ -236,9 +270,7 @@
                                         </GridView>
                                     </ListView.View>
                                 </ListView>
-                                    <TextBlock Text="{Binding OrderItems, Converter={StaticResource ItemsToTotalConverter}, StringFormat='Gesamtpreis: {0:0.00} €'}"
-            Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="10,5,0,0"/>
-
+                                    <TextBlock Text="{Binding OrderItems, Converter={StaticResource ItemsToTotalConverter}, StringFormat='Gesamtpreis: {0:0.00} €'}" Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="2,5,0,0"/>
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

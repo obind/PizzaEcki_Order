@@ -1,0 +1,925 @@
+"ID","STRASSE","ORTSTEIL","PLZ","VORWAHL"
+2,Kuckucksweg,Amshausen,33803,5204
+3,Am Sportplatz,Amshausen,33803,5204
+4,Hasenheide,Amshausen,33803,5204
+5,Kalkwerk,Amshausen,33803,5204
+6,Zeisigweg,Amshausen,33803,5204
+7,Bahnhofstr.,Amshausen,33803,5204
+8,Fasanenweg,Amshausen,33803,5204
+9,Schnatweg,Amshausen,33803,5204
+10,Meisenstr.,Amshausen,33803,5204
+11,Spechtstr.,Amshausen,33803,5204
+12,Kiebitzstr.,Amshausen,33803,5204
+13,Buchenweg,Amshausen,33803,5204
+14,Amselstr.,Amshausen,33803,5204
+15,Quellweg,Amshausen,33803,5204
+16,Brilskamp,Amshausen,33803,5204
+17,Eichenstr.,Amshausen,33803,5204
+18,Feldweg,Amshausen,33803,5204
+19,Sörenbrink,Amshausen,33803,5204
+20,Kiefernweg,Amshausen,33803,5204
+21,Buchfinkenstr.,Amshausen,33803,5204
+22,Tiefer Weg,Amshausen,33803,5204
+23,Alte Landwehr,Amshausen,33803,5204
+24,Petersberg,Amshausen,33803,5204
+25,Auf dem Kampe,Amshausen,33803,5204
+26,Rügener Str.,Amshausen,33803,5204
+27,Starenweg,Amshausen,33803,5204
+28,Tiergarten,Amshausen,33803,5204
+29,Alter Garten,Amshausen,33803,5204
+30,Landwehrs Brede,Amshausen,33803,5204
+31,Ringstr.,Amshausen,33803,5204
+32,Am Bußberg,Amshausen,33803,5204
+33,Schlingenweg,Amshausen,33803,5204
+34,Finkenstr.,Amshausen,33803,5204
+35,Birkenweg,Amshausen,33803,5204
+36,Kaistr.,Amshausen,33803,5204
+37,Upheider Weg,Amshausen,33803,5204
+38,In der Howe,Amshausen,33803,5204
+39,Drosselweg,Amshausen,33803,5204
+40,Jückemöllers Hof,Amshausen,33803,5204
+41,Niedernkamp,Amshausen,33803,5204
+42,Elsterstr.,Amshausen,33803,5204
+43,Fliederstr.,Amshausen,33803,5204
+44,Amshausener Str.,Amshausen,33803,5204
+45,Schwalbenweg,Amshausen,33803,5204
+46,Stralsunder Str.,Amshausen,33803,5204
+47,Haferbrede,Amshausen,33803,5204
+48,Bussardstr.,Amshausen,33803,5204
+49,Haller Str.,Amshausen,33803,5204
+50,Jückemöhlenweg,Amshausen,33803,5204
+51,Roggenkamp,Amshausen,33803,5204
+52,Schuhkamp,Amshausen,33803,5204
+53,Adlerstr.,Amshausen,33803,5204
+54,Butterweg,Amshausen,33803,5204
+55,Am Langenberg,Amshausen,33803,5204
+56,Lindenstr.,Amshausen,33803,5204
+57,Lärchenstr.,Amshausen,33803,5204
+58,Erlenstr.,Amshausen,33803,5204
+59,Am Foddenbach,Amshausen,33803,5204
+60,Forellenweg,Amshausen,33803,5204
+61,An der Jöpke,Amshausen,33803,5204
+62,Kastanienstr.,Amshausen,33803,5204
+63,Swinemünder Str.,Amshausen,33803,5204
+64,Taubenweg,Amshausen,33803,5204
+65,Lohbrede,Amshausen,33803,5204
+66,Wolliner Str.,Amshausen,33803,5204
+67,Falkenstr.,Amshausen,33803,5204
+68,Am Jakobsberg,Amshausen,33803,5204
+69,Bergstr.,Amshausen,33803,5204
+70,Sechtenbrink,Amshausen,33803,5204
+71,Ascheloher Weg,Amshausen,33803,5204
+72,"Deterts Heide",Amshausen,33803,5204
+73,Uhlandstr.,Brockhagen,33803,5204
+74,Arnsbergstr.,Brockhagen,33803,5204
+75,Riegestr.,Brockhagen,33803,5204
+76,Eichendorffstr.,Brockhagen,33803,5204
+77,Mönchsweg,Brockhagen,33803,5204
+78,Patthorster Str.,Brockhagen,33803,5204
+79,Am Kottenteich,Brockhagen,33803,5204
+80,Freiligrathstr.,Brockhagen,33803,5204
+81,Auf dem Hofe,Brockhagen,33803,5204
+82,Wallbrink,Brockhagen,33803,5204
+83,Ebbesloher Str.,Brockhagen,33803,5204
+84,Ellerbrok,Brockhagen,33803,5204
+85,Lessingstr.,Brockhagen,33803,5204
+86,Abrookstr.,Brockhagen,33803,5204
+87,Baumkamp,Brockhagen,33803,5204
+88,Mörikestr.,Brockhagen,33803,5204
+89,Sandforther Str.,Brockhagen,33803,5204
+90,Holstheide,Brockhagen,33803,5204
+91,Hauptmannstr.,Brockhagen,33803,5204
+92,Landhagen,Brockhagen,33803,5204
+93,Rilkestr.,Brockhagen,33803,5204
+94,Schierenweg,Brockhagen,33803,5204
+95,Körnerstr.,Brockhagen,33803,5204
+96,Thunheide,Brockhagen,33803,5204
+97,Backsheide,Brockhagen,33803,5204
+98,Zehntgarten,Brockhagen,33803,5204
+99,Goethestr.,Brockhagen,33803,5204
+100,Kästnerstr.,Brockhagen,33803,5204
+101,Gütersloher Str.,"",33803,5204
+102,Claudiusstr.,Brockhagen,33803,5204
+103,Michaelisstr.,Brockhagen,33803,5204
+104,Kleiststr.,Brockhagen,33803,5204
+105,Buschstr.,Brockhagen,33803,5204
+106,Alter Sportplatz,Brockhagen,33803,5204
+107,Heckenweg,Brockhagen,33803,5204
+108,Sandweg,Brockhagen,33803,5204
+109,Miegelstr.,Brockhagen,33803,5204
+110,Kampstr.,Brockhagen,33803,5204
+111,Vennheide,Brockhagen,33803,5204
+112,Birkenvenn,Brockhagen,33803,5204
+113,Brockhagener Str.,Brockhagen,33803,5204
+114,Grabenstr.,Brockhagen,33803,5204
+115,Lönsstr.,Brockhagen,33803,5204
+116,Droste-Hülshoff-Str.,Brockhagen,33803,5204
+117,Lutherstr.,Brockhagen,33803,5204
+118,Bergengruenstr.,Brockhagen,33803,5204
+119,Schillerstr.,Brockhagen,33803,5204
+120,Kantstr.,Brockhagen,33803,5204
+121,Vennorter Str.,Brockhagen,33803,5204
+122,Bobenheide,Brockhagen,33803,5204
+123,Hagenort,Brockhagen,33803,5204
+124,Kölkebecker Str.,Brockhagen,33803,5204
+125,Lode,Brockhagen,33803,5204
+126,Horststr.,Brockhagen,33803,5204
+127,Schwarzes Feld,Brockhagen,33803,5204
+128,Bonhoefferstr.,Brockhagen,33803,5204
+129,Siebenweg,Brockhagen,33803,5204
+130,Harsewinkeler Str.,Brockhagen,33803,5204
+131,Arndtstr.,Brockhagen,33803,5204
+132,Heinestr.,Brockhagen,33803,5204
+133,Fröbelstr.,Brockhagen,33803,5204
+134,Kellerstr,Brockhagen,33803,5204
+136,Brändströmstr.,Steinhagen,33803,5204
+137,Teplitzer Str.,Steinhagen,33803,5204
+138,Alte Kirchstr.,Steinhagen,33803,5204
+139,Otterweg,Steinhagen,33803,5204
+140,Modersohn-Becker-Hof,Steinhagen,33803,5204
+141,Große Wiese,Steinhagen,33803,5204
+142,Hellenbrede,Steinhagen,33803,5204
+143,Carl-Goerdeler-Str.,Steinhagen,33803,5204
+144,Queller Str.,Steinhagen,33803,5204
+145,Leipziger Str.,Steinhagen,33803,5204
+146,Gabriele-Münter-Hof,Steinhagen,33803,5204
+147,Dessauer Str.,Steinhagen,33803,5204
+148,Waldwinkel,Steinhagen,33803,5204
+149,Lisztstr.,Steinhagen,33803,5204
+150,Böttcherhof,Steinhagen,33803,5204
+151,Heinrichstr.,Steinhagen,33803,5204
+152,Lutgardisweg,Steinhagen,33803,5204
+153,Rote Erde,Steinhagen,33803,5204
+154,Igelweg,Steinhagen,33803,5204
+155,Bernhardstr.,Steinhagen,33803,5204
+156,Julius-Leber-Str.,Steinhagen,33803,5204
+157,Ströher Str.,Steinhagen,33803,5204
+158,Brahmsstr.,Steinhagen,33803,5204
+159,Narzissenstr.,Steinhagen,33803,5204
+160,Glatzer Str.,Steinhagen,33803,5204
+161,Gleiwitzer Str.,Steinhagen,33803,5204
+162,Teutoburger Str.,Steinhagen,33803,5204
+163,Alte Landstr.,Steinhagen,33803,5204
+164,Pestalozzistr.,Steinhagen,33803,5204
+165,Kuhweg,Steinhagen,33803,5204
+166,Bertha-von-Suttner-Hof,Steinhagen,33803,5204
+167,Grünewaldweg,Steinhagen,33803,5204
+168,Hilterweg,Steinhagen,33803,5204
+169,Cecilienstr.,Steinhagen,33803,5204
+170,Ummelner Str.,Steinhagen,33803,5204
+171,Hasenweg,Steinhagen,33803,5204
+172,Kreienbrink,Steinhagen,33803,5204
+173,Dieselstr.,Steinhagen,33803,5204
+174,Weberstr.,Steinhagen,33803,5204
+175,Asternstr.,Steinhagen,33803,5204
+176,Rigaer Str.,Steinhagen,33803,5204
+177,Lortzingstr.,Steinhagen,33803,5204
+178,Brückhof,Steinhagen,33803,5204
+179,Hermannstr.,Steinhagen,33803,5204
+180,Läningweg,Steinhagen,33803,5204
+181,Rubensweg,Steinhagen,33803,5204
+182,Iltisweg,Steinhagen,33803,5204
+183,Am Landbach,Steinhagen,33803,5204
+184,Biberweg,Steinhagen,33803,5204
+185,Schubertstr.,Steinhagen,33803,5204
+186,Memeler Str.,Steinhagen,33803,5204
+187,Königsberger Str.,Steinhagen,33803,5204
+188,Friedhofstr.,Steinhagen,33803,5204
+189,Austmannshof,Steinhagen,33803,5204
+190,Breslauer Str.,Steinhagen,33803,5204
+191,St.-Hedwig-Str.,Steinhagen,33803,5204
+192,Nelkenstr.,Steinhagen,33803,5204
+193,Westernkamp,Steinhagen,33803,5204
+194,Gluckstr.,Steinhagen,33803,5204
+195,Esch,Steinhagen,33803,5204
+196,Kurze Str.,Steinhagen,33803,5204
+197,Kleeheide,Steinhagen,33803,5204
+198,Gudrunweg,Steinhagen,33803,5204
+199,Chemnitzer Str.,Steinhagen,33803,5204
+200,Unterer Steinweg,Steinhagen,33803,5204
+201,Anemonenstr.,Steinhagen,33803,5204
+202,Quittenstr.,Steinhagen,33803,5204
+203,Liebermannweg,Steinhagen,33803,5204
+204,Wittenborghof,Steinhagen,33803,5204
+205,Dorotheenstr.,Steinhagen,33803,5204
+206,Weidenstr.,Steinhagen,33803,5204
+207,Luchsweg,Steinhagen,33803,5204
+208,Niederhove,Steinhagen,33803,5204
+209,Hermelinstr.,Steinhagen,33803,5204
+210,Meschers Hof,Steinhagen,33803,5204
+211,Eickhof,Steinhagen,33803,5204
+212,Alte Brennerei,Steinhagen,33803,5204
+213,Beerenstr.,Steinhagen,33803,5204
+214,Magdeburger Str.,Steinhagen,33803,5204
+215,Im Busche,Steinhagen,33803,5204
+216,Fichtenhof,Steinhagen,33803,5204
+217,Am Pulverbach,Steinhagen,33803,5204
+218,Bielefelder Str.,Steinhagen,33803,5204
+219,Schulweg,Steinhagen,33803,5204
+220,Menzelweg,Steinhagen,33803,5204
+221,Fuchsweg,Steinhagen,33803,5204
+222,Brinkstr.,Steinhagen,33803,5204
+223,Nerzweg,Steinhagen,33803,5204
+224,Kirchplatz,Steinhagen,33803,5204
+225,Woerdener Str.,Steinhagen,33803,5204
+226,Kirschenstr.,Steinhagen,33803,5204
+227,Grewingsweg,Steinhagen,33803,5204
+228,Bunzlauer Str.,Steinhagen,33803,5204
+229,Pfirsichstr.,Steinhagen,33803,5204
+230,Irma-Stern-Hof,Steinhagen,33803,5204
+231,Holtkamper Str.,Steinhagen,33803,5204
+232,Veilchenstr.,Steinhagen,33803,5204
+233,Annastr.,Steinhagen,33803,5204
+234,Raiffeisenstr.,Steinhagen,33803,5204
+235,Liebigstr.,Steinhagen,33803,5204
+236,Brennmeisterhof,Steinhagen,33803,5204
+237,Haydnstr.,Steinhagen,33803,5204
+238,Dresdener Str.,Steinhagen,33803,5204
+239,Weimarer Str.,Steinhagen,33803,5204
+240,Augustastr.,Steinhagen,33803,5204
+241,Ludwig-Beck-Str.,Steinhagen,33803,5204
+242,Overhove,Steinhagen,33803,5204
+243,Himmelreich,Steinhagen,33803,5204
+244,Muckenbrock,Steinhagen,33803,5204
+245,Elisabethstr.,Steinhagen,33803,5204
+246,Beethovenstr.,Steinhagen,33803,5204
+247,Rügenwalder Weg,Steinhagen,33803,5204
+248,Mandelstr.,Steinhagen,33803,5204
+249,Industriestr.,Steinhagen,33803,5204
+250,Am Sennberg,Steinhagen,33803,5204
+251,Schumannstr.,Steinhagen,33803,5204
+252,Görlitzer Str.,Steinhagen,33803,5204
+253,Baumwiese,Steinhagen,33803,5204
+254,Brockhagener Str.,Steinhagen,33803,5204
+255,Stettiner Str.,Steinhagen,33803,5204
+256,Niehorster Str.,Steinhagen,33803,5204
+257,Schreefeld,Steinhagen,33803,5204
+258,Gottlieb-Daimler-Str.,Steinhagen,33803,5204
+259,Gräfenhof,Steinhagen,33803,5204
+260,Tilsiter Str.,Steinhagen,33803,5204
+261,Postweg,Steinhagen,33803,5204
+262,Kästriner Str.,Steinhagen,33803,5204
+263,Sophie-Scholl-Hof,Steinhagen,33803,5204
+264,Haller Str.,Steinhagen,33803,5204
+265,Cottbuser Str.,Steinhagen,33803,5204
+266,Voßheide,Steinhagen,33803,5204
+267,Anne-Frank-Hof,Steinhagen,33803,5204
+268,Rathausstr.,Steinhagen,33803,5204
+269,Liegnitzer Str.,Steinhagen,33803,5204
+270,Niederstadthof,Steinhagen,33803,5204
+271,Laukshof,Steinhagen,33803,5204
+272,Wiesenstr.,Steinhagen,33803,5204
+273,Azaleenstr.,Steinhagen,33803,5204
+274,Robertstr.,Steinhagen,33803,5204
+275,Luisenstr.,Steinhagen,33803,5204
+276,Hirschberger Str.,Steinhagen,33803,5204
+277,Am Cronsbach,Steinhagen,33803,5204
+278,Begonienstr.,Steinhagen,33803,5204
+279,Marderweg,Steinhagen,33803,5204
+280,Isselhorster Str.,Steinhagen,33803,5204
+281,Schlüttgarten,Steinhagen,33803,5204
+282,Bisamweg,Steinhagen,33803,5204
+283,Gartenstr.,Steinhagen,33803,5204
+284,Noldeweg,Steinhagen,33803,5204
+285,Ackerstr.,Steinhagen,33803,5204
+286,Oberer Steinweg,Steinhagen,33803,5204
+287,Kolberger Str.,Steinhagen,33803,5204
+288,V. Stauffenberg-Str.,Steinhagen,33803,5204
+289,Tizianweg,Steinhagen,33803,5204
+290,Am Bahnhof,Steinhagen,33803,5204
+291,Potsdamer Str.,Steinhagen,33803,5204
+292,Joseph-Beuys-Hof,Steinhagen,33803,5204
+293,Dachsweg,Steinhagen,33803,5204
+294,Wagnerstr.,Steinhagen,33803,5204
+295,Apfelstr.,Steinhagen,33803,5204
+296,Reichenberger Str.,Steinhagen,33803,5204
+297,Lilienstr.,Steinhagen,33803,5204
+298,Tonkrukenhof,Steinhagen,33803,5204
+299,Heidestr.,Steinhagen,33803,5204
+300,Leberblümchenweg,Steinhagen,33803,5204
+301,Wilhelmstr.,Steinhagen,33803,5204
+302,Bachstr.,Steinhagen,33803,5204
+303,Fanny-Hensel-Hof,Steinhagen,33803,5204
+304,Holbeinweg,Steinhagen,33803,5204
+305,Nimmersather Str.,Steinhagen,33803,5204
+306,Erfurter Str.,Steinhagen,33803,5204
+307,Am Dämmer,Steinhagen,33803,5204
+308,Margeritenweg,Steinhagen,33803,5204
+309,Jahnstr.,Steinhagen,33803,5204
+310,Flurstr.,Steinhagen,33803,5204
+311,An der Brake,Steinhagen,33803,5204
+312,Bodelschwinghstr.,Steinhagen,33803,5204
+313,Schweriner Str.,Steinhagen,33803,5204
+314,Mirabellenstr.,Steinhagen,33803,5204
+315,Geraer Str.,Steinhagen,33803,5204
+316,Brombeerstr.,Steinhagen,33803,5204
+317,Suhler Str.,Steinhagen,33803,5204
+318,Obernheide,Steinhagen,33803,5204
+319,Kollwitzweg,Steinhagen,33803,5204
+320,Böckstiegelweg,Steinhagen,33803,5204
+321,Greifswalder Str.,Steinhagen,33803,5204
+322,Traubenstr.,Steinhagen,33803,5204
+323,Primelstr.,Steinhagen,33803,5204
+324,Lange Str.,Steinhagen,33803,5204
+325,Luise-Rinser-Hof,Steinhagen,33803,5204
+326,Hamsterweg,Steinhagen,33803,5204
+327,Dahlienstr.,Steinhagen,33803,5204
+328,Waldbadstr.,Steinhagen,33803,5204
+329,Aprikosenstr.,Steinhagen,33803,5204
+330,Rembrandtweg,Steinhagen,33803,5204
+331,Rohbrannthof,Steinhagen,33803,5204
+332,Heimchenweg,Steinhagen,33803,5204
+333,Dürerweg,Steinhagen,33803,5204
+334,Wolfspfad,Steinhagen,33803,5204
+335,Bahndamm,Steinhagen,33803,5204
+336,Rolandstr.,Steinhagen,33803,5204
+337,Oberes Feld,Steinhagen,33803,5204
+338,Bergstr.,Steinhagen,33803,5204
+339,Schlehenstr.,Steinhagen,33803,5204
+340,Marienburger Str.,Steinhagen,33803,5204
+341,Jenaer Str.,Steinhagen,33803,5204
+342,Mozartstr.,Steinhagen,33803,5204
+343,Voßhof,Steinhagen,33803,5204
+344,Ginsterstr.,Steinhagen,33803,5204
+345,Dattelstr.,Steinhagen,33803,5204
+346,Bromberger Str.,Steinhagen,33803,5204
+347,Brucknerstr.,Steinhagen,33803,5204
+348,Albertstr.,Steinhagen,33803,5204
+349,Osterfeldstr.,Steinhagen,33803,5204
+350,Krokusweg,Steinhagen,33803,5204
+351,Unteres Feld,Steinhagen,33803,5204
+352,Große Heide,Steinhagen,33803,5204
+353,Carl-Benz-Str.,Steinhagen,33803,5204
+354,Tulpenstr.,Steinhagen,33803,5204
+355,Am Markt,Steinhagen,33803,5204
+356,Quellental,Steinhagen,33803,5204
+357,Laurentiusweg,Steinhagen,33803,5204
+358,Marie-Curie-Hof,Steinhagen,33803,5204
+359,Hanfgarten,Steinhagen,33803,5204
+360,Kalberkamp,Steinhagen,33803,5204
+361,Danziger Str.,Steinhagen,33803,5204
+362,Waldenburger Str.,Steinhagen,33803,5204
+363,Resedastr.,Steinhagen,33803,5204
+364,Lise-Meitner-Str.,Steinhagen,33803,5204
+365,Taschehof,Steinhagen,33803,5204
+366,Egbertstr.,Steinhagen,33803,5204
+367,Bahnhofstr.,Steinhagen,33803,5204
+368,Rostocker Str.,Steinhagen,33803,5204
+369,Mönchsweg,Steinhagen,33803,5204
+370,Händelstr.,Steinhagen,33803,5204
+371,Patthorster Str.,Steinhagen,33803,5204
+372,Schloßallee,Steinhagen,33803,5204
+373,Marienstr.,Steinhagen,33803,5204
+374,Johannesweg,Steinhagen,33803,5204
+375,Borsigstr.,Steinhagen,33803,5204
+376,Siegfriedstr.,Steinhagen,33803,5204
+377,Mühlenstr.,Steinhagen,33803,5204
+378,Wacholderhof,Steinhagen,33803,5204
+379,Gladiolenstr.,Steinhagen,33803,5204
+381,Berghagen,Ascheloh,33790,5201
+382,Nordstr.,Ascheloh,33790,5201
+383,Teichstr.,Ascheloh,33790,5201
+384,Am Lotteberg,Ascheloh,33790,5201
+385,Steinweg,Ascheloh,33790,5201
+386,Hengeberg,Ascheloh,33790,5201
+387,Berghof,Ascheloh,33790,5201
+388,Grüner Weg,Ascheloh/Halle,33790,5201
+389,Ascheloher Weg,Ascheloh,33790,5201
+390,Heuweg,Bokel,33790,5201
+391,Bockemühlenweg,Bokel,33790,5201
+392,Haferstr.,Bokel,33790,5201
+393,Ernteweg,Bokel,33790,5201
+394,Söderkamp,Bokel,33790,5201
+395,Versmolder Str.,Bokel,33790,5201
+396,Dahlbreede,Bokel,33790,5201
+397,Tatenhausener Str.,Bokel,33790,5201
+398,Ringstr.,Bokel,33790,5201
+399,Hainweg,Bokel,33790,5201
+400,Brückenstr.,Bokel,33790,5201
+401,Saurer-Acker-Weg,Bokel,33790,5201
+402,Landmannstr.,Bokel,33790,5201
+403,Angerweg,Bokel,33790,5201
+404,Querstr.,Bokel,33790,5201
+405,Ziegelstr.,Bokel,33790,5201
+406,Keimstr.,Bokel,33790,5201
+407,Wästenweg,Bokel,33790,5201
+408,Zwergstr.,Bokel,33790,5201
+409,Bokeler Str.,Bokel,33790,5201
+410,Gütersloher Str.,"",33790,5201
+411,Eggeberger Str.,Eggeberg,33790,5201
+412,Hohlweg,Eggeberg,33790,5201
+413,Egge,Eggeberg,33790,5201
+414,Turmstr.,Eggeberg,33790,5201
+415,Kleistr.,Eggeberg,33790,5201
+416,Theenhausener Str.,Eggeberg,33790,5201
+417,Hesseltal,Eggeberg,33790,5201
+418,Müdsiek,Eggeberg,33790,5201
+419,Niederfeldstr.,Eggeberg,33790,5201
+421,Fischweg,Hörste,33790,5201
+422,Fuchsweg,Hörste,33790,5201
+423,Hörster Str.,Hörste,33790,5201
+424,Rotdornweg,Hörste,33790,5201
+425,Ruthebachstr.,Hörste,33790,5201
+426,Fliederstr.,Hörste,33790,5201
+427,Suttheide,Hörste,33790,5201
+428,Veilchenstr.,Hörste,33790,5201
+429,Kuhlenweg,Hörste,33790,5201
+430,Heuermanns Weg,Hörste,33790,5201
+431,Bruchstr.,Hörste,33790,5201
+432,Nelkenstr.,Hörste,33790,5201
+433,Fleerweg,Hörste,33790,5201
+434,Alte Dorfstr.,Hörste,33790,5201
+435,Schloßweg,Hörste,33790,5201
+436,Siedinghausener Str.,Hörste,33790,5201
+437,Neue Dorfstr.,Hörste,33790,5201
+438,Kapellenweg,Hörste,33790,5201
+439,Versmolder Str.,Hörste,33790,5201
+440,Zum Niederdorf,Hörste,33790,5201
+441,Sanddornweg,Hörste,33790,5201
+442,Lilienstr.,Hörste,33790,5201
+443,Paterpatt,Hörste,33790,5201
+444,Tulpenstr.,Hörste,33790,5201
+445,Voßbrink,Hörste,33790,5201
+446,Weißer Kamp,Hörste,33790,5201
+447,Ackerweg,Hörste,33790,5201
+448,Sandkuhlenweg,Hörste,33790,5201
+449,Holunderstr.,Hörste,33790,5201
+450,Voßheide,Hörste,33790,5201
+451,Kölkenweg,Hörste,33790,5201
+452,Eichenweg,Hörste,33790,5201
+453,Jägerstr.,Hörste,33790,5201
+454,Stockkämper Weg,Hörste,33790,5201
+455,Haartstr.,Hörste,33790,5201
+456,Tiegstr.,Hörste,33790,5201
+457,Haselnußstr.,Hörste,33790,5201
+458,Kirchesch,Hörste,33790,5201
+459,Buschweg,Hörste,33790,5201
+460,Igelweg,Hörste,33790,5201
+461,Rierkstr.,Hörste,33790,5201
+462,Koppelweg,Hörste,33790,5201
+463,Wacholderstr.,Hörste,33790,5201
+464,Hasenweg,Hörste,33790,5201
+466,Weststr.,Halle,33790,5201
+467,Albert-Schweitzer-Str.,Halle,33790,5201
+468,Masurenweg,Halle,33790,5201
+469,Margarethe-Windthorst-Str.,Halle,33790,5201
+470,Elsa-Brändström-Str.,Halle,33790,5201
+471,Am Kleinebach,Halle,33790,5201
+472,Am Hang,Halle,33790,5201
+473,Mühlenweg,Halle,33790,5201
+474,Arrode,Halle,33790,5201
+475,Schmisingstr.,Halle,33790,5201
+476,Berliner Str.,Halle,33790,5201
+477,Kirchplatz,Halle,33790,5201
+478,Storkenstr.,Halle,33790,5201
+479,Goethestr.,Halle,33790,5201
+480,Bonhoefferstr.,Halle,33790,5201
+481,Ulmenweg,Halle,33790,5201
+482,Winnebrockstr.,Halle,33790,5201
+483,Waldenburger Str.,Halle,33790,5201
+484,Langer Brink,Halle,33790,5201
+485,Walnussweg,Halle,33790,5201
+486,Kättkenstr.,Halle,33790,5201
+487,Heckenweg,Halle,33790,5201
+488,Künsebecker Weg,Halle,33790,5201
+489,Christoph-Probst-Str.,Halle,33790,5201
+490,Alexander-Schmorell-Str.,Halle,33790,5201
+491,Schillerstr.,Halle,33790,5201
+492,Erlenweg,Halle,33790,5201
+493,Am Laibach,Halle,33790,5201
+494,Schäferstr.,Halle,33790,5201
+495,Nansenstr.,Halle,33790,5201
+496,Im Winkel,Halle,33790,5201
+497,Oldendorfer Str.,Halle,33790,5201
+498,Kampstr.,Halle,33790,5201
+499,Fahlenbreede,Halle,33790,5201
+500,Bielefelder Str.,Halle,33790,5201
+501,Pestalozzistr.,Halle,33790,5201
+502,Kiskerstr.,Halle,33790,5201
+503,Graebestr.,Halle,33790,5201
+504,Hartmanns Kamp,Halle,33790,5201
+505,Wischkamp,Halle,33790,5201
+506,Rundweg,Halle,33790,5201
+507,Wiesenstr.,Halle,33790,5201
+508,Alleestr.,Halle,33790,5201
+509,Schlesierweg,Halle,33790,5201
+510,Maximilian-Kolbe-Str.,Halle,33790,5201
+511,Hoffmannstr.,Halle,33790,5201
+512,Nadeweg,Halle,33790,5201
+513,Am Meisenbrink,Halle,33790,5201
+514,Am Stadtrand,Halle,33790,5201
+515,Schützenberg,Halle,33790,5201
+516,In den Gärten,Halle,33790,5201
+517,Bachstr.,Halle,33790,5201
+518,Osnabrücker Str.,Halle,33790,5201
+519,Gartenstr.,Halle,33790,5201
+520,Thüringer Weg,Halle,33790,5201
+521,Platanenweg,Halle,33790,5201
+522,Kleeweg,Halle,33790,5201
+523,Grenzweg,Halle,33790,5201
+524,Hartmanns Wäldchen,Halle,33790,5201
+525,Brandenburger Weg,Halle,33790,5201
+526,Rilkestr.,Halle,33790,5201
+527,Zum Laibachtal,Halle,33790,5201
+528,Hagedornstr.,Halle,33790,5201
+529,Brunnenweg,Halle,33790,5201
+530,Wasserwerkstr.,Halle,33790,5201
+531,Samlandweg,Halle,33790,5201
+532,Lettow-Vorbeck-Str.,Halle,33790,5201
+533,Heidekamp,Halle,33790,5201
+534,Danziger Weg,Halle,33790,5201
+535,Mecklenburger Weg,Halle,33790,5201
+536,Hofweg,Halle,33790,5201
+537,Neulehenstr.,Halle,33790,5201
+538,Am Wall,Halle,33790,5201
+539,Industriestr.,Halle,33790,5201
+540,Sandgrabenweg,Halle,33790,5201
+541,Fröbelstr.,Halle,33790,5201
+542,Bahnhofstr.,Halle,33790,5201
+543,Starrexweg,Halle,33790,5201
+544,Geschwister-Scholl-Str.,Halle,33790,5201
+545,Gartnischer Weg,Halle,33790,5201
+546,Birkenweg,Halle,33790,5201
+547,Tiefer Weg,Halle,33790,5201
+548,Pommernweg,Halle,33790,5201
+549,Große Heide,Halle,33790,5201
+550,Brandheide,Halle,33790,5201
+551,Humpenweg,Halle,33790,5201
+552,Weidenstr.,Halle,33790,5201
+553,Heideweg,Halle,33790,5201
+554,Alter Marktplatz,Halle,33790,5201
+555,Amselstr.,Halle,33790,5201
+556,Jahnstr.,Halle,33790,5201
+557,Friedhofstr.,Halle,33790,5201
+558,Behringstr.,Halle,33790,5201
+559,Osningstr.,Halle,33790,5201
+560,Bismarckstr.,Halle,33790,5201
+561,Postweg,Halle,33790,5201
+562,Kleine Str.,Halle,33790,5201
+563,Grüner Weg,Halle,33790,5201
+564,Am Lött,Halle,33790,5201
+565,Buchenweg,Halle,33790,5201
+566,Sandkamp,Halle,33790,5201
+567,Mönchstr.,Halle,33790,5201
+568,Lindartstr.,Halle,33790,5201
+569,Willi-Graf-Str.,Halle,33790,5201
+570,Am Alten Hof,Halle,33790,5201
+571,Mittelstr.,Halle,33790,5201
+572,Fasanenweg,Halle,33790,5201
+573,Neumarkt,Halle,33790,5201
+574,Jauerstr.,Halle,33790,5201
+575,Schlammpatt,Halle,33790,5201
+576,Ostpreußenweg,Halle,33790,5201
+577,Gausekampweg,Halle,33790,5201
+578,Blumenstr.,Halle,33790,5201
+579,Bredenstr.,Halle,33790,5201
+580,Roonstr.,Halle,33790,5201
+581,Ronchinplatz,Halle,33790,5201
+582,Handelsstr.,Halle,33790,5201
+583,Ahornweg,Halle,33790,5201
+584,Maschweg,Halle,33790,5201
+585,Lotkampsweg,Halle,33790,5201
+586,Schulstr.,Halle,33790,5201
+587,Moltkestr.,Halle,33790,5201
+588,Hufeisenweg,Halle,33790,5201
+589,Paulskamp,Halle,33790,5201
+590,Feldstr.,Halle,33790,5201
+591,Apfelstr.,Halle,33790,5201
+592,Neustädter Str.,Halle,33790,5201
+593,Schloerstr.,Halle,33790,5201
+594,Bergkamp,Halle,33790,5201
+595,Suttnerstr.,Halle,33790,5201
+596,Oststr.,Halle,33790,5201
+597,Bodelschwinghstr.,Halle,33790,5201
+598,Kluskamp,Halle,33790,5201
+599,Rosenberger Str.,Halle,33790,5201
+600,Lange Str.,Halle,33790,5201
+601,Wertherstr.,Halle,33790,5201
+602,Akazienweg,Halle,33790,5201
+603,Sauerbruchstr.,Halle,33790,5201
+604,Eisweg,Halle,33790,5201
+605,Am Forst,Halle,33790,5201
+606,Schultenstr.,Halle,33790,5201
+607,Beckers Garten,Halle,33790,5201
+608,Apothekerstr.,Halle,33790,5201
+609,Spitzenkamp,Halle,33790,5201
+610,Kaiserstr.,Halle,33790,5201
+611,Bergstr.,Halle,33790,5201
+612,Stodieks Hof,Halle,33790,5201
+613,Goebenstr.,Halle,33790,5201
+614,Hachhowe,Halle,33790,5201
+615,Ravensberger Str.,Halle,33790,5201
+616,Rosenstr.,Halle,33790,5201
+617,Langer Acker,Halle,33790,5201
+618,Klingenhagen,Halle,33790,5201
+620,Paulinenweg,Hesseln,33790,5201
+621,Hesselwiese,Hesseln,33790,5201
+622,Margarethe-Windthorst-Str.,Hesseln,33790,5201
+623,Auf dem Felde,Hesseln,33790,5201
+624,Riedweg,Hesseln,33790,5201
+625,Clever Str.,Hesseln,33790,5201
+626,Steinheide,Hesseln,33790,5201
+627,Holtfelder Str.,Hesseln,33790,5201
+628,Eschweg,Hesseln,33790,5201
+629,Osnabrücker Str.,Hesseln,33790,5201
+630,Lönsweg,Hesseln,33790,5201
+631,Wilhelmstr.,Hesseln,33790,5201
+632,An der Hessel,Hesseln,33790,5201
+633,Karlstr.,Hesseln,33790,5201
+634,Steinhausener Weg,Hesseln,33790,5201
+635,Gewerbestr.,Hesseln,33790,5201
+636,Rolandstr.,Hesseln,33790,5201
+637,Heinrichstr.,Hesseln,33790,5201
+638,Stockkämper Weg,Hesseln,33790,5201
+639,Hesselner Str.,Hesseln,33790,5201
+640,Friedrichstr.,Hesseln,33790,5201
+641,Hermannstr.,Hesseln,33790,5201
+642,Schildstr.,Kölkebeck,33790,5201
+643,Rundheide,Kölkebeck,33790,5201
+644,Hanenbrink,Kölkebeck,33790,5201
+645,Steinbachstr.,Kölkebeck,33790,5201
+646,Settelweg,Kölkebeck,33790,5201
+647,Brokweg,Kölkebeck,33790,5201
+648,Speckhagen,Kölkebeck,33790,5201
+649,Lagerheider Weg,Kölkebeck,33790,5201
+650,Sinnerstr.,Kölkebeck,33790,5201
+651,Dallweg,Kölkebeck,33790,5201
+652,Kölkebecker Str.,Kölkebeck,33790,5201
+653,Schulbusch,Kölkebeck,33790,5201
+654,Diekhäger Str.,Kölkebeck,33790,5201
+655,Strothweg,Kölkebeck,33790,5201
+656,Burgstr.,Kölkebeck,33790,5201
+657,Am Denkmal,Kölkebeck,33790,5201
+658,Schmiedering,Kölkebeck,33790,5201
+659,Treiberweg,Kölkebeck,33790,5201
+660,Hesselteicher Str,Kölkebeck,33790,5201
+662,Carl-Bosch-Str.,Künsebeck,33790,5201
+663,Schwalbenweg,Künsebeck,33790,5201
+664,Im Hagen,Künsebeck,33790,5201
+665,Sportplatzstr.,Künsebeck,33790,5201
+666,Kalkstr.,Künsebeck,33790,5201
+667,Richard-Wagner-Str.,Künsebeck,33790,5201
+668,Kreisstr.,Künsebeck,33790,5201
+669,Brinkweg,Künsebeck,33790,5201
+670,Hauptstr.,Künsebeck,33790,5201
+671,Wielandstr.,Künsebeck,33790,5201
+672,Max-Planck-Str.,Künsebeck,33790,5201
+673,Hochstr.,Künsebeck,33790,5201
+674,Am Katzenberg,Künsebeck,33790,5201
+675,Fuhrweg,Künsebeck,33790,5201
+676,Teutoburger Str.,Künsebeck,33790,5201
+677,Brackweder Str.,Künsebeck,33790,5201
+678,Waldweg,Künsebeck,33790,5201
+679,Lerchenstr.,Künsebeck,33790,5201
+680,Hegelstr.,Künsebeck,33790,5201
+681,Künsebecker Weg,Künsebeck,33790,5201
+682,Sandforther Str.,Künsebeck,33790,5201
+683,Flurstr.,Künsebeck,33790,5201
+684,Kantstr.,Künsebeck,33790,5201
+685,Bielefelder Str.,Künsebeck,33790,5201
+686,Kurze Str.,Künsebeck,33790,5201
+687,Lessingstr.,Künsebeck,33790,5201
+688,Wilhelm-Busch-Str.,Künsebeck,33790,5201
+689,Amshausener Weg,Künsebeck,33790,5201
+690,Kleine Heide,Künsebeck,33790,5201
+691,Heller Weg,Künsebeck,33790,5201
+692,Leimweg,Künsebeck,33790,5201
+693,Drosselstr.,Künsebeck,33790,5201
+694,Schnatweg,Künsebeck,33790,5201
+695,Meindersstr.,Künsebeck,33790,5201
+696,Falkenstr.,Künsebeck,33790,5201
+697,Neuer Kamp,Künsebeck,33790,5201
+698,Stettiner Str.,Künsebeck,33790,5201
+699,Gartnischer Weg,Künsebeck,33790,5201
+700,Tatenhausener Str.,Künsebeck,33790,5201
+701,Braunsberger Str.,Künsebeck,33790,5201
+702,Hallenstr.,Künsebeck,33790,5201
+703,Patthorster Str.,Künsebeck,33790,5201
+704,Ascheloher Weg,Künsebeck,33790,5201
+705,Sperberstr.,Künsebeck,33790,5201
+706,Friedlandstr.,Künsebeck,33790,5201
+707,Kehrweg,Künsebeck,33790,5201
+708,Ginsterweg,Künsebeck,33790,5201
+709,Landweg,Künsebeck,33790,5201
+710,Werkstr.,Künsebeck,33790,5201
+711,Sandweg,Künsebeck,33790,5201
+712,Helmholtzstr.,Künsebeck,33790,5201
+713,Sperlingstr.,Künsebeck,33790,5201
+714,Dr.-Georg-Schäfer-Ring,Künsebeck,33790,5201
+715,Gleiwitzer Str.,Künsebeck,33790,5201
+716,Turnerstr.,Künsebeck,33790,5201
+717,Röntgenstr.,Künsebeck,33790,5201
+718,Gutenbergstr.,Künsebeck,33790,5201
+719,Breite Str.,Künsebeck,33790,5201
+720,Siekerweg,Künsebeck,33790,5201
+721,Werner-von-Siemens-Str.,Künsebeck,33790,5201
+722,Bussardstr.,Künsebeck,33790,5201
+723,Maschweg,Künsebeck,33790,5201
+724,Mühlenhof,Künsebeck,33790,5201
+725,Finkenstr.,Künsebeck,33790,5201
+726,Friesenweg,Künsebeck,33790,5201
+727,Dürkoppstr.,Künsebeck,33790,5201
+728,Talstr.,Künsebeck,33790,5201
+729,Pappelstr.,Künsebeck,33790,5201
+730,Kiefernweg,Künsebeck,33790,5201
+731,Uhlandstr.,Künsebeck,33790,5201
+732,Breslauer Str.,Künsebeck,33790,5201
+733,Im Flurwinkel,Künsebeck,33790,5201
+734,Ahornstr.,Ummeln,336,521
+735,Akazienstr.,Ummeln,336,521
+736,Almestr.,Ummeln,336,521
+737,Alte Landstr.,Ummeln,336,521
+738,Am Bahndamm,Ummeln,336,521
+739,Am Depenbrocks Hof,Ummeln,336,521
+740,Am Reiherbach,Ummeln,336,521
+741,Am Speksel,Ummeln,336,521
+742,Anne-Frank-Str.,Ummeln,336,521
+743,Auf der Hart,Ummeln,336,521
+744,Auf der Höhe,Ummeln,336,521
+745,Austerweg,Ummeln,336,521
+746,Begaweg,Ummeln,336,521
+747,Birkenstr.,Ummeln,336,521
+748,Bohlenweg,Ummeln,336,521
+749,Bokelstr.,Ummeln,336,521
+750,Botweg,Ummeln,336,521
+751,Breitscheidstr.,Ummeln,336,521
+752,Buchenstr.,Ummeln,336,521
+753,Buschweg,Ummeln,336,521
+754,Dammweg,Ummeln,336,521
+755,Dorstener Str.,Ummeln,336,521
+756,Dönenweg,Ummeln,336,521
+757,Eichenstr.,Ummeln,336,521
+758,Ennepestr.,Ummeln,336,521
+759,Erlenstr.,Ummeln,336,521
+760,Erpestr.,Ummeln,336,521
+761,Eschenstr.,Ummeln,336,521
+762,Fichtenweg,Ummeln,336,521
+763,Firneweg,Ummeln,336,521
+764,Führenstr.,Ummeln,336,521
+765,Goerdelerstr.,Ummeln,336,521
+766,Göwertweg,Ummeln,336,521
+767,Grenzlandstr.,Ummeln,336,521
+768,Gütersloher Str.,"",336,521
+769,Hambrinker Heide,Ummeln,336,521
+770,Im Sielen,Ummeln,336,521
+771,Isselhorster Str.,Ummeln,336,521
+772,Kasseler Str.,Ummeln,336,521
+773,Kastanienstr.,Ummeln,336,521
+774,Kiefernstr.,Ummeln,336,521
+775,Knappweg,Ummeln,336,521
+776,Korbacher Str.,Ummeln,336,521
+777,Kralheider Str.,Ummeln,336,521
+778,Lennestr.,Ummeln,336,521
+779,Lindenstr.,Ummeln,336,521
+780,Listerstr.,Ummeln,336,521
+781,Magnolienweg,Ummeln,336,521
+782,Maschweg,Ummeln,336,521
+783,Ostlandstr.,Ummeln,336,521
+784,Pappelstr.,Ummeln,336,521
+785,Pivitsweg,Ummeln,336,521
+786,Queller Str.,Ummeln,336,521
+787,Quittenweg,Ummeln,336,521
+788,Rabenecksheide,Ummeln,336,521
+789,Ramselweg,Ummeln,336,521
+790,Ramsloh,Ummeln,336,521
+791,Ravensberger Bleiche,Ummeln,336,521
+792,Rietberger Str.,Ummeln,336,521
+793,Schröderweg,Ummeln,336,521
+794,Seikebruch,Ummeln,336,521
+795,Sinnernweg,Ummeln,336,521
+796,Sorpestr.,Ummeln,336,521
+797,Stallbusch,Ummeln,336,521
+798,Stämme,Ummeln,336,521
+799,Steinhagener Str.,Ummeln,336,521
+800,Trüggelbachstr.,Ummeln,336,521
+801,Ulmenstr.,Ummeln,336,521
+802,Umlostr.,Ummeln,336,521
+803,Ummelner Str.,Ummeln,336,521
+804,Ummelner Str.,Ummeln,336,521
+805,Veerhoffstr.,Ummeln,336,521
+806,Versmolder Str.,Ummeln,336,521
+807,Vollmestr.,Ummeln,336,521
+808,Warburger Str.,Ummeln,336,521
+809,Warendorfer Str.,Ummeln,336,521
+810,Weidenstr.,Ummeln,336,521
+811,Zedernstr.,Ummeln,336,521
+812,Zinnstr.,Ummeln,336,521
+813,Zirbelstr,Ummeln,336,521
+815,Ackerstr.,Quelle,336,521
+816,Albertstr.,Quelle,336,521
+817,Alexanderstr.,Quelle,336,521
+818,Alleestr.,Quelle,336,521
+819,Am Freibad,Quelle,336,521
+820,Am Heidkämpken,Quelle,336,521
+821,Am Königshof,Quelle,336,521
+822,Am Langen Grund,Quelle,336,521
+823,Am Lichtebach,Quelle,336,521
+824,Am Rennplatz,Quelle,336,521
+825,An der Lutter,Quelle,336,521
+826,Annastr.,Quelle,336,521
+827,Arminstr.,Quelle,336,521
+828,Auf dem Hellweg,Quelle,336,521
+829,Augustastr.,Quelle,336,521
+830,Azaleenstr.,Quelle,336,521
+831,Barbaraweg,Quelle,336,521
+832,Baseler Str.,Quelle,336,521
+833,Baseler Str.,Quelle,336,521
+834,Berner Str.,Quelle,336,521
+835,Bertholdstr.,Quelle,336,521
+836,Bieler Str.,Quelle,336,521
+837,Borgsen-Allee,Quelle,336,521
+838,Breedenstr.,Quelle,336,521
+839,Carl-Severing-Str.,Quelle,336,521
+840,Charlottenstr.,Quelle,336,521
+841,Dianastr.,Quelle,336,521
+842,Dornbuschweg,Quelle,336,521
+843,Eisenstr.,Quelle,336,521
+844,Elisabethstr.,Quelle,336,521
+845,Elisenweg,Quelle,336,521
+846,Erwinstr.,Quelle,336,521
+847,Ewaldstr.,Quelle,336,521
+848,Ferdinandstr.,Quelle,336,521
+849,Forstweg,Quelle,336,521
+850,Fortunastr.,Quelle,336,521
+851,Friedrich-Wilhelms-Bleiche,Quelle,336,521
+852,Frühlingstr.,Quelle,336,521
+853,Galoppweg,Quelle,336,521
+854,Genfer Str.,Quelle,336,521
+855,Georgstr.,Quelle,336,521
+856,Gerhardstr.,Quelle,336,521
+857,Gottfriedstr.,Quelle,336,521
+858,Grazer Weg,Quelle,336,521
+859,Hainbuchenweg,Quelle,336,521
+860,Hammerholz,Quelle,336,521
+861,Hedwigstr.,Quelle,336,521
+862,Heidekampstr.,Quelle,336,521
+863,Heinemannstr.,Quelle,336,521
+864,Helenenstr.,Quelle,336,521
+865,Hengstweg,Quelle,336,521
+866,Hildegardweg,Quelle,336,521
+867,Hohe Breede,Quelle,336,521
+868,Hönenburgstr.,Quelle,336,521
+869,Idunastr.,Quelle,336,521
+870,Innsbrucker Str.,Quelle,336,521
+871,Jockeyweg,Quelle,336,521
+872,Kalkbreede,Quelle,336,521
+873,Kleine Str.,Quelle,336,521
+874,Kleiner Kampweg,Quelle,336,521
+875,Kleiststr.,Quelle,336,521
+876,Klemensstr.,Quelle,336,521
+877,Kreuzbreede,Quelle,336,521
+878,Kupferheide,Quelle,336,521
+879,Kupferstr.,Quelle,336,521
+880,Kurze Breede,Quelle,336,521
+881,Lange Breede,Quelle,336,521
+882,Leopoldstr.,Quelle,336,521
+883,Linzer Str.,Quelle,336,521
+884,Ludwigstr.,Quelle,336,521
+885,Lunastr.,Quelle,336,521
+886,Luzerner Str.,Quelle,336,521
+887,Magdalenenstr.,Quelle,336,521
+888,Marienfelder Str.,Quelle,336,521
+889,Meraner Weg,Quelle,336,521
+890,Messingweg,Quelle,336,521
+891,Meyerweg,Quelle,336,521
+892,Nickelweg,Quelle,336,521
+893,Niederbreede,Quelle,336,521
+894,Niederkampweg,Quelle,336,521
+895,Niemöllershof,Quelle,336,521
+896,Oberfeldweg,Quelle,336,521
+897,Obernheide,Quelle,336,521
+898,Oleanderweg,Quelle,336,521
+899,Oskarstr.,Quelle,336,521
+900,Osnabrücker Str.,Quelle,336,521
+901,Ottostr.,Quelle,336,521
+902,Paul-Schwarze-Str.,Quelle,336,521
+903,Poloweg,Quelle,336,521
+904,Queller Str.,Quelle,336,521
+905,Rappenweg,Quelle,336,521
+906,Reinholdstr.,Quelle,336,521
+907,Rembrandtstr.,Quelle,336,521
+908,Robertstr.,Quelle,336,521
+909,Salzburger Str.,Quelle,336,521
+910,Schäferkamp,Quelle,336,521
+911,Schlingenstr.,Quelle,336,521
+912,Schoppenhof,Quelle,336,521
+913,Schörhornweg,Quelle,336,521
+914,Siekbreede,Quelle,336,521
+915,Silberstr.,Quelle,336,521
+916,Sophienweg,Quelle,336,521
+917,Steiler Weg,Quelle,336,521
+918,Steinbreede,Quelle,336,521
+919,Stutenweg,Quelle,336,521
+920,Thaliastr.,Quelle,336,521
+921,Theresienstr.,Quelle,336,521
+922,Thielenkampweg,Quelle,336,521
+923,Traberweg,Quelle,336,521
+924,Tribünenweg,Quelle,336,521
+925,Ursulastr.,Quelle,336,521
+926,Vogelweide,Quelle,336,521
+927,Waldbreede,Quelle,336,521
+928,Waldquellenweg,Quelle,336,521
+929,Wiener Str.,Quelle,336,521
+930,Wilfriedstr.,Quelle,336,521
+931,Wolfgangweg,Quelle,336,521
+932,Zu den Lutterquellen,Quelle,336,521

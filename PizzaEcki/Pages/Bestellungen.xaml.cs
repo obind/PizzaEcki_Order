@@ -4,6 +4,8 @@ using SharedLibrary;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,9 @@ namespace PizzaEcki.Pages
         private DatabaseManager _apiService;
         private ObservableCollection<Order> _orders;
         public bool IsEditEnabled { get; set; }
+        private GridViewColumnHeader _lastHeaderClicked = null;
+        private ListSortDirection _lastDirection = ListSortDirection.Ascending;
+
 
         // Hier definieren wir _bearbeitenFenster korrekt
         private BestellungBearbeiten _bearbeitenFenster;
@@ -138,7 +143,56 @@ namespace PizzaEcki.Pages
         }
 
 
+        private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+        {
+            var headerClicked = e.OriginalSource as GridViewColumnHeader;
+            ListSortDirection direction;
 
+            if (headerClicked != null && headerClicked.Column != null)
+            {
+                if (headerClicked != _lastHeaderClicked)
+                {
+                    direction = ListSortDirection.Ascending;
+                }
+                else
+                {
+                    direction = _lastDirection == ListSortDirection.Ascending
+                        ? ListSortDirection.Descending
+                        : ListSortDirection.Ascending;
+                }
+
+                var columnBinding = headerClicked.Column.DisplayMemberBinding as Binding;
+                var sortBy = columnBinding?.Path.Path ?? headerClicked.Column.Header as string;
+
+                // Überprüfe, ob nach der Straße sortiert werden soll
+                if (sortBy == "Adresse")
+                {
+                    sortBy = "Customer.Street";
+                }
+
+                Sort(sortBy, direction);
+
+                // Aktualisiere die letzte geklickte Header-Information
+                _lastHeaderClicked = headerClicked;
+                _lastDirection = direction;
+            }
+            else
+            {
+                // Hier kannst du optional eine Protokollierung oder eine Fehlermeldung hinzufügen
+                Debug.WriteLine("Header clicked or column is null.");
+            }
+
+        }
+
+        private void Sort(string sortBy, ListSortDirection direction)
+        {
+            ICollectionView dataView = CollectionViewSource.GetDefaultView(BestellungenListView.ItemsSource);
+
+            dataView.SortDescriptions.Clear();
+            SortDescription sd = new SortDescription(sortBy, direction);
+            dataView.SortDescriptions.Add(sd);
+            dataView.Refresh();
+        }
 
     }
 }

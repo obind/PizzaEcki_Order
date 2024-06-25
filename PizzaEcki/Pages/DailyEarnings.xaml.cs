@@ -145,6 +145,7 @@ namespace PizzaEcki.Pages
 
                 // Löschen aller Bestellungen
                 await _dbManager.DeleteDailyOrdersAsync();
+                this.Close();
        
             }
         }
