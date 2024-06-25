@@ -105,7 +105,7 @@
                     </GridViewColumn>
 
 
-                    <GridViewColumn Header="Telefonnummer" Width="Auto" >
+                    <GridViewColumn Header="Kunden Nr." Width="Auto" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" 

@@ -101,7 +101,7 @@ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 
 
 
-                    <GridViewColumn Header="Telefonnummer" Width="Auto">
+                    <GridViewColumn Header="Kunden Nr." Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding CustomerPhoneNumber, Converter={StaticResource PhoneNumberToTextConverter}}" 
