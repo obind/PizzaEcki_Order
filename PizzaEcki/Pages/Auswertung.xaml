@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PizzaEcki.Pages"
         mc:Ignorable="d"
-        Title="Leistungsübersicht" Height="300" Width="400" ResizeMode="NoResize">
+        Title="Leistungsübersicht" Height="400" MaxHeight="600" Width="400" ResizeMode="NoResize">
 
     <Window.Resources>
         <!-- Stil für DataGridColumnHeader -->
@@ -27,7 +27,6 @@
             <Setter Property="Background" Value="#FF1D1E20"/>
         </Style>
 
-
         <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
         <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
         <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#ff3300   "/>
@@ -38,13 +37,14 @@
         <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
         <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
         <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
-            
+          
             <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
             <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Padding" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -58,15 +58,15 @@
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true" >
                                 <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
-                                <Setter TargetName="border" Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="Black" Direction="320" ShadowDepth="7" BlurRadius="5" Opacity="0.5"/>
-                                    </Setter.Value>
-                                </Setter>
+                                <!--<Setter TargetName="border" Property="Effect">
+                             <Setter.Value>
+                                 <DropShadowEffect Color="Black" BlurRadius="0" Direction="20" ShadowDepth="1" />
+                             </Setter.Value>
+                         </Setter>-->
                             </Trigger>
                             <Trigger Property="IsPressed" Value="true">
                                 <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
@@ -80,7 +80,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid Background="#FF1D1E20" >
+    <Grid Background="#FF1D1E20" Height="Auto">
         <StackPanel Background="#FF1D1E20" Margin="10,10,10,10">
             <DataGrid x:Name="DailySalesDataGrid" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False" Background="#FF1D1E20" IsReadOnly="True" BorderBrush="#FFFF602C" FontSize="16">
                 <DataGrid.Columns>
@@ -105,7 +105,11 @@
 
 
         </StackPanel>
-        <Button x:Name="DruckButton" Content="Drucken" HorizontalAlignment="Right" Margin="10,0,10,10" VerticalAlignment="Bottom" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="#FF602C"  Style="{DynamicResource ButtonStyle1}" Click="PrintButton_Click" BorderBrush="{x:Null}"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="DruckButton" Content="Drucken" HorizontalAlignment="Right" Margin="10,0,0,10" VerticalAlignment="Bottom" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="#FF602C"  Style="{DynamicResource ButtonStyle1}" Click="PrintButton_Click" BorderBrush="{x:Null}"/>
+            <Button x:Name="Schließen" Content="Schließen"  HorizontalAlignment="Right" Margin="10,0,10,10" VerticalAlignment="Bottom" Foreground="White" Padding="10,2,10,2" FontWeight="Bold" Background="#FF602C"  Style="{DynamicResource ButtonStyle1}"  BorderBrush="{x:Null}" Click="Schließen_Click"/>
+
+        </StackPanel>
 
     </Grid>
         

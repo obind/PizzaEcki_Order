@@ -141,5 +141,9 @@ namespace PizzaEcki.Pages
             }
         }
 
+        private void Schließen_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

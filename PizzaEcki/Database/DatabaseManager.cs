@@ -98,6 +98,7 @@ namespace PizzaEcki.Database
             {
                 command.ExecuteNonQuery();
             }
+            //ImportCsvData(_connection, "../Data/Strassenverzeichnis.csv");
             InitializeStaticDrivers();
             // Initialer Eintrag, falls die Tabelle gerade erstellt wurde
             _connection.Open();
@@ -2150,5 +2151,36 @@ namespace PizzaEcki.Database
             _connection?.Close();
             _connection?.Dispose();
         }
+
+        //Hilfsmethoden 
+
+        private void ImportCsvData(SqliteConnection connection, string csvFilePath)
+        {
+            //var records = ReadCsvFile(csvFilePath);
+
+            //foreach (var record in records)
+            //{
+            //    string insertSql = "INSERT INTO Strassenverzeichnis (Strasse, Ortsteil, PLZ, Vorwahl) VALUES (@Strasse, @Ortsteil, @PLZ, @Vorwahl)";
+            //    using (var command = new SqliteCommand(insertSql, connection))
+            //    {
+            //        command.Parameters.AddWithValue("@Strasse", record.Strasse);
+            //        command.Parameters.AddWithValue("@Ortsteil", record.Ortsteil);
+            //        command.Parameters.AddWithValue("@PLZ", record.PLZ);
+            //        command.Parameters.AddWithValue("@Vorwahl", record.Vorwahl);
+            //        command.ExecuteNonQuery();
+            //    }
+            //}
+        }
+
+        //private List<StreetRecord> ReadCsvFile(string filePath)
+        //{
+        //    //using (var reader = new StreamReader(filePath))
+        //    //using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
+        //    //{
+        //    //    return new List<StreetRecord>(csv.GetRecords<StreetRecord>());
+        //    //}
+        //}
+
+
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -147,7 +148,7 @@ namespace PizzaEcki.Pages
             var headerClicked = e.OriginalSource as GridViewColumnHeader;
             ListSortDirection direction;
 
-            if (headerClicked != null)
+            if (headerClicked != null && headerClicked.Column != null)
             {
                 if (headerClicked != _lastHeaderClicked)
                 {
@@ -171,9 +172,16 @@ namespace PizzaEcki.Pages
 
                 Sort(sortBy, direction);
 
+                // Aktualisiere die letzte geklickte Header-Information
                 _lastHeaderClicked = headerClicked;
                 _lastDirection = direction;
             }
+            else
+            {
+                // Hier kannst du optional eine Protokollierung oder eine Fehlermeldung hinzufügen
+                Debug.WriteLine("Header clicked or column is null.");
+            }
+
         }
 
         private void Sort(string sortBy, ListSortDirection direction)
