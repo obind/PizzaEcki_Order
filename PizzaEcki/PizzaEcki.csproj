@@ -22,6 +22,9 @@
     <Content Include="icons\cash.svg" />
     <Content Include="icons\paypal.svg" />
     <Content Include="pizzzzzzaaaa.ico" />
+	  <None Update="Data\Strassenverzeichnis.csv">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
   </ItemGroup>
 
   <ItemGroup>

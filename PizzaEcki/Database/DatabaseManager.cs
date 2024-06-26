@@ -22,6 +22,7 @@ namespace PizzaEcki.Database
         private readonly string databaseFileName = "database.sqlite";
         private readonly string fullPathToDatabaseFolder;
         private readonly string fullPathToDatabase;
+        private CsvImporter _csvImporter;
 
         public DatabaseManager()
         {
@@ -39,7 +40,18 @@ namespace PizzaEcki.Database
             _connection.Open();
 
             CreateTable();
-     
+
+            _csvImporter = new CsvImporter(_connection);
+
+            // Dynamisch den Pfad zur CSV-Datei ermitteln
+            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string csvPath = Path.Combine(currentDirectory, "Data", "Strassenverzeichnis.csv");
+
+            if (_csvImporter.IsTableEmpty("Strassenverzeichnis"))
+            {
+                _csvImporter.ImportCSVData(csvPath, "Strassenverzeichnis");
+            }
+
         }
         //Customers
         private void CreateTable()
