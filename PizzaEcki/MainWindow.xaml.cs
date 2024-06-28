@@ -507,30 +507,32 @@ namespace PizzaEcki
         private void SizeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             bool isHappyHour = IsHappyHour();
-            bool isHappyHourNow = IsHappyHour();
             Dish selectedDish = (Dish)DishComboBox.SelectedItem;
 
-            if (_selectedDish.Id == 700)
+            if (selectedDish == null)
             {
-              PriceLabel.Content = $"{tempOrderItem.Gesamt:F2} €";
+                return;
             }
-            // Überprüfe, ob Mittagsangebot anwendbar ist
-            if (isHappyHourNow && IsEligibleForLunchOffer(_selectedDish, "L"))
-            {
 
-                PriceLabel.Content = $"9.00 €";// Preis für das Mittagsangebot setzen
+            if (selectedDish.Id == 700)
+            {
+                PriceLabel.Content = $"{tempOrderItem.Gesamt:F2} €";
+                return;
             }
-            else if (SizeComboBox.SelectedItem != null && _selectedDish.Id != 700)
+
+            // Überprüfe, ob Mittagsangebot anwendbar ist und die ausgewählte Größe "L" ist
+            if (isHappyHour && SizeComboBox.SelectedItem != null && SizeComboBox.SelectedItem.ToString() == "L" && IsEligibleForLunchOffer(selectedDish, "L"))
+            {
+                PriceLabel.Content = $"9.00 €"; // Preis für das Mittagsangebot setzen
+            }
+            else if (SizeComboBox.SelectedItem != null)
             {
                 string selectedSize = SizeComboBox.SelectedItem.ToString();
-
                 double price = GetPriceForSelectedSize(selectedDish, selectedSize);
                 PriceLabel.Content = $"{price:F2} €";
                 tempOrderItem.Epreis = price;
             }
-           
         }
-
 
 
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)

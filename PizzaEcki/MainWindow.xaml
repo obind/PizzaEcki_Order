@@ -1,11 +1,11 @@
-﻿<Window x:Name="MainWindowEcki" x:Class="PizzaEcki.MainWindow"
+﻿ <Window x:Name="MainWindowEcki" x:Class="PizzaEcki.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Order Mate" KeyDown="MainWindowEcki_KeyDown"
+        Title="Order Mate" KeyDown="MainWindowEcki_KeyDown"  Width="800" Height="800"
        MinWidth="1000" MinHeight="600" Cursor="Arrow" Closing="MainWindowEcki_Closing"  
     xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
 
@@ -409,17 +409,18 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="*"/>
-
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*"/>
+                    
                 </Grid.RowDefinitions>
 
-                <Border Background="#FF602C" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="4" VerticalAlignment="Top" Margin="0,0,0,-20">
+                <Border Background="#FF602C" CornerRadius="10" Padding="5,0,5,2" Grid.ColumnSpan="5" VerticalAlignment="Top" Margin="0,0,0,-20">
                     <Label Content="Eingabe" Foreground="White" FontWeight="Bold" FontSize="20" VerticalContentAlignment="Center"/>
                 </Border>
                 <Label Grid.Row="1" Content="Gericht" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" FontStretch="ExtraCondensed" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinHeight="20" Padding="5,0,5,0"/>
@@ -437,13 +438,12 @@
     VerticalAlignment="Center" Grid.Column="1" TabIndex="7" KeyDown="ExtrasComboBox_KeyDown" Loaded="ExtrasComboBox_Loaded" 
     PreviewKeyDown="ExtrasComboBox_PreviewKeyDown" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand" />
 
-                <Label Grid.Row="2" Grid.Column="2" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
+                <Label Grid.Row="2" Grid.Column="2" Content="Anzahl" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
                 <ComboBox x:Name="amountComboBox" Grid.Row="2" Grid.Column="3" 
                     VerticalAlignment="Center" FontSize="18" 
                     KeyDown="amountComboBox_KeyDown" 
                     HorizontalContentAlignment="Stretch" 
-                    VerticalContentAlignment="Center" 
-                    Margin="0,0,20,0" Padding="5,0,5,0" HorizontalAlignment="Left"  
+                    VerticalContentAlignment="Center" Padding="5,0,5,0" HorizontalAlignment="Left"  
                     IsEditable="True" TabIndex="6" 
                     Text="1" MinWidth="40" Style="{StaticResource FocusedComboBoxStyle}" Cursor="Hand">
                     <ComboBoxItem>1</ComboBoxItem>
@@ -459,25 +459,25 @@
                     <TextBlock x:Name="extraShowLabel" Background="LightGray" Foreground="Black" TextWrapping="Wrap" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ScrollViewer}}, Mode=OneWay}" FontSize="14" />
                 </ScrollViewer>
 
-                <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0" Margin="30,0,0,0"/>
+                <Label Grid.Row="1" Grid.Column="2" Content="Größe" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" MinHeight="20" Padding="5,0,5,0"/>
 
                 
                     <ComboBox x:Name="SizeComboBox" Grid.Row="1" Grid.Column="3" FontSize="18"
           HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"
           Padding="5,0,5,0" HorizontalAlignment="Left" TabIndex="8" KeyDown="SizeComboBox_KeyDown"
           MinWidth="40" Cursor="Hand" PreviewKeyDown="SizeComboBox_PreviewKeyDown"
-          Style="{StaticResource FocusVisualStyleForComboBox}" SelectionChanged="SizeComboBox_SelectionChanged" VerticalAlignment="Bottom">
+          Style="{StaticResource FocusVisualStyleForComboBox}" SelectionChanged="SizeComboBox_SelectionChanged" VerticalAlignment="Bottom" Margin="0,0,60,0">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <Label x:Name="PriceLabel"   Padding="5,0,5,0" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" Foreground="White" HorizontalAlignment="Right" Margin="0,5,20,0"/>
+                <Label x:Name="PriceLabel"  Content="0,00€" Padding="5,0,5,0" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" FontSize="18" Foreground="White" Margin="2,5,0,0" HorizontalAlignment="Right"/>
           
 
-                <Label Grid.Row="3" Grid.Column="2" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="30,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="5,0,5,0" MinHeight="20" />
-                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100" Cursor="Hand" />
+                <Label Grid.Row="3" Grid.Column="2" Content="Uhrzeit" FontSize="20" FontFamily="Segoe UI" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,5" VerticalAlignment="Top" HorizontalAlignment="Right" Padding="5,0,5,0" MinHeight="20" />
+                <xctk:TimePicker Name="TimePickermein" FormatString="HH:mm" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Top" FontSize="18" VerticalContentAlignment="Center" KeyDown="TimePicker_KeyDown" TimeInterval="00:30:00" Format="Custom" InputScope="Xml" Margin="0,0,20,0" Padding="5,0,5,0" Grid.Column="3" HorizontalContentAlignment="Left" TabIndex="9" HorizontalAlignment="Left" MinWidth="100" Cursor="Hand" />
 
             </Grid>
         </Border>

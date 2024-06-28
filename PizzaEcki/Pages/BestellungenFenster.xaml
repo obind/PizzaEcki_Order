@@ -4,7 +4,7 @@
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:services="clr-namespace:PizzaEcki.Services" 
-        Title="Bestellungen anzeigen" Height="450" Width="Auto"  KeyDown="Window_KeyDown" 
+        Title="Bestellungen anzeigen" Height="450" Width="Auto" MinWidth="1600"  KeyDown="Window_KeyDown" 
 >
 
     <Window.Resources>
@@ -140,7 +140,7 @@
                     </GridViewColumn>
 
 
-                    <GridViewColumn Header="Adresse" Width="Auto">
+                    <GridViewColumn Header="Adresse" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel>
