@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Globalization;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
 
 namespace PizzaEcki.Database
 {
@@ -21,6 +22,7 @@ namespace PizzaEcki.Database
         private readonly string databaseFileName = "database.sqlite";
         private readonly string fullPathToDatabaseFolder;
         private readonly string fullPathToDatabase;
+        private CsvImporter _csvImporter;
 
         public DatabaseManager()
         {
@@ -38,7 +40,18 @@ namespace PizzaEcki.Database
             _connection.Open();
 
             CreateTable();
-     
+
+            _csvImporter = new CsvImporter(_connection);
+
+            // Dynamisch den Pfad zur CSV-Datei ermitteln
+            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string csvPath = Path.Combine(currentDirectory, "Data", "Strassenverzeichnis.csv");
+
+            if (_csvImporter.IsTableEmpty("Strassenverzeichnis"))
+            {
+                _csvImporter.ImportCSVData(csvPath, "Strassenverzeichnis");
+            }
+
         }
         //Customers
         private void CreateTable()
@@ -90,9 +103,17 @@ namespace PizzaEcki.Database
                 command.ExecuteNonQuery();
              
             }
- 
-
+           
+            _connection.Open();
+            sql = "CREATE TABLE IF NOT EXISTS Strassenverzeichnis (Id INTEGER PRIMARY KEY, Strasse Text  ,Ortsteil TEXT, PLZ INTEGER, Vorwahl INTEGER)";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.ExecuteNonQuery();
+            }
+            //ImportCsvData(_connection, "../Data/Strassenverzeichnis.csv");
+            InitializeStaticDrivers();
             // Initialer Eintrag, falls die Tabelle gerade erstellt wurde
+            _connection.Open();
             sql = "INSERT INTO Settings (LastResetDate, CurrentBonNumber) SELECT @date, @number WHERE NOT EXISTS (SELECT 1 FROM Settings)";
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -343,6 +364,139 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+        //straßen  Methoden
+
+        private List<string> _allStreets;
+
+        public List<string> GetStreetsStartingWith(string input)
+        {
+            _connection.Open();
+            List<string> streets = new List<string>();
+
+            string sql = "SELECT DISTINCT Street FROM Addresses WHERE Street LIKE @Input || '%'"; // DISTINCT hinzugefügt
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Input", input);
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string streetWithNumber = reader.GetString(0);
+                        string streetWithoutNumber = ExtractStreetName(streetWithNumber); // Hausnummer entfernen
+                        streets.Add(streetWithoutNumber);
+                    }
+                }
+            }
+            _connection.Close();
+            return streets.Distinct().ToList(); // Duplikate entfernen
+        }
+
+        public List<string> GetAllStreets()
+        {
+            if (_allStreets == null) // Nur einmal laden, wenn noch nicht im Cache
+            {
+                _connection.Open();
+                _allStreets = new List<string>();
+
+                string sql = "SELECT Street FROM Addresses";
+
+                using (SqliteCommand command = new SqliteCommand(sql, _connection))
+                {
+                    using (SqliteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (!reader.IsDBNull(0))
+                            {
+                                string streetWithNumber = reader.GetString(0);
+                                string streetWithoutNumber = ExtractStreetName(streetWithNumber);
+                                _allStreets.Add(streetWithoutNumber);
+                            }
+                        }
+                    }
+                }
+                _connection.Close();
+                _allStreets = _allStreets.Distinct().ToList(); // Duplikate entfernen
+            }
+
+            return _allStreets;
+        }
+
+        public List<StreetSuggestion> GetStreetSuggestions(string suchText)
+        {
+            List<StreetSuggestion> vorschläge = new List<StreetSuggestion>();
+
+            _connection.Open();
+
+            string sql = "SELECT Strasse, Ortsteil FROM Strassenverzeichnis WHERE Strasse LIKE @suchText || '%'";
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@suchText", suchText);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (!reader.IsDBNull(0)) // Prüfen, ob die Spalte "Strasse" NULL ist
+                        {
+                            var suggestion = new StreetSuggestion
+                            {
+                                Street = reader.GetString(0),
+                                City = !reader.IsDBNull(1) ? reader.GetString(1) : string.Empty // Prüfen, ob die Spalte "Ortsteil" NULL ist
+                            };
+                            vorschläge.Add(suggestion);
+                        }
+                    }
+                }
+            }
+
+            _connection.Close();
+            return vorschläge;
+        }
+
+
+
+
+
+        // Hilfsmethode zum Extrahieren des Straßennamens ohne Hausnummer
+        private string ExtractStreetName(string streetWithNumber)
+        {
+            // Angenommen, die Hausnummer ist durch ein Leerzeichen vom Straßennamen getrennt
+            int index = streetWithNumber.LastIndexOf(' ');
+            if (index > 0)
+            {
+                return streetWithNumber.Substring(0, index);
+            }
+            return streetWithNumber; // Wenn keine Hausnummer gefunden wurde, den gesamten String zurückgeben
+        }
+
+        public async Task<string> GetCityForStreet(string street)
+        {
+            string city = string.Empty;
+
+          
+                _connection.Open();
+
+                string sql = "SELECT City FROM Addresses WHERE Street LIKE @street";
+                using (var command = new SqliteCommand(sql, _connection))
+                {
+                    command.Parameters.AddWithValue("@street", street + "%");
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read() && !reader.IsDBNull(0))
+                        {
+                            city = reader.GetString(0);
+                        }
+                    }
+                }
+
+                _connection.Close();
+            
+
+            return city;
+        }
+
 
 
         //Fahrer Methoden
@@ -1634,45 +1788,34 @@ namespace PizzaEcki.Database
             _connection.Close();
             return cities;
         }
-        public List<string> GetAllStreets()
-        {
 
-            List<string> streets = new List<string>();
-            string sql = "SELECT DISTINCT Street FROM Addresses";
-            using (SqliteCommand command = new SqliteCommand(sql, _connection))
-            {
-                using (SqliteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        streets.Add(reader.GetString(0));
-                    }
-                }
-            }
-            return streets;
-        }
 
 
         //Admin Methoden
-        public List<DailySalesInfo> GetDailySales(DateTime date)
+
+
+        // DatabaseManager.cs
+        public List<DailySalesInfo> GetDailySalesByDriver(DateTime date)
         {
             _connection.Open();
             List<DailySalesInfo> dailySalesInfoList = new List<DailySalesInfo>();
 
-            // SQL-Query, um die täglichen Umsätze abzurufen
             string sql = @"
-            SELECT
-                IFNULL(Drivers.Name, 'Theke') as Name,
-                SUM(OrderAssignments.Price) as DailySales
-            FROM
-                OrderAssignments
-            LEFT JOIN
-                Drivers ON OrderAssignments.DriverId = Drivers.Id
-            WHERE
-                date(OrderAssignments.Timestamp) = date(@Date)
-            GROUP BY
-                IFNULL(Drivers.Name, 'Theke');
-            ";
+        SELECT
+            IFNULL(d.Name, 'Theke') as Name,
+            o.PaymentMethod as PaymentMethod, 
+            COUNT(oa.OrderId) as OrderCount, -- Anzahl der Fahrten
+            SUM(oi.Gesamt) as DailySales
+        FROM
+            OrderAssignments oa
+        LEFT JOIN Drivers d ON oa.DriverId = d.Id
+        INNER JOIN Orders o ON oa.OrderId = o.OrderId
+        INNER JOIN OrderItems oi ON o.OrderId = oi.OrderId
+        WHERE
+            date(oa.Timestamp) = date(@Date)
+        GROUP BY
+            IFNULL(d.Name, 'Theke'), o.PaymentMethod;
+    ";
 
             using (SqliteCommand command = new SqliteCommand(sql, _connection))
             {
@@ -1685,7 +1828,9 @@ namespace PizzaEcki.Database
                         DailySalesInfo dailySalesInfo = new DailySalesInfo
                         {
                             Name = reader.GetString(0),
-                            DailySales = reader.IsDBNull(1) ? 0 : reader.GetDouble(1)  // Überprüfung auf NULL
+                            PaymentMethod = reader.GetString(1),
+                            Count = reader.GetInt32(2), // Anzahl der Fahrten
+                            DailySales = reader.GetDouble(3)
                         };
                         dailySalesInfoList.Add(dailySalesInfo);
                     }
@@ -1694,6 +1839,49 @@ namespace PizzaEcki.Database
             _connection.Close();
             return dailySalesInfoList;
         }
+
+        public List<PaymentMethodSummary> GetDailySales(DateTime date)
+        {
+            _connection.Open();
+            List<PaymentMethodSummary> paymentMethodSummaries = new List<PaymentMethodSummary>();
+
+            string sql = @"
+    SELECT
+        o.PaymentMethod,
+        COUNT(*) as OrderCount,
+        SUM(oi.Gesamt) as TotalSales
+    FROM
+        OrderAssignments oa
+    INNER JOIN Orders o ON oa.OrderId = o.OrderId
+    INNER JOIN OrderItems oi ON o.OrderId = oi.OrderId
+    WHERE
+        date(oa.Timestamp) = date(@Date)
+    GROUP BY
+        o.PaymentMethod;
+    ";
+
+            using (SqliteCommand command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        PaymentMethodSummary summary = new PaymentMethodSummary
+                        {
+                            PaymentMethod = reader.GetString(0),
+                            OrderCount = reader.GetInt32(1),
+                            TotalSales = reader.GetDouble(2)
+                        };
+                        paymentMethodSummaries.Add(summary);
+                    }
+                }
+            }
+            _connection.Close();
+            return paymentMethodSummaries;
+        }
+
         public async Task DeleteDailyOrdersAsync()
         {
             // Öffnen Sie die Verbindung zur Datenbank
@@ -1928,10 +2116,83 @@ namespace PizzaEcki.Database
             }
             _connection.Close();
         }
+
+        public List<DailySalesInfo> GetSalesByPaymentMethod(DateTime date)
+        {
+            List<DailySalesInfo> paymentMethodSales = new List<DailySalesInfo>();
+            string sql = @"
+        SELECT 
+            o.PaymentMethod, 
+            SUM(i.Gesamt) AS DailySales
+        FROM 
+            Orders o
+        JOIN 
+            OrderItems i ON o.OrderId = i.OrderId
+        WHERE 
+            DATE(o.Timestamp) = @Date
+        GROUP BY 
+            o.PaymentMethod;
+    ";
+
+            using (var command = new SqliteCommand(sql, _connection))
+            {
+                command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+                _connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var method = new DailySalesInfo
+                        {
+                            Name = reader["PaymentMethod"].ToString() + " Zahlung",
+                            DailySales = reader.IsDBNull(reader.GetOrdinal("DailySales")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("DailySales"))
+                        };
+                        paymentMethodSales.Add(method);
+                    }
+                }
+                _connection.Close();
+            }
+
+            return paymentMethodSales;
+        }
+
+
+
         public void Dispose()
         {
             _connection?.Close();
             _connection?.Dispose();
         }
+
+        //Hilfsmethoden 
+
+        private void ImportCsvData(SqliteConnection connection, string csvFilePath)
+        {
+            //var records = ReadCsvFile(csvFilePath);
+
+            //foreach (var record in records)
+            //{
+            //    string insertSql = "INSERT INTO Strassenverzeichnis (Strasse, Ortsteil, PLZ, Vorwahl) VALUES (@Strasse, @Ortsteil, @PLZ, @Vorwahl)";
+            //    using (var command = new SqliteCommand(insertSql, connection))
+            //    {
+            //        command.Parameters.AddWithValue("@Strasse", record.Strasse);
+            //        command.Parameters.AddWithValue("@Ortsteil", record.Ortsteil);
+            //        command.Parameters.AddWithValue("@PLZ", record.PLZ);
+            //        command.Parameters.AddWithValue("@Vorwahl", record.Vorwahl);
+            //        command.ExecuteNonQuery();
+            //    }
+            //}
+        }
+
+        //private List<StreetRecord> ReadCsvFile(string filePath)
+        //{
+        //    //using (var reader = new StreamReader(filePath))
+        //    //using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
+        //    //{
+        //    //    return new List<StreetRecord>(csv.GetRecords<StreetRecord>());
+        //    //}
+        //}
+
+
     }
 }
