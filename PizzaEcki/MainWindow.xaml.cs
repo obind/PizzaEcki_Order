@@ -521,7 +521,7 @@ namespace PizzaEcki
             }
 
             // Überprüfe, ob Mittagsangebot anwendbar ist und die ausgewählte Größe "L" ist
-            if (isHappyHour && SizeComboBox.SelectedItem != null && SizeComboBox.SelectedItem.ToString() == "L" && IsEligibleForLunchOffer(selectedDish, "L"))
+            if (isHappyHour && SizeComboBox.SelectedItem != null && SizeComboBox.SelectedItem.ToString() == "L" && _orderHelper.IsEligibleForLunchOffer(selectedDish, "L"))
             {
                 PriceLabel.Content = $"9.00 €"; // Preis für das Mittagsangebot setzen
             }
@@ -808,14 +808,47 @@ namespace PizzaEcki
                     return 0; // Oder einen Standardpreis, wenn keine Größe übereinstimmt
             }
         }
+
+
+        private OrderHelper _orderHelper = new OrderHelper();
+
+
         private bool IsHappyHour()
         {
-            var currentTime = DateTime.Now.TimeOfDay;
+            var currentDateTime = DateTime.Now;
             var happyHourStart = Properties.Settings.Default.HappyHourStart;
             var happyHourEnd = Properties.Settings.Default.HappyHourEnd;
+            var happyHourStartDay = ConvertGermanDayOfWeek(Properties.Settings.Default.HappyHourStartDay);
+            var happyHourEndDay = ConvertGermanDayOfWeek(Properties.Settings.Default.HappyHourEndDay);
 
-            return currentTime >= happyHourStart && currentTime <= happyHourEnd;
+            return _orderHelper.IsHappyHour(currentDateTime, happyHourStart, happyHourEnd, happyHourStartDay, happyHourEndDay);
         }
+
+        private DayOfWeek ConvertGermanDayOfWeek(string germanDay)
+        {
+            switch (germanDay)
+            {
+                case "Montag":
+                    return DayOfWeek.Monday;
+                case "Dienstag":
+                    return DayOfWeek.Tuesday;
+                case "Mittwoch":
+                    return DayOfWeek.Wednesday;
+                case "Donnerstag":
+                    return DayOfWeek.Thursday;
+                case "Freitag":
+                    return DayOfWeek.Friday;
+                case "Samstag":
+                    return DayOfWeek.Saturday;
+                case "Sonntag":
+                    return DayOfWeek.Sunday;
+                default:
+                    throw new ArgumentException("Ungültiger Tag der Woche");
+            }
+        }
+
+
+
 
         private void ProcessOrder()
         {
@@ -827,17 +860,9 @@ namespace PizzaEcki
                 return;
             }
 
-            //if (string.IsNullOrEmpty(tempOrderItem.Gericht))
-            //{
-            //    MessageBox.Show("Bitte füllen Sie alle erforderlichen Felder aus.");
-            //    return;
-            //}
-
-            
-
             bool isHappyHourNow = IsHappyHour();
 
-            if(tempOrderItem.OrderItemId != 700)
+            if (tempOrderItem.OrderItemId != 700)
             {
                 tempOrderItem.Epreis = 0;
             }
@@ -846,26 +871,21 @@ namespace PizzaEcki
             string selectedSize = SizeComboBox.SelectedItem.ToString();
             tempOrderItem.Größe = selectedSize;
 
-            bool isHappyHour = IsHappyHour();
-
             if (selectedDish != null)
             {
                 // Grundpreis des Gerichts basierend auf der ausgewählten Größe berechnen
                 double basePrice = GetPriceForSelectedSize(selectedDish, selectedSize);
 
                 // Überprüfe, ob Mittagsangebot anwendbar ist
-                if (isHappyHourNow && IsEligibleForLunchOffer(selectedDish, selectedSize))
+                if (isHappyHourNow && _orderHelper.IsEligibleForLunchOffer(selectedDish, selectedSize))
                 {
                     basePrice = 9; // Preis für das Mittagsangebot setzen
                 }
 
-               if(tempOrderItem.OrderItemId != 700)
+                if (tempOrderItem.OrderItemId != 700)
                 {
                     tempOrderItem.Epreis = basePrice;
                 }
-
-
-           
 
                 // Verarbeite alle ausgewählten Extras
                 if (tempOrderItem.Extras != null)
@@ -896,10 +916,8 @@ namespace PizzaEcki
                 }
 
                 // Berechne den Gesamtpreis für das Gericht
-                
                 tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
             }
-
 
             // Berechnen Sie den Gesamtpreis eines Gerichtes mit Berücksichtigung der Anzahl
             tempOrderItem.Gesamt = tempOrderItem.Epreis * tempOrderItem.Menge;
@@ -908,7 +926,7 @@ namespace PizzaEcki
             tempOrderItem.Nr = orderItems.Count + 1;
             orderItems.Add(tempOrderItem);
             myDataGrid.ItemsSource = null;
-                myDataGrid.ItemsSource = orderItems;
+            myDataGrid.ItemsSource = orderItems;
 
             CalculateTotal(orderItems);
 
@@ -923,13 +941,8 @@ namespace PizzaEcki
             extraShowLabel.Text = "";
             DishComboBox.Focus();
         }
-        private bool IsEligibleForLunchOffer(Dish selectedDish, string selectedSize)
-        {
-            return (selectedDish.Kategorie == DishCategory.Pizza && selectedSize == "L" && selectedDish.HappyHour == "1") ||
-                   (selectedDish.Kategorie == DishCategory.Nudeln && selectedDish.HappyHour == "1") ||
-                   (selectedDish.Kategorie == DishCategory.Pasta && selectedDish.HappyHour == "1");
 
-        }
+       
 
 
         private bool IsLunchOfferApplicable(DateTime time)

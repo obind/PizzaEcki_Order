@@ -217,6 +217,8 @@ namespace PizzaEcki.Pages
         }
 
 
+
+
         public static class ApplicationSettings
         {
             public static TimeSpan HappyHourStartTime { get; set; }
