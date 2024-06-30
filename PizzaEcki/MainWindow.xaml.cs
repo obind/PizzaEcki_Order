@@ -277,30 +277,8 @@ namespace PizzaEcki
         private bool _firstClick = true;
         private List<string> _allStreets;
 
-        //private void CustomerStreetComboBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        //{
+      
 
-        //    string input = (CustomerStreetComboBox.Text + e.Text).Trim('\n');
-
-
-        //    // Speichere den aktuellen Text und die Cursor-Position
-        //    string currentText = CustomerStreetComboBox.Text + e.Text;
-        //    int currentCaretIndex = currentText.Length;
-
-        
-        //        List<string> suggestions = _databaseManager.GetStreetsStartingWith(currentText);
-        //    suggestions = suggestions.Select(ExtractStreetName).Distinct().Take(7).ToList(); // Duplikate entfernen
-        //    UpdateComboBoxItems(suggestions, currentText, currentCaretIndex);
-        //        CustomerStreetComboBox.IsDropDownOpen = true;
-        //        if (suggestions.Count > 0)
-        //        {
-        //            CustomerStreetComboBox.SelectedIndex = 0; 
-        //        }
-
-
-        //    // Verhindert doppeltes Tippen
-        //    e.Handled = true;
-        //}
         private string ExtractStreetName(string streetWithNumber)
         {
             // Angenommen, die Hausnummer ist durch ein Leerzeichen vom Straßennamen getrennt
@@ -312,24 +290,6 @@ namespace PizzaEcki
             return streetWithNumber; // Wenn keine Hausnummer gefunden wurde, den gesamten String zurückgeben
         }
 
-        private void UpdateComboBoxItems(IEnumerable<string> items, string currentText, int currentCaretIndex)
-        {
-            //Dispatcher.Invoke(() =>
-            //{
-            //    CustomerStreetComboBox.ItemsSource = items;
-
-            //    // Finde die TextBox in der ComboBox und setze den Text und die Cursor-Position
-            //    var textBox = (TextBox)CustomerStreetComboBox.Template.FindName("PART_EditableTextBox", CustomerStreetComboBox);
-            //    if (textBox != null)
-            //    {
-            //        textBox.Text = currentText;
-            //        textBox.SelectionStart = currentCaretIndex;
-            //        textBox.SelectionLength = textBox.Text.Length - currentCaretIndex; // Hervorhebung ab der aktuellen Cursor-Position
-
-            //    }
-            //});
-        }
-
         private void CityTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (Key.Enter == e.Key)
@@ -338,75 +298,6 @@ namespace PizzaEcki
             }
         }
 
-
-
-        //private void CustomerStreetComboBox_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    _allStreets = _databaseManager.GetAllStreets();
-        //    CustomerStreetComboBox.ItemsSource = _allStreets;
-        //    CustomerStreetComboBox.ClearValue(ComboBox.TextProperty);
-        //}
-        //private async void CustomerStreetComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        //{
-        //    if (e.Key == Key.Enter || e.Key == Key.Return)
-        //    {
-        //        e.Handled = true;
-
-        //       if (CustomerStreetComboBox.SelectedItem == null)
-        //        {
-        //            CityTextBox.Focus();
-        //            return;
-                   
-        //        }
-                
-        //            string selectedStreet = CustomerStreetComboBox.SelectedItem.ToString();
-        //            CustomerStreetComboBox.Text = selectedStreet;
-
-        //            TextBox editableTextBox = CustomerStreetComboBox.Template.FindName("PART_EditableTextBox", CustomerStreetComboBox) as TextBox;
-        //            if (editableTextBox != null)
-        //            {
-        //                editableTextBox.SelectionStart = selectedStreet.Length;
-        //            }
-
-        //            // Ort automatisch setzen (falls gewünscht)
-        //            string city = await _databaseManager.GetCityForStreet(selectedStreet);
-        //            CityTextBox.Text = city;
-               
-        //        if(CityTextBox.Text == "")
-        //        {
-        //            CityTextBox.Focus();
-        //        }
-        //        else
-        //        {
-        //            AdditionalInfoTextBox.Focus();
-        //        }   
-        //    }
-        //    else if (e.Key == Key.Down || e.Key == Key.Up)
-        //    {
-        //        // Standard-Verhalten beibehalten, um durch die ComboBox-Elemente zu navigieren
-        //        CustomerStreetComboBox.IsDropDownOpen = true;
-        //    }
-        //}
-        //private async void CustomerStreetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (CustomerStreetComboBox.SelectedItem != null)
-        //    {
-        //        string selectedStreet = CustomerStreetComboBox.SelectedItem.ToString();
-        //        CustomerStreetComboBox.Text = selectedStreet;
-
-        //        // Finde die TextBox in der ComboBox und setze den Text und die Cursor-Position
-        //        var textBox = (TextBox)CustomerStreetComboBox.Template.FindName("PART_EditableTextBox", CustomerStreetComboBox);
-        //        if (textBox != null)
-        //        {
-        //            textBox.Text = selectedStreet;
-        //            textBox.SelectionStart = selectedStreet.Length;
-        //        }
-
-        //        // Ort automatisch setzen
-        //        string city = await _databaseManager.GetCityForStreet(selectedStreet);
-        //        CityTextBox.Text = city;
-        //    }
-        //}
         private void AdditionalInfoTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (Key.Enter == e.Key && SaveButton.Visibility == Visibility.Visible)
@@ -508,6 +399,7 @@ namespace PizzaEcki
         {
             bool isHappyHour = IsHappyHour();
             Dish selectedDish = (Dish)DishComboBox.SelectedItem;
+            string selectedSize = SizeComboBox.SelectedItem.ToString();
 
             if (selectedDish == null)
             {
@@ -521,13 +413,13 @@ namespace PizzaEcki
             }
 
             // Überprüfe, ob Mittagsangebot anwendbar ist und die ausgewählte Größe "L" ist
-            if (isHappyHour && SizeComboBox.SelectedItem != null && SizeComboBox.SelectedItem.ToString() == "L" && IsEligibleForLunchOffer(selectedDish, "L"))
+            if (isHappyHour && SizeComboBox.SelectedItem != null && SizeComboBox.SelectedItem.ToString() == "L" && IsEligibleForLunchOffer(selectedDish, selectedSize))
             {
                 PriceLabel.Content = $"9.00 €"; // Preis für das Mittagsangebot setzen
             }
             else if (SizeComboBox.SelectedItem != null)
             {
-                string selectedSize = SizeComboBox.SelectedItem.ToString();
+                selectedSize = SizeComboBox.SelectedItem.ToString();
                 double price = GetPriceForSelectedSize(selectedDish, selectedSize);
                 PriceLabel.Content = $"{price:F2} €";
                 tempOrderItem.Epreis = price;
@@ -814,8 +706,15 @@ namespace PizzaEcki
             var happyHourStart = Properties.Settings.Default.HappyHourStart;
             var happyHourEnd = Properties.Settings.Default.HappyHourEnd;
 
+            // Handle overnight happy hours
+            if (happyHourStart > happyHourEnd)
+            {
+                return currentTime >= happyHourStart || currentTime <= happyHourEnd;
+            }
+
             return currentTime >= happyHourStart && currentTime <= happyHourEnd;
         }
+
 
         private void ProcessOrder()
         {
@@ -846,6 +745,7 @@ namespace PizzaEcki
             string selectedSize = SizeComboBox.SelectedItem.ToString();
             tempOrderItem.Größe = selectedSize;
 
+            
             bool isHappyHour = IsHappyHour();
 
             if (selectedDish != null)
