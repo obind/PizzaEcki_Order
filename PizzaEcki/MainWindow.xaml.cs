@@ -399,7 +399,6 @@ namespace PizzaEcki
         {
             bool isHappyHour = IsHappyHour();
             Dish selectedDish = (Dish)DishComboBox.SelectedItem;
-            string selectedSize = SizeComboBox.SelectedItem.ToString();
 
             if (selectedDish == null)
             {
@@ -419,12 +418,13 @@ namespace PizzaEcki
             }
             else if (SizeComboBox.SelectedItem != null)
             {
-                selectedSize = SizeComboBox.SelectedItem.ToString();
+                string selectedSize = SizeComboBox.SelectedItem.ToString();
                 double price = GetPriceForSelectedSize(selectedDish, selectedSize);
                 PriceLabel.Content = $"{price:F2} €";
                 tempOrderItem.Epreis = price;
             }
         }
+    
 
 
         private void DishComboBox_AutocompleteKeyDown(object sender, KeyEventArgs e)
