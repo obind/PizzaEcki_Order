@@ -413,7 +413,7 @@ namespace PizzaEcki
             }
 
             // Überprüfe, ob Mittagsangebot anwendbar ist und die ausgewählte Größe "L" ist
-            if (isHappyHour && SizeComboBox.SelectedItem != null && SizeComboBox.SelectedItem.ToString() == "L" && IsEligibleForLunchOffer(selectedDish, "L"))
+            if (isHappyHour && SizeComboBox.SelectedItem != null && SizeComboBox.SelectedItem.ToString() == "L" && _orderHelper.IsEligibleForLunchOffer(selectedDish, "L"))
             {
                 PriceLabel.Content = $"9.00 €"; // Preis für das Mittagsangebot setzen
             }
@@ -713,7 +713,31 @@ namespace PizzaEcki
             var happyHourStartDay = ConvertGermanDayOfWeek(Properties.Settings.Default.HappyHourStartDay);
             var happyHourEndDay = ConvertGermanDayOfWeek(Properties.Settings.Default.HappyHourEndDay);
 
-            return currentTime >= happyHourStart && currentTime <= happyHourEnd;
+            return _orderHelper.IsHappyHour(currentDateTime, happyHourStart, happyHourEnd, happyHourStartDay, happyHourEndDay);
+        }
+
+
+        private DayOfWeek ConvertGermanDayOfWeek(string germanDay)
+        {
+            switch (germanDay)
+            {
+                case "Montag":
+                    return DayOfWeek.Monday;
+                case "Dienstag":
+                    return DayOfWeek.Tuesday;
+                case "Mittwoch":
+                    return DayOfWeek.Wednesday;
+                case "Donnerstag":
+                    return DayOfWeek.Thursday;
+                case "Freitag":
+                    return DayOfWeek.Friday;
+                case "Samstag":
+                    return DayOfWeek.Saturday;
+                case "Sonntag":
+                    return DayOfWeek.Sunday;
+                default:
+                    throw new ArgumentException("Ungültiger Tag der Woche");
+            }
         }
 
         private void ProcessOrder()
